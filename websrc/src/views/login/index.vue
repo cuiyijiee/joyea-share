@@ -61,10 +61,11 @@
                                     localStorage.removeItem("u")
                                 }
                                 localStorage.setItem("userInfo",JSON.stringify({
+                                    session:response.session,
                                     name:response.user_name,
                                     email:_this.loginForm.user
                                 }));
-                                _this.$router.push("/")
+                                _this.$router.push("/build")
                             } else {
                                 _this.$message.error("登陆失败，请检查用户名密码！");
                                 console.log(response.msg);

@@ -96,6 +96,8 @@
             let user = localStorage.getItem('userInfo');
             if (user) {
                 this.userInfo = JSON.parse(user)
+            }else{
+                this.$router.push("/login")
             }
         }
     }

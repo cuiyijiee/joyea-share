@@ -32,7 +32,7 @@ class UserHandler extends IAction {
         val userName = request.get("user").asString()
 
         LenovoUtil.logout(userName, new CommonListener[String] {
-          override def onSuccess(resp:String): Unit = {
+          override def onSuccess(resp: String): Unit = {
             println(resp)
           }
 
@@ -43,6 +43,9 @@ class UserHandler extends IAction {
 
         context.session.remove("lenovo_session")
         listener.onSuccess(respJson = resJson)
+
+      case "check" =>
+
       case _ =>
     }
   }

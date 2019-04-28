@@ -4,18 +4,17 @@
         <el-input placeholder="输入你想搜索的任何内容" v-model="search.key" class="input-with-select px10_divider">
             <el-select v-model="search.type" slot="prepend" placeholder="请选择类型" style="width: 80px"
                        :value="search.type">
-                <el-option v-for="item in options.search" :label="item.label" :value="item.value" :key="item.value"/>
+                <el-option v-for="item in options.search" :label="item.label" :value="item.value" :key="item.value" :disabled="item.disabled"/>
             </el-select>
             <el-button slot="append" icon="el-icon-search" v-on:click="handleSearch"></el-button>
         </el-input>
         <el-row :gutter="20" class="px10_divider">
-            <el-col :span="12" class="bg-purple"
-                    v-loading="loading.search">
+            <el-col :span="12" class="bg-purple">
                 <div>
                     <div style="width: 100%" class="center_vertical">
                         <h1>搜索结果</h1>
                     </div>
-                    <el-table stripe empty-text="暂没有搜索数据" :data="searchResult" style="width: 100%">
+                    <el-table stripe empty-text="暂没有搜索数据" :data="searchResult" style="width: 100%" v-loading="loading.search">
                         <el-table-column prop="path" label="素材名"/>
                         <el-table-column prop="mime_type" label="素材格式" width="150"/>
                         <!--                    <el-table-column prop="updator" label="是否有解说词" /> -->
@@ -72,9 +71,16 @@
                             </template>
                         </el-table-column>
                     </el-table>
-                    <el-button class="load_more_bt" :class="{no_display:toCreateAlbum.list.length === 0}"
-                               type="primary" @click="handleSaveList">{{'保存当前清单(' + toCreateAlbum.list.length + ')'}}
-                    </el-button>
+                    <el-row  class="load_more_bt" :class="{no_display:toCreateAlbum.list.length === 0}">
+                        <el-col  :span="12">
+                            <el-button type="primary" @click="handleSaveList" class="load_more_bt">{{'保存当前清单(' + toCreateAlbum.list.length + ')'}}
+                            </el-button>
+                        </el-col>
+                        <el-col  :span="12">
+                            <el-button type="danger" @click="handleClearList" class="load_more_bt" >{{'清空当前清单(' + toCreateAlbum.list.length + ')'}}
+                            </el-button>
+                        </el-col>
+                    </el-row >
                 </div>
             </el-col>
         </el-row>
@@ -93,11 +99,14 @@
                     key: '仅一',
                     hasNext: false
                 },
+                userInfo:{
+
+                },
                 options: {
                     search: [
                         {value: 'pic', label: '图片'},
-                        {value: 'video', label: '视频'},
-                        {value: '', label: '全部'}
+                        {value: 'video', label: '视频',disabled: false},
+                        {value: '', label: '全部',disabled: false}
                     ]
                 },
                 loading: {
@@ -225,7 +234,9 @@
                 this.toCreateAlbum.list.splice(index, 1);
             },
             genPreviewUrl(neid, hash, rev) {
-                return 'https://console.box.lenovo.com/v2/preview_router?type=pic&root=databox&path=&path_type=ent&from=&neid=' + neid + '&hash=' + hash + '&rev=' + rev;
+                let previewType = 'pic';    // if video is av
+                return 'https://console.box.lenovo.com/v2/preview_router?type=' + previewType +'&root=databox&path=&path_type=ent&from=&neid='
+                    + neid + '&hash=' + hash + '&rev=' + rev + "&X-LENOVO-SESS-ID=" + this.userInfo.session;
                 //+ '&date=' + new Date().getTime();
             },
             handleSaveList() {
@@ -243,6 +254,20 @@
                         message: '取消保存'
                     });
                 });
+            },
+            handleClearList(){
+                this.$alert('当前列表还没有保存，确定清空吗？', '清空提示', {
+                    confirmButtonText: '确定',
+                    callback: action => {
+                        this.toCreateAlbum.list = [];
+                    }
+                });
+            }
+        },
+        mounted() {
+            let user = localStorage.getItem('userInfo');
+            if (user) {
+                this.userInfo = JSON.parse(user)
             }
         }
     }
