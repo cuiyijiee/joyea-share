@@ -19,7 +19,7 @@ object LenovoUtil {
     * @param pwd
     * @param listener
     */
-  def login(user: String, pwd: String, listener: CommonListener[(String, String)]): Unit = {
+  def login(user: String, pwd: String, listener: CommonListener[(String, String, Long)]): Unit = {
     val formBodyBuilder = new FormBody.Builder()
     formBodyBuilder.add("user_slug", s"email:$user")
     formBodyBuilder.add("password", pwd)
@@ -38,7 +38,7 @@ object LenovoUtil {
           if (session == null) {
             listener.onError(s"登陆错误:$respStr")
           } else {
-            listener.onSuccess((session, respJson.getString("user_name", "")))
+            listener.onSuccess((session, respJson.getString("user_name", ""), respJson.getLong("user_id", -1)))
           }
         } catch {
           case e: Exception =>
@@ -115,7 +115,7 @@ object LenovoUtil {
     })
   }
 
-  def obtainFilePreviewUrl(sessionID:String,filePath: String, rev: String, listener: CommonListener[JsonObject]): Unit = {
+  def obtainFilePreviewUrl(sessionID: String, filePath: String, rev: String, listener: CommonListener[JsonObject]): Unit = {
     val urlBuilder = HttpUrl.parse(s"$BASE_URL/dl_router/databox$filePath").newBuilder()
     urlBuilder
       //.addQueryParameter("root", "/")
@@ -141,5 +141,24 @@ object LenovoUtil {
         }
       }
     })
+  }
+
+  def getUserInfo(sessionID: String, listener: CommonListener[JsonObject]): Unit = {
+    val request = HttpUtil.obtainBaseRequest(sessionID).url("https://box.lenovo.com/v2/user/info/get").get().build()
+    HttpUtil.obtainHttpClient().newCall(request).enqueue(new Callback {
+      override def onFailure(call: Call, e: IOException): Unit = {
+        listener.onError("请求失败！")
+      }
+
+      override def onResponse(call: Call, response: Response): Unit = {
+        val resultJson = JsonObject.readFrom(response.body().string())
+        if (resultJson.getInt("state", -1) == 401) {
+          listener.onError(resultJson.get("message").asString())
+        } else {
+          listener.onSuccess(resultJson)
+        }
+      }
+    })
+
   }
 }

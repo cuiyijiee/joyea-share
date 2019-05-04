@@ -78,7 +78,6 @@
             logout: function () {
                 let _this = this;
                 this.$confirm('确认退出吗?', '提示', {
-
                 }).then(() => {
                     _this.$router.push('/login');
                     api({

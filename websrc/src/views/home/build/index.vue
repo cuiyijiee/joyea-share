@@ -4,7 +4,8 @@
         <el-input placeholder="输入你想搜索的任何内容" v-model="search.key" class="input-with-select px10_divider">
             <el-select v-model="search.type" slot="prepend" placeholder="请选择类型" style="width: 80px"
                        :value="search.type">
-                <el-option v-for="item in options.search" :label="item.label" :value="item.value" :key="item.value" :disabled="item.disabled"/>
+                <el-option v-for="item in options.search" :label="item.label" :value="item.value" :key="item.value"
+                           :disabled="item.disabled"/>
             </el-select>
             <el-button slot="append" icon="el-icon-search" v-on:click="handleSearch"></el-button>
         </el-input>
@@ -14,15 +15,18 @@
                     <div style="width: 100%" class="center_vertical">
                         <h1>搜索结果</h1>
                     </div>
-                    <el-table stripe empty-text="暂没有搜索数据" :data="searchResult" style="width: 100%" v-loading="loading.search">
+                    <el-table stripe empty-text="暂没有搜索数据" :data="searchResult" style="width: 100%"
+                              v-loading="loading.search">
                         <el-table-column prop="path" label="素材名"/>
-                        <el-table-column prop="mime_type" label="素材格式" width="150"/>
+                        <el-table-column label="解说词" width="80">0</el-table-column>
+                        <el-table-column prop="mime_type" label="素材格式" width="100"/>
                         <!--                    <el-table-column prop="updator" label="是否有解说词" /> -->
-                        <el-table-column label="操作" width="150">
+                        <el-table-column label="操作" width="120">
                             <template slot-scope="scope">
                                 <el-button circle type="primary" @click="handleAdd(scope.$index, scope.row)"
                                            icon="el-icon-plus"/>
-                                <el-button circle type="warning" @click="handleCollect(scope.$index, scope.row)"
+                                <el-button circle :type="scope.row.collect ? 'warning' : ''"
+                                           @click="handleCollect(scope.$index, scope.row)"
                                            icon="el-icon-star-off"/>
                             </template>
                         </el-table-column>
@@ -71,16 +75,18 @@
                             </template>
                         </el-table-column>
                     </el-table>
-                    <el-row  class="load_more_bt" :class="{no_display:toCreateAlbum.list.length === 0}">
-                        <el-col  :span="12">
-                            <el-button type="primary" @click="handleSaveList" class="load_more_bt">{{'保存当前清单(' + toCreateAlbum.list.length + ')'}}
+                    <el-row class="load_more_bt" :class="{no_display:toCreateAlbum.list.length === 0}">
+                        <el-col :span="12">
+                            <el-button type="primary" @click="handleSaveList" class="load_more_bt">{{'保存当前清单(' +
+                                toCreateAlbum.list.length + ')'}}
                             </el-button>
                         </el-col>
-                        <el-col  :span="12">
-                            <el-button type="danger" @click="handleClearList" class="load_more_bt" >{{'清空当前清单(' + toCreateAlbum.list.length + ')'}}
+                        <el-col :span="12">
+                            <el-button type="danger" @click="handleClearList" class="load_more_bt">{{'清空当前清单(' +
+                                toCreateAlbum.list.length + ')'}}
                             </el-button>
                         </el-col>
-                    </el-row >
+                    </el-row>
                 </div>
             </el-col>
         </el-row>
@@ -89,6 +95,7 @@
 
 <script>
     import api from "../../../api";
+    import genSrcPreviewSrc from "../../../utils/index"
 
     export default {
         name: "index",
@@ -99,14 +106,12 @@
                     key: '仅一',
                     hasNext: false
                 },
-                userInfo:{
-
-                },
+                userInfo: {},
                 options: {
                     search: [
                         {value: 'pic', label: '图片'},
-                        {value: 'video', label: '视频',disabled: false},
-                        {value: '', label: '全部',disabled: false}
+                        {value: 'video', label: '视频', disabled: true},
+                        {value: '', label: '全部', disabled: true}
                     ]
                 },
                 loading: {
@@ -203,7 +208,27 @@
                 this.toCreateAlbum.list.push(row);
             },
             handleCollect(index, row) {
-
+                api({
+                    action: "srcCollect",
+                    method: row.collect ? 'unCollect' : 'collect',
+                    neid: row.neid,
+                    path: row.path,
+                    type: row.mime_type,
+                    hash: row.hash,
+                    rev: row.rev,
+                    size: row.size
+                }).then(response => {
+                    if (response.result) {
+                        row.collect = !row.collect;
+                        this.$notify.success({
+                            type: "success",
+                            title: "提示",
+                            message: row.collect ? "收藏成功:" + row.filename : "取消收藏成功:" + row.filename
+                        })
+                    } else {
+                        console.log(response.msg)
+                    }
+                })
             },
             handleModify(index, row, cg) {
                 //点击修改 判断是否已经保存所有操作
@@ -235,19 +260,36 @@
             },
             genPreviewUrl(neid, hash, rev) {
                 let previewType = 'pic';    // if video is av
-                return 'https://console.box.lenovo.com/v2/preview_router?type=' + previewType +'&root=databox&path=&path_type=ent&from=&neid='
-                    + neid + '&hash=' + hash + '&rev=' + rev + "&X-LENOVO-SESS-ID=" + this.userInfo.session;
+                return genSrcPreviewSrc(neid, hash, rev, previewType, this.userInfo.session);
+                // return 'https://console.box.lenovo.com/v2/preview_router?type=' + previewType + '&root=databox&path=&path_type=ent&from=&neid='
+                //     + neid + '&hash=' + hash + '&rev=' + rev + "&X-LENOVO-SESS-ID=" + this.userInfo.session;
                 //+ '&date=' + new Date().getTime();
             },
             handleSaveList() {
                 this.$prompt('请输入清单的名称', '保存提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消'
-                }).then(({ value }) => {
-                    this.$notify.success({
-                        title:"保存结果",
-                        message:'保存成功'
-                    })
+                }).then(action => {
+                    let listName = action.value;
+                    api({
+                        action: 'album',
+                        method: 'save',
+                        name: listName,
+                        src: this.toCreateAlbum.list
+                    }).then(response => {
+                        if(response.result){
+                            this.$notify.success({
+                                title: "保存结果",
+                                message: '保存成功'
+                            })
+                        }else{
+                            console.log(response.msg);
+                            this.$notify.error({
+                                title: "保存结果",
+                                message: '保存失败'
+                            })
+                        }
+                    });
                 }).catch(() => {
                     this.$message({
                         type: 'info',
@@ -255,7 +297,7 @@
                     });
                 });
             },
-            handleClearList(){
+            handleClearList() {
                 this.$alert('当前列表还没有保存，确定清空吗？', '清空提示', {
                     confirmButtonText: '确定',
                     callback: action => {

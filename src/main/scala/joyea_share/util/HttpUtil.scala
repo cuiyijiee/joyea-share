@@ -26,4 +26,8 @@ object HttpUtil {
       .addHeader("Connection", "keep-alive")
   }
 
+  def obtainBaseRequest(sessionId: String): Request.Builder = {
+    obtainBaseRequest().header("Cookie", s"X-LENOVO-SESS-ID=$sessionId")
+  }
+
 }

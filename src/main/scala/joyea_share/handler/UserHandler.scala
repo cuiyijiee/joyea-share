@@ -14,9 +14,11 @@ class UserHandler extends IAction {
         val userName = request.get("user").asString()
         val canSee = request.getBoolean("see", false)
         val pwd = if (canSee) request.get("pwd").asString() else new String(Base64.getDecoder.decode(request.get("pwd").asString()), "utf-8")
-        LenovoUtil.login(userName, pwd, new CommonListener[(String, String)] {
-          override def onSuccess(session: (String, String)): Unit = {
+        LenovoUtil.login(userName, pwd, new CommonListener[(String, String, Long)] {
+          override def onSuccess(session: (String, String, Long)): Unit = {
             context.session("lenovo_session") = session._1
+            context.session("user_name") = session._2
+            context.session("user_id") = session._3
             listener.onSuccess(respJson =
               resJson.add("session", session._1)
                 .add("user_name", session._2)

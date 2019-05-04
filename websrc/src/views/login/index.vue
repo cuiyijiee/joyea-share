@@ -3,7 +3,7 @@
              class="demo-ruleForm login-container">
         <h3 class="title">仅一素材库系统</h3>
         <el-form-item prop="useruser">
-            <el-input type="text" v-model="loginForm.user" auto-complete="off" placeholder="联想网盘账号"></el-input>
+            <el-input type="text" v-model="loginForm.user" auto-complete="off" placeholder="联想网盘账号(暂只支持邮箱)"></el-input>
         </el-form-item>
         <el-form-item prop="pwd">
             <el-input type="password" v-model="loginForm.pwd" auto-complete="off" placeholder="密码"></el-input>
@@ -33,7 +33,7 @@
                 },
                 loginRule: {
                     user: [
-                        {required: true, message: '请输入账号', trigger: 'blur'},
+                        {required: true, message: '请输入账号(暂只支持邮箱)', trigger: 'blur'},
                     ],
                     pwd: [
                         {required: true, message: '请输入密码', trigger: 'blur'},

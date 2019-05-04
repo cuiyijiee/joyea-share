@@ -1,13 +1,122 @@
 <template>
-    
+    <section>
+        <div class="px10_divider">
+            <el-row>
+                <el-col :md="8" :xs="24" v-for="(img,fileIndex) in collectList" :key="img.path">
+                    <el-card style="padding: 2px;margin: 5px">
+                        <img :src="img.url"
+                             style="width: 100%; height: 150px"
+                             preview="我的收藏" :preview-text="img.path">
+                        <div style="height: 20px;margin-top: 10px">
+                            <el-tooltip class="item" effect="dark" :content="img.path" placement="bottom">
+                                <span class="svg_name">{{img.path}}</span>
+                            </el-tooltip>
+                        </div>
+                    </el-card>
+                </el-col>
+            </el-row>
+        </div>
+        <div style="width: 100%;margin: 10px 0">
+            <el-pagination
+                    background
+                    layout="prev, pager, next"
+                    @current-change="pageFind"
+                    :page-size="pageSize"
+                    :current-page="curPage"
+                    :total="total">
+            </el-pagination>
+        </div>
+    </section>
 </template>
 
 <script>
+
+    import api from "../../../api";
+    import genSrcPreviewUrl from "../../../utils/index"
+
     export default {
-        name: "collection"
+        name: "collection",
+        data() {
+            return {
+                userInfo: {},
+                curPage: 1,
+                pageSize: 15,
+                total: 0,
+                collectList: []
+            }
+        },
+        methods: {
+            pageFind(curPage) {
+                api({
+                    action: 'srcCollect',
+                    method: 'pageFind',
+                    curPage: curPage,
+                    pageSize: this.pageSize
+                }).then(response => {
+                    if (response.result) {
+                        this.curPage = response.curPage;
+                        this.pageSize = response.pageSize;
+                        this.total = response.total;
+                        let previewType = 'pic';    // if video is av
+                        this.collectList = [];
+                        response.list.forEach(src => {
+                            this.collectList.push({
+                                url: genSrcPreviewUrl(src.neid, src.hash, src.rev, previewType, this.userInfo.session),
+                                path:src.path
+                            })
+                        })
+                    } else {
+                        console.log(response.msg)
+                    }
+                })
+            }
+        },
+        mounted() {
+            let user = localStorage.getItem('userInfo');
+            if (user) {
+                this.userInfo = JSON.parse(user)
+            }
+            this.pageFind(this.curPage);
+        }
     }
 </script>
 
 <style scoped>
 
+    .px10_divider {
+        margin-top: 10px;
+    }
+
+    #list {
+        overflow-x: auto;
+        list-style: none;
+        white-space: nowrap;
+        width: auto;
+    }
+
+    ::-webkit-scrollbar {
+        width: 0 !important
+    }
+
+    .svg_name {
+        white-space: normal;
+        color: #606266;
+        font-weight: 500;
+        font-size: 14px;
+    }
+
+    .item {
+        display: inline-block;
+        padding-right: 20px;
+    }
+
+    ul {
+        margin-block-start: 0;
+        margin-block-end: 0;
+        padding-inline-start: 20px;
+    }
+
+    .no_display {
+        display: none;
+    }
 </style>
