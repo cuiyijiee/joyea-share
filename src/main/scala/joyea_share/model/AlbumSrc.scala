@@ -28,9 +28,8 @@ case class AlbumSrc(
         .add("type", this.srcType)
         .add("rev", this.srcRev)
         .add("size", this.srcSize)
-        .add("cp ", this.srcDesc)
+        .add("desc", this.srcDesc)
         .add("created_at", this.createdAt.getTime)
-
 }
 
 object AlbumSrc extends SQLSyntaxSupport[AlbumSrc] with ShortenedNames {
@@ -91,6 +90,10 @@ object AlbumSrc extends SQLSyntaxSupport[AlbumSrc] with ShortenedNames {
 
     def findByAlbumId(albumId: Long)(implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[List[AlbumSrc]] = withSQL {
         selectFrom(AlbumSrc as albums).where.eq(albums.albumId, albumId)
+    }.map(AlbumSrc(albums)).list().future()
+
+    def findByNeid(srcNeid: Long)(implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[List[AlbumSrc]] = withSQL {
+        selectFrom(AlbumSrc as albums).where.eq(albums.srcNeid, srcNeid)
     }.map(AlbumSrc(albums)).list().future()
 
 }

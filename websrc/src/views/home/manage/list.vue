@@ -1,7 +1,7 @@
 <template>
     <section>
         <!--工具条-->
-        <el-input placeholder="输入清单名称查找" v-model="search.key" class="input-with-select px10_divider">
+        <el-input placeholder="输入清单名称查找" v-model="search.key" class="input-with-select px10_divider" style="display: none">
             <el-button slot="append" icon="el-icon-search" v-on:click="handleSearch"></el-button>
         </el-input>
 
@@ -9,6 +9,10 @@
             <el-card v-for="(album,index) in albumList" style="margin-bottom: 10px">
                 <div slot="header" class="clearfix">
                     <span style="color: #fff;font-weight:bold;">{{album.name}}</span>
+                    <span style="float: right">
+                        <el-button icon="el-icon-share" circle size="mini"/>
+                        <el-button icon="el-icon-delete" circle size="mini" @click="handleDelete(index)"/>
+                    </span>
                 </div>
                 <el-row>
                     <el-col :md="8" :xs="24" v-for="(img,fileIndex) in album.list">
@@ -61,13 +65,14 @@
                             let imgUrl = [];
                             list.src.forEach(src => {
                                 imgUrl.push({
-                                    url:genSrcPreviewUrl(src.neid, src.hash, src.rev, previewType, this.userInfo.session),
-                                    desc:src.desc
+                                    url: genSrcPreviewUrl(src.neid, src.hash, src.rev, previewType, this.userInfo.session),
+                                    desc: src.desc
                                 })
                             });
                             this.albumList.push({
-                                name:list.album_name,
-                                list:imgUrl
+                                id: list.album_id,
+                                name: list.album_name,
+                                list: imgUrl
                             })
                         })
                     } else {
@@ -75,6 +80,30 @@
                         this.$message.error("加载失败！")
                     }
                 })
+            },
+            handleDelete(index) {
+                this.$alert('即将删除清单【 ' + this.albumList[index].name + ' 】！', '删除提示', {
+                    confirmButtonText: '删除',
+                    callback: action => {
+                        if(action === "confirm"){
+                            api({
+                                action: "album",
+                                method: "delete",
+                                album_id: this.albumList[index].id
+                            }).then(response => {
+                                if (response.result) {
+                                    this.$message.success("清单【 " + this.albumList[index].name + " 】删除成功！");
+                                    this.albumList.splice(index, 1)
+                                } else {
+                                    this.$notify.error({
+                                        title: "提示",
+                                        message: "清单【 " + this.albumList[index].name + " 】删除失败！"
+                                    })
+                                }
+                            })
+                        }
+                    }
+                });
             }
         },
         mounted() {

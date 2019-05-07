@@ -18,7 +18,11 @@
                     <el-table stripe empty-text="暂没有搜索数据" :data="searchResult" style="width: 100%"
                               v-loading="loading.search">
                         <el-table-column prop="path" label="素材名"/>
-                        <el-table-column label="解说词" width="80">0</el-table-column>
+                        <el-table-column label="解说词" width="80">
+                            <template slot-scope="scope">
+                                <span>{{scope.row.desc.length}}</span>
+                            </template>
+                        </el-table-column>
                         <el-table-column prop="mime_type" label="素材格式" width="100"/>
                         <!--                    <el-table-column prop="updator" label="是否有解说词" /> -->
                         <el-table-column label="操作" width="120">
@@ -90,6 +94,12 @@
                 </div>
             </el-col>
         </el-row>
+        <el-dialog title="选择已有解说词" :visible.sync="toCreateAlbum.descSelectDialogVisible">
+            <el-table :data="toCreateAlbum.toSelectDesc" @row-click="handleSelectDesc">
+                <el-table-column prop="desc"></el-table-column>
+            </el-table>
+            <el-button type="primary" @click="handleCustomDesc" style="margin-top: 10px">不用借鉴别人的解说词，自己编辑</el-button>
+        </el-dialog>
     </section>
 </template>
 
@@ -122,13 +132,16 @@
                 toCreateAlbum: {
                     name: '',
                     list: [],
-                    modifyRow: ''
+                    modifyRow: '',
+                    toAddRow: {},
+                    descSelectDialogVisible: false,
+                    toSelectDesc: []
                 },
                 loadMoreForm: {
                     type: '',
                     key: '',
                     nextOffset: 0
-                }
+                },
             }
         },
         methods: {
@@ -205,7 +218,27 @@
                 }
             },
             handleAdd(index, row) {
-                this.toCreateAlbum.list.push(row);
+                if (row.desc.length > 0) {
+                    this.toCreateAlbum.toAddRow = row;
+                    this.toCreateAlbum.toSelectDesc = row.desc;
+                    this.toCreateAlbum.descSelectDialogVisible = true;
+                } else {
+                    this.toCreateAlbum.list.push(row);
+                }
+            },
+            handleSelectDesc(row, column, event) {
+                this.toCreateAlbum.toAddRow.joyeaDesc = row.desc;
+                this.toCreateAlbum.list.push(this.toCreateAlbum.toAddRow);
+                this.toCreateAlbum.toAddRow = {};
+                this.toCreateAlbum.toSelectDesc = [];
+                this.toCreateAlbum.descSelectDialogVisible = false;
+            },
+            handleCustomDesc() {
+                this.toCreateAlbum.toAddRow.joyeaDesc = "";
+                this.toCreateAlbum.list.push(this.toCreateAlbum.toAddRow);
+                this.toCreateAlbum.toAddRow = {};
+                this.toCreateAlbum.toSelectDesc = [];
+                this.toCreateAlbum.descSelectDialogVisible = false;
             },
             handleCollect(index, row) {
                 api({
@@ -277,12 +310,12 @@
                         name: listName,
                         src: this.toCreateAlbum.list
                     }).then(response => {
-                        if(response.result){
+                        if (response.result) {
                             this.$notify.success({
                                 title: "保存结果",
                                 message: '保存成功'
                             })
-                        }else{
+                        } else {
                             console.log(response.msg);
                             this.$notify.error({
                                 title: "保存结果",

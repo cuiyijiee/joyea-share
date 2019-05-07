@@ -74,11 +74,11 @@ class AlbumHandler extends IAction {
                         val albumArr = new JsonArray()
                         albumList.foreach(album => {
                             val albumJson = album.toJson
-                            val albumSrcList = Await.result(AsyncDB.withPool{
+                            val albumSrcList = Await.result(AsyncDB.withPool {
                                 implicit tx => {
                                     AlbumSrc.findByAlbumId(album.albumId)
                                 }
-                            },MySQLSettings.MYSQL_READ_TIMEOUT)
+                            }, MySQLSettings.MYSQL_READ_TIMEOUT)
 
                             val albumSrcArr = new JsonArray()
                             albumSrcList.foreach(albumSrc => {
@@ -90,6 +90,17 @@ class AlbumHandler extends IAction {
                         listener.onSuccess(respJson = resJson.add("data", albumArr))
                     } else {
                         listener.onError("查询失败:" + SUtil.convertExceptionToStr(findTry.failed.get))
+                    }
+                })
+            case "delete" =>
+                val albumId = request.get("album_id").asLong()
+                Album.delete(albumId).onComplete(delTry => {
+                    if (delTry.isSuccess) {
+                        AlbumSrc.deleteByAlbumId(albumId).onComplete(_ => {
+                            listener.onSuccess(respJson = resJson)
+                        })
+                    } else {
+                        listener.onError("删除失败:" + SUtil.convertExceptionToStr(delTry.failed.get))
                     }
                 })
             case _ =>
