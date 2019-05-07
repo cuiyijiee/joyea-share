@@ -1,7 +1,8 @@
 <template>
     <section>
         <!--工具条-->
-        <el-input placeholder="输入清单名称查找" v-model="search.key" class="input-with-select px10_divider" style="display: none">
+        <el-input placeholder="输入清单名称查找" v-model="search.key" class="input-with-select px10_divider"
+                  style="display: none">
             <el-button slot="append" icon="el-icon-search" v-on:click="handleSearch"></el-button>
         </el-input>
 
@@ -10,7 +11,8 @@
                 <div slot="header" class="clearfix">
                     <span style="color: #fff;font-weight:bold;">{{album.name}}</span>
                     <span style="float: right">
-                        <el-button icon="el-icon-share" circle size="mini"/>
+                        <el-button :type="album.shared ? 'warning':''" icon="el-icon-share" circle size="mini"
+                                   @click="handleShare(index)"/>
                         <el-button icon="el-icon-delete" circle size="mini" @click="handleDelete(index)"/>
                     </span>
                 </div>
@@ -22,7 +24,7 @@
                                  :preview="album.name" :preview-text="img.desc">
                             <div style="height: 20px;margin-top: 10px">
                                 <el-tooltip class="item" effect="dark" :content="img.desc" placement="bottom">
-                                    <span class="svg_name">{{img.desc}}</span>
+                                    <span class="svg_name"><b>解说词：</b>{{img.desc}}</span>
                                 </el-tooltip>
                             </div>
                         </el-card>
@@ -72,6 +74,7 @@
                             this.albumList.push({
                                 id: list.album_id,
                                 name: list.album_name,
+                                shared: list.shared,
                                 list: imgUrl
                             })
                         })
@@ -85,7 +88,7 @@
                 this.$alert('即将删除清单【 ' + this.albumList[index].name + ' 】！', '删除提示', {
                     confirmButtonText: '删除',
                     callback: action => {
-                        if(action === "confirm"){
+                        if (action === "confirm") {
                             api({
                                 action: "album",
                                 method: "delete",
@@ -104,6 +107,20 @@
                         }
                     }
                 });
+            },
+            handleShare(index) {
+                api({
+                    action: "album",
+                    method: this.albumList[index].shared ? "unShare" : "share",
+                    album_id: this.albumList[index].id
+                }).then(response => {
+                    if (response.result) {
+                        this.albumList[index].shared = !this.albumList[index].shared;
+
+                    } else {
+                        this.$message.error("操作失败！")
+                    }
+                })
             }
         },
         mounted() {

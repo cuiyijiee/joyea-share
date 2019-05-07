@@ -7,6 +7,7 @@ import Login from '../views/login/index'
 import Build from '../views/home/build'
 import Collection from '../views/home/manage/collection'
 import List from '../views/home/manage/list'
+import Share from '../views/home/share'
 
 Vue.use(Router);
 
@@ -17,6 +18,12 @@ export default new Router({
             path: '/login',
             name: '登陆',
             component: Login,
+            hidden:true
+        },
+        {
+            path: '/share',
+            name: '分享',
+            component: Share,
             hidden:true
         },
         {

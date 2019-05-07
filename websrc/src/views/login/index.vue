@@ -55,17 +55,20 @@
                         }).then(response => {
                             if (response.result) {
                                 _this.$message.success("登陆成功,【" + response.user_name + "】欢迎您回来！");
-                                if(_this.loginForm.rememberPwd){
-                                    localStorage.setItem("u",btoa(JSON.stringify(_this.loginForm)))
-                                }else{
+                                if (_this.loginForm.rememberPwd) {
+                                    localStorage.setItem("u", btoa(JSON.stringify(_this.loginForm)))
+                                } else {
                                     localStorage.removeItem("u")
                                 }
-                                localStorage.setItem("userInfo",JSON.stringify({
-                                    session:response.session,
-                                    name:response.user_name,
-                                    email:_this.loginForm.user
+                                localStorage.setItem("userInfo", JSON.stringify({
+                                    session: response.session,
+                                    name: response.user_name,
+                                    email: _this.loginForm.user
                                 }));
-                                _this.$router.push("/build")
+                                _this.$router.push({
+                                    name: "制作清单",
+                                    params: {checked: true}
+                                })
                             } else {
                                 _this.$message.error("登陆失败，请检查用户名密码！");
                                 console.log(response.msg);
@@ -73,7 +76,7 @@
                         }).catch(error => {
                             _this.$message.error("登陆失败，请检查用户名密码！");
                             console.log(error);
-                        }).finally(()=> {
+                        }).finally(() => {
                             _this.loginLoading = false;
                         })
                     } else {
@@ -85,7 +88,7 @@
         },
         mounted() {
             let userInfoOpt = localStorage.getItem("u");
-            if(userInfoOpt){
+            if (userInfoOpt) {
                 this.loginForm = JSON.parse(atob(userInfoOpt))
             }
         }

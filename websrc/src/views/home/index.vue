@@ -27,7 +27,8 @@
                                           v-if="!child.hidden">{{child.name}}
                             </el-menu-item>
                         </el-submenu>
-                        <el-menu-item v-if="item.noChild && item.children && item.children.length > 0" :index="item.children[0].path"><i
+                        <el-menu-item v-if="item.noChild && item.children && item.children.length > 0"
+                                      :index="item.children[0].path"><i
                                 :class="item.icon"></i>{{item.name}}
                         </el-menu-item>
                     </template>
@@ -56,15 +57,16 @@
 
 <script>
     import api from "../../api/index";
-    const localStorage  = window.localStorage;
+
+    const localStorage = window.localStorage;
 
     export default {
         data() {
             return {
                 sysName: '仅一素材库系统',
-                userInfo:{
-                    name:'',
-                    email:''
+                userInfo: {
+                    name: '',
+                    email: ''
                 }
             }
         },
@@ -77,13 +79,12 @@
             },
             logout: function () {
                 let _this = this;
-                this.$confirm('确认退出吗?', '提示', {
-                }).then(() => {
+                this.$confirm('确认退出吗?', '提示', {}).then(() => {
                     _this.$router.push('/login');
                     api({
-                        action:'user',
-                        method:'logout',
-                        user:_this.userInfo.email
+                        action: 'user',
+                        method: 'logout',
+                        user: _this.userInfo.email
                     }).then(resp => {
 
                     })
@@ -92,10 +93,23 @@
             }
         },
         mounted() {
+            if (!this.$route.params.checked) {
+                api({
+                    action: "user",
+                    method: "check"
+                }).then(response => {
+                    if (response.result) {
+
+                    } else {
+                        this.$router.push("/login");
+                        this.$message.error(response.msg)
+                    }
+                })
+            }
             let user = localStorage.getItem('userInfo');
             if (user) {
                 this.userInfo = JSON.parse(user)
-            }else{
+            } else {
                 this.$router.push("/login")
             }
         }
@@ -142,15 +156,17 @@
                 font-size: 22px;
                 padding-left: 20px;
                 padding-right: 20px;
-                -webkit-user-select:none;
-                -moz-user-select:none;
-                -ms-user-select:none;
-                user-select:none;
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+
                 img {
                     width: 40px;
                     float: left;
                     margin: 10px 10px 10px 18px;
                 }
+
                 .txt {
                     color: #fff;
                 }
