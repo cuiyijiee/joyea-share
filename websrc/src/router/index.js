@@ -16,44 +16,47 @@ export default new Router({
     routes: [
         {
             path: '/login',
-            name: '登陆',
+            name: 'login',
+            desc: '登陆',
             component: Login,
-            hidden:true
+            hidden: true
         },
         {
             path: '/share',
-            name: '分享',
+            name: 'share',
+            desc: '分享',
             component: Share,
-            hidden:true
+            hidden: true
         },
         {
             path: '/',
             name: '工作台',
+            desc: '工作台',
             component: Home,
-            icon:'el-icon-edit',
+            icon: 'el-icon-edit',
             noChild: true,
-            children:[
-                { path: '/build', component: Build, name: '制作清单' }
+            children: [
+                {path: '/build', component: Build, name: 'build', desc: '制作清单',}
             ]
         },
         {
             path: '/',
             name: '我的清单',
             component: Home,
-            icon:'el-icon-tickets',
+            icon: 'el-icon-tickets',
             noChild: true,
-            children:[
-                { path: '/manage/list', component: List, name: '清单' },
+            children: [
+                {path: '/manage/list', component: List, name: 'list', desc: '清单'},
             ]
         },
         {
             path: '/',
             name: '我的收藏',
             component: Home,
-            icon:'el-icon-star-off',
+            icon: 'el-icon-star-off',
             noChild: true,
-            children:[
-                { path: '/manage/collection', component: Collection, name: '收藏' },
+            children: [
+                {path: '/manage/collection', component: Collection, name: 'collection', desc: '收藏'},
             ]
         }
     ]

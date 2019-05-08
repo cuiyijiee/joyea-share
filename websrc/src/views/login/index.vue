@@ -65,10 +65,25 @@
                                     name: response.user_name,
                                     email: _this.loginForm.user
                                 }));
-                                _this.$router.push({
-                                    name: "制作清单",
-                                    params: {checked: true}
-                                })
+                                if (_this.$route.query.ref) {
+                                    let refInfo = JSON.parse(atob(_this.$route.query.ref));
+                                    if (refInfo.fromShare) {
+                                        _this.$router.push({
+                                            name: "share",
+                                            query: {albumId: refInfo.albumId}
+                                        })
+                                    } else {
+                                        _this.$router.push({
+                                            name: "build",
+                                            params: {checked: true}
+                                        })
+                                    }
+                                } else {
+                                    _this.$router.push({
+                                        name: "share",
+                                        params: {albumId: _this.$route.params.albumId}
+                                    })
+                                }
                             } else {
                                 _this.$message.error("登陆失败，请检查用户名密码！");
                                 console.log(response.msg);

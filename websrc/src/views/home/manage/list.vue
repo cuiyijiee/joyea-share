@@ -11,8 +11,17 @@
                 <div slot="header" class="clearfix">
                     <span style="color: #fff;font-weight:bold;">{{album.name}}</span>
                     <span style="float: right">
-                        <el-button :type="album.shared ? 'warning':''" icon="el-icon-share" circle size="mini"
-                                   @click="handleShare(index)"/>
+                         <el-popover
+                                 placement="bottom"
+                                 title="分享链接"
+                                 width="200"
+                                 trigger="hover"
+                                 :content="album.shared ? domain + '/#/share?albumId=' + album.id:'未分享,点击分享后可见'"
+                                    style="margin-right: 5px">
+                             <el-button slot="reference" :type="album.shared ? 'warning':''" icon="el-icon-share" circle
+                                        size="mini"
+                                        @click="handleShare(index)"/>
+                         </el-popover>
                         <el-button icon="el-icon-delete" circle size="mini" @click="handleDelete(index)"/>
                     </span>
                 </div>
@@ -21,7 +30,7 @@
                         <el-card style="padding: 2px;margin: 5px">
                             <img :src="img.url"
                                  style="width: 100%; height: 150px"
-                                 :preview="album.name" :preview-text="img.desc">
+                                 :preview="album.name" :preview-text="'解说词：' + img.desc">
                             <div style="height: 20px;margin-top: 10px">
                                 <el-tooltip class="item" effect="dark" :content="img.desc" placement="bottom">
                                     <span class="svg_name"><b>解说词：</b>{{img.desc}}</span>
@@ -44,6 +53,7 @@
         name: "list",
         data() {
             return {
+                domain: window.location.protocol + '//' + window.location.host,
                 userInfo: {},
                 search: {
                     key: ''
