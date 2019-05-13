@@ -28,4 +28,5 @@ object MySQLSettings {
       mysqlConfig.getString("pwd"))
     isInitialized = true
   }
+
 }

@@ -1,7 +1,7 @@
 <template>
     <section>
         <!--工具条-->
-        <el-input placeholder="输入你想搜索的任何内容" v-model="search.key" class="input-with-select px10_divider">
+        <el-input placeholder="请输入关键字" v-model="search.key" class="input-with-select px10_divider">
             <el-select v-model="search.type" slot="prepend" placeholder="请选择类型" style="width: 80px"
                        :value="search.type">
                 <el-option v-for="item in options.search" :label="item.label" :value="item.value" :key="item.value"
@@ -113,7 +113,7 @@
             return {
                 search: {
                     type: 'pic',
-                    key: '仅一',
+                    key: '',
                     hasNext: false
                 },
                 userInfo: {},

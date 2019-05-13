@@ -11,7 +11,7 @@
  Target Server Version : 50726
  File Encoding         : 65001
 
- Date: 07/05/2019 19:36:33
+ Date: 08/05/2019 23:52:11
 */
 
 SET NAMES utf8mb4;
@@ -30,13 +30,13 @@ CREATE TABLE `album` (
   `updated_at` datetime DEFAULT NULL,
   `shared` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`album_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
 -- ----------------------------
 -- Records of album
 -- ----------------------------
 BEGIN;
-INSERT INTO `album` VALUES (5, 696047, '23', '', '2019-05-05 23:39:45', NULL, 0);
+INSERT INTO `album` VALUES (8, 696047, 'uigyiuyiuyiuy', '', '2019-05-08 23:47:43', '2019-05-08 23:47:55', 1);
 COMMIT;
 
 -- ----------------------------
@@ -55,15 +55,16 @@ CREATE TABLE `album_src` (
   `src_desc` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
 -- ----------------------------
 -- Records of album_src
 -- ----------------------------
 BEGIN;
-INSERT INTO `album_src` VALUES (16, 5, '391664415', '5c3565a58f525f408b6a164cfd317a1a', '47cce0eb3c9c4a64ab22902789a95602', '/各部门全共享资料/财务部/仅一LOGO/9.JOYEA仅一1-反黑.gif', '', '11.5 KB', '', '2019-05-05 23:39:45');
-INSERT INTO `album_src` VALUES (17, 5, '391664393', '8e215620bc9f7e9f36b071ba52819bc6', 'e4353b43593e478eba65b54afc51409f', '/各部门全共享资料/财务部/仅一LOGO/3.JOYEA仅一1.gif', '', '12.3 KB', '', '2019-05-05 23:39:45');
-INSERT INTO `album_src` VALUES (18, 5, '391664377', 'b68f8b0712758739738148076475365e', '7c30d5a58d5c466e987492d2352ec8ce', '/各部门全共享资料/财务部/仅一LOGO/1.JOYEA仅一2.gif', '', '36.4 KB', '', '2019-05-05 23:39:45');
+INSERT INTO `album_src` VALUES (29, 8, '391664415', '5c3565a58f525f408b6a164cfd317a1a', '47cce0eb3c9c4a64ab22902789a95602', '/各部门全共享资料/财务部/仅一LOGO/9.JOYEA仅一1-反黑.gif', '', '11.5 KB', 'ujgjikhgjkhkjh', '2019-05-08 23:47:43');
+INSERT INTO `album_src` VALUES (30, 8, '391664377', 'b68f8b0712758739738148076475365e', '7c30d5a58d5c466e987492d2352ec8ce', '/各部门全共享资料/财务部/仅一LOGO/1.JOYEA仅一2.gif', '', '36.4 KB', '', '2019-05-08 23:47:43');
+INSERT INTO `album_src` VALUES (31, 8, '391664393', '8e215620bc9f7e9f36b071ba52819bc6', 'e4353b43593e478eba65b54afc51409f', '/各部门全共享资料/财务部/仅一LOGO/3.JOYEA仅一1.gif', '', '12.3 KB', 'fyufuiyfguiytuit', '2019-05-08 23:47:43');
+INSERT INTO `album_src` VALUES (32, 8, '631129947', '490e74c4d488658b76d8f56c08c50720', 'f2537d00ad4d408c8e5c2746e69a19f0', '/IT运维/点检图片/05.28/05.28 江苏电信对仅一防火墙进行了弱口令测试.png', '', '30.6 KB', '', '2019-05-08 23:47:43');
 COMMIT;
 
 -- ----------------------------

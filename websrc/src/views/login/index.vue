@@ -2,7 +2,7 @@
     <el-form :model="loginForm" :rules="loginRule" ref="loginForm" label-position="left" label-width="0px"
              class="demo-ruleForm login-container">
         <h3 class="title">仅一素材库系统</h3>
-        <el-form-item prop="useruser">
+        <el-form-item prop="user">
             <el-input type="text" v-model="loginForm.user" auto-complete="off" placeholder="联想网盘账号(暂只支持邮箱)"></el-input>
         </el-form-item>
         <el-form-item prop="pwd">
@@ -80,8 +80,8 @@
                                     }
                                 } else {
                                     _this.$router.push({
-                                        name: "share",
-                                        params: {albumId: _this.$route.params.albumId}
+                                        name: "build",
+                                        params: {checked: true}
                                     })
                                 }
                             } else {

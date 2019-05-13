@@ -7,16 +7,18 @@
                         <img :src="img.url"
                              style="width: 100%; height: 150px"
                              preview="我的收藏" :preview-text="img.path">
-                        <div style="height: 20px;margin-top: 10px">
+                        <div style="height: 20px;margin-top: 10px" class="clearfix">
                             <el-tooltip class="item" effect="dark" :content="img.path" placement="bottom">
                                 <span class="svg_name">{{img.path}}</span>
                             </el-tooltip>
+                            <el-button type="danger" size="mini" icon="el-icon-delete"
+                                       @click="handleDel(img,fileIndex)"></el-button>
                         </div>
                     </el-card>
                 </el-col>
             </el-row>
         </div>
-        <div style="width: 100%;margin: 10px 0">
+        <div style="width: 100%;margin: 10px 0" :class="{no_display:collectList.length === 0}">
             <el-pagination
                     background
                     layout="prev, pager, next"
@@ -61,14 +63,37 @@
                         this.collectList = [];
                         response.list.forEach(src => {
                             this.collectList.push({
+                                id: src.id,
                                 url: genSrcPreviewUrl(src.neid, src.hash, src.rev, previewType, this.userInfo.session),
-                                path:src.path
+                                path: src.path
                             })
                         })
                     } else {
                         console.log(response.msg)
                     }
                 })
+            },
+            handleDel(img, index) {
+                this.$alert('你即将删除：【' + img.path + '】', '提示', {
+                    confirmButtonText: '确定',
+                    callback: action => {
+                        if(action === 'confirm'){
+                            api({
+                                action: "srcCollect",
+                                method: "delete",
+                                id: img.id
+                            }).then(resp => {
+                                if (resp.result) {
+                                    this.$message.success("成功删除收藏:" + img.path);
+                                    this.collectList.splice(index,1);
+                                } else {
+                                    this.$message.error("删除失败,请重新再试！");
+                                    console.log("删除失败：" + resp.msg);
+                                }
+                            })
+                        }
+                    }
+                });
             }
         },
         mounted() {
@@ -108,6 +133,7 @@
     .item {
         display: inline-block;
         padding-right: 20px;
+        width: 80%;
     }
 
     ul {
@@ -118,5 +144,15 @@
 
     .no_display {
         display: none;
+    }
+
+    .clearfix:before,
+    .clearfix:after {
+        display: table;
+        content: "";
+    }
+
+    .clearfix:after {
+        clear: both
     }
 </style>
