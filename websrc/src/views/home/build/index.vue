@@ -25,10 +25,12 @@
                         </el-table-column>
                         <el-table-column prop="mime_type" label="素材格式" width="100"/>
                         <!--                    <el-table-column prop="updator" label="是否有解说词" /> -->
-                        <el-table-column label="操作" width="120">
+                        <el-table-column label="操作" width="180">
                             <template slot-scope="scope">
                                 <el-button circle type="primary" @click="handleAdd(scope.$index, scope.row)"
                                            icon="el-icon-plus"/>
+                                <el-button circle type="primary" icon="el-icon-download"
+                                           @click="handleDownloadSrc(false,scope.row)"/>
                                 <el-button circle :type="scope.row.collect ? 'warning' : ''"
                                            @click="handleCollect(scope.$index, scope.row)"
                                            icon="el-icon-star-off"/>
@@ -44,13 +46,14 @@
             <el-col :span="12" class="bg-purple">
                 <div class="content_div">
                     <div style="width: 100%" class="center_vertical">
-                        <h1>清单列表</h1>
+                        <h1>清单编辑列表（{{toCreateAlbum.list.length}}）</h1>
                     </div>
                     <el-table stripe empty-text="清单内还没有内容" :data="toCreateAlbum.list" style="width: 100%">
                         <el-table-column label="预览">
                             <template slot-scope="scope">
                                 <el-tooltip class="item" effect="dark" :content="scope.row.path" placement="top">
-                                    <img :preview="scope.row.path" :preview-text="scope.row.path" class="preview_img"
+                                    <img class="preview_img"
+                                         :preview="scope.row.path" :preview-text="scope.row.path"
                                          :src="genPreviewUrl(scope.row.neid,scope.row.hash,scope.row.rev)">
                                 </el-tooltip>
                             </template>
@@ -80,14 +83,22 @@
                         </el-table-column>
                     </el-table>
                     <el-row class="load_more_bt" :class="{no_display:toCreateAlbum.list.length === 0}">
-                        <el-col :span="12">
-                            <el-button type="primary" @click="handleSaveList" class="load_more_bt">{{'保存当前清单(' +
-                                toCreateAlbum.list.length + ')'}}
+                        <el-col :span="8">
+                            <el-button type="primary" @click="handleSaveList" class="load_more_bt"
+                                       icon="el-icon-folder-add">
+                                {{'保存当前清单(' + toCreateAlbum.list.length + ')'}}
                             </el-button>
                         </el-col>
-                        <el-col :span="12">
-                            <el-button type="danger" @click="handleClearList" class="load_more_bt">{{'清空当前清单(' +
-                                toCreateAlbum.list.length + ')'}}
+                        <el-col :span="8">
+                            <el-button type="success" @click="handleDownloadSrc(true)" class="load_more_bt"
+                                       icon="el-icon-download">
+                                {{'下载当前资源(' + toCreateAlbum.list.length + ')'}}
+                            </el-button>
+                        </el-col>
+                        <el-col :span="8">
+                            <el-button type="danger" @click="handleClearList" class="load_more_bt"
+                                       icon="el-icon-delete">
+                                {{'清空当前清单(' + toCreateAlbum.list.length + ')'}}
                             </el-button>
                         </el-col>
                     </el-row>
@@ -106,9 +117,13 @@
 <script>
     import api from "../../../api";
     import genSrcPreviewSrc from "../../../utils/index"
+    import VueLoadImage from 'vue-load-image'
 
     export default {
         name: "index",
+        components: {
+            'vue-load-image': VueLoadImage
+        },
         data() {
             return {
                 search: {
@@ -337,6 +352,39 @@
                         this.toCreateAlbum.list = [];
                     }
                 });
+            },
+            handleDownloadSrc(isList, row) {
+                let toDownloadList = [];
+                if (isList) {
+                    this.toCreateAlbum.list.forEach(src => {
+                        toDownloadList.push({
+                            filename: src.filename,
+                            rev: src.rev,
+                            neid: src.neid.toString(),
+                            path_type: src.path_type
+                        })
+                    })
+                } else {
+                    toDownloadList.push({
+                        filename: row.filename,
+                        rev: row.rev,
+                        neid: row.neid.toString(),
+                        path_type: row.path_type
+                    })
+                }
+                api({
+                    action: "downloadSrc",
+                    src: toDownloadList
+                }).then(response => {
+                    if (response.result) {
+                        window.open(window.location.protocol + "//" + window.location.host + "/download/" + response.id)
+                    } else {
+                        this.$notify.error({
+                            title: "提示",
+                            message: response.msg
+                        })
+                    }
+                })
             }
         },
         mounted() {
@@ -405,8 +453,9 @@
     }
 
     .preview_img {
-        height: auto;
-        width: 100%;
+        max-height:50px;
+        height:auto;
+        width:auto;
     }
 
 </style>

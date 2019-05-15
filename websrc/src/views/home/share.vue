@@ -14,9 +14,8 @@
             <el-row>
                 <el-col :md="8" :xs="24" v-for="(img,fileIndex) in album.list">
                     <el-card style="padding: 2px;margin: 5px">
-                        <img :src="img.url"
-                             style="width: 100%; height: 150px"
-                             :preview="album.name" :preview-text="'解说词：' + img.desc">
+                        <img :src="img.url" style="width: 100%; height: 150px" :preview="album.name"
+                             :preview-text="'解说词：' + img.desc">
                         <div style="height: 20px;margin-top: 10px">
                             <el-tooltip class="item" effect="dark" :content="img.desc" placement="bottom">
                                 <span class="svg_name"><b>解说词：</b>{{img.desc}}</span>
@@ -32,9 +31,13 @@
 <script>
     import api from "../../api";
     import genSrcPreviewUrl from "../../utils/index"
+    import VueLoadImage from 'vue-load-image'
 
     export default {
         name: "share",
+        components: {
+            'vue-load-image': VueLoadImage
+        },
         data() {
             return {
                 userInfo: {},
