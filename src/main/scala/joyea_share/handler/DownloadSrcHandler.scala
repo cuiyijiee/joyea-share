@@ -33,9 +33,8 @@ class DownloadSrcHandler extends IAction {
             src.forEach(value => {
                 val toDownloadObj = value.asObject()
                 val fileName = toDownloadObj.get("filename").asString()
-                    .replaceAll("\\/", "-")
-                    .replaceAll("\\<", "-")
-                    .replaceAll("\\>", "-")
+                    .replaceAll("<mark>","")
+                    .replaceAll("</mark>","")
                 LenovoUtil.downloadFile(
                     sessionId,
                     toDownloadObj.get("rev").asString(),

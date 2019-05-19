@@ -15,10 +15,6 @@ class DownloadSrcAction extends Action {
         try{
             val id = paramo[String]("id").getOrElse("")
             val toDownloadFile = new File(s"${System.getProperty("user.dir")}/tmp/$id.zip")
-            _log.info("【 DownloadSrcAction 】:" + toDownloadFile.getAbsolutePath)
-            _log.error("【 DownloadSrcAction 】:" + toDownloadFile.getAbsolutePath)
-            _log.error("【 DownloadSrcAction 】:" + toDownloadFile)
-            _log.error("【 DownloadSrcAction 】:" + toDownloadFile)
             if (toDownloadFile.exists()) {
                 respondFile(toDownloadFile.getAbsolutePath)
             } else {

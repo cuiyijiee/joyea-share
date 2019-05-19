@@ -6,7 +6,7 @@
             <el-input type="text" v-model="loginForm.user" auto-complete="off" placeholder="联想网盘账号(暂只支持邮箱)"></el-input>
         </el-form-item>
         <el-form-item prop="pwd">
-            <el-input type="password" v-model="loginForm.pwd" auto-complete="off" placeholder="密码"></el-input>
+            <el-input type="password" @keyup.enter.native="handleLogin" v-model="loginForm.pwd" auto-complete="off" placeholder="密码"></el-input>
         </el-form-item>
         <el-checkbox v-model="loginForm.rememberPwd" checked class="remember">记住密码</el-checkbox>
         <el-form-item style="width:100%;">

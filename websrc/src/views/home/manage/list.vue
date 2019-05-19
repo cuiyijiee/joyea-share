@@ -1,5 +1,7 @@
 <template>
-    <section>
+
+    <h1 style="color: #303133;" v-if="albumList.length === 0">您暂时没有创建的清单！</h1>
+    <section v-else>
         <!--工具条-->
         <el-input placeholder="输入清单名称查找" v-model="search.key" class="input-with-select px10_divider"
                   style="display: none">
@@ -17,12 +19,13 @@
                                  width="200"
                                  trigger="hover"
                                  :content="album.shared ? domain + '/#/share?albumId=' + album.id:'未分享,点击分享后可见'"
-                                    style="margin-right: 5px">
+                                 style="margin-right: 5px">
                              <el-button slot="reference" :type="album.shared ? 'warning':''" icon="el-icon-share" circle
                                         size="mini"
                                         @click="handleShare(index)"/>
                          </el-popover>
                         <el-button icon="el-icon-delete" circle size="mini" @click="handleDelete(index)"/>
+                        <el-button icon="el-icon-edit" circle size="mini" @click="handleEdit(index)"/>
                     </span>
                 </div>
                 <el-row>
@@ -33,8 +36,10 @@
                                  :preview="album.name" :preview-text="'解说词：' + img.desc">
                             <div style="height: 20px;margin-top: 10px">
                                 <el-tooltip class="item" effect="dark" :content="img.desc" placement="bottom">
-                                    <span class="svg_name"><b>解说词：</b>{{img.desc}}</span>
+                                    <span class="svg_name">{{img.desc.length > 30 ? img.desc.substr(0,30) + "..." : img.desc}}</span>
                                 </el-tooltip>
+                                <!--                                <el-button type="danger" size="mini" icon="el-icon-delete"-->
+                                <!--                                           @click=""></el-button>-->
                             </div>
                         </el-card>
                     </el-col>
@@ -78,7 +83,10 @@
                             list.src.forEach(src => {
                                 imgUrl.push({
                                     url: genSrcPreviewUrl(src.neid, src.hash, src.rev, previewType, this.userInfo.session),
-                                    desc: src.desc
+                                    desc: src.desc.length === 0 ? "暂未设置解说词" : src.desc,
+                                    neid:src.neid,
+                                    hash:src.hash,
+                                    rev:src.rev,
                                 })
                             });
                             this.albumList.push({
@@ -118,6 +126,21 @@
                     }
                 });
             },
+            handleEdit(index) {
+                this.$alert('你即将前往编辑页面，编辑【 ' + this.albumList[index].name + ' 】清单', '提示', {
+                    confirmButtonText: '确定',
+                    callback: action => {
+                        if (action === 'confirm') {
+                            this.$router.push({
+                                name: "build",
+                                params: {
+                                    toEditList: this.albumList[index]
+                                }
+                            })
+                        }
+                    }
+                });
+            },
             handleShare(index) {
                 api({
                     action: "album",
@@ -126,7 +149,6 @@
                 }).then(response => {
                     if (response.result) {
                         this.albumList[index].shared = !this.albumList[index].shared;
-
                     } else {
                         this.$message.error("操作失败！")
                     }
@@ -170,6 +192,7 @@
     .item {
         display: inline-block;
         padding-right: 20px;
+        //width: 80%;
     }
 
     ul {

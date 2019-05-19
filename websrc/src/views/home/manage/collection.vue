@@ -1,5 +1,6 @@
 <template>
-    <section>
+    <h1 style="color: #303133;" v-if="collectList.length === 0">您暂时没有收藏的资源！</h1>
+    <section v-else>
         <div class="px10_divider">
             <el-row>
                 <el-col :md="8" :xs="24" v-for="(img,fileIndex) in collectList" :key="img.path">
@@ -9,7 +10,7 @@
                              preview="我的收藏" :preview-text="img.path">
                         <div style="height: 20px;margin-top: 10px" class="clearfix">
                             <el-tooltip class="item" effect="dark" :content="img.path" placement="bottom">
-                                <span class="svg_name">{{img.path}}</span>
+                                <span class="svg_name">{{img.path.length > 30 ? img.path.substr(0,30) + "..." : img.path}}</span>
                             </el-tooltip>
                             <el-button type="danger" size="mini" icon="el-icon-delete"
                                        @click="handleDel(img,fileIndex)"></el-button>

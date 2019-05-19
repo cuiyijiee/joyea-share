@@ -1,7 +1,8 @@
 <template>
     <section>
         <!--工具条-->
-        <el-input placeholder="请输入关键字" v-model="search.key" class="input-with-select px10_divider">
+        <el-input placeholder="请输入关键字" v-model="search.key" class="input-with-select px10_divider"
+                  @keyup.enter.native="handleSearch">
             <el-select v-model="search.type" slot="prepend" placeholder="请选择类型" style="width: 80px"
                        :value="search.type">
                 <el-option v-for="item in options.search" :label="item.label" :value="item.value" :key="item.value"
@@ -29,8 +30,8 @@
                             <template slot-scope="scope">
                                 <el-button circle type="primary" @click="handleAdd(scope.$index, scope.row)"
                                            icon="el-icon-plus"/>
-                                <el-button circle type="primary" icon="el-icon-download"
-                                           @click="handleDownloadSrc(false,scope.row)"/>
+                                <el-button circle type="" icon="el-icon-search"
+                                           @click="handleGoToPreview(scope.row)"/>
                                 <el-button circle :type="scope.row.collect ? 'warning' : ''"
                                            @click="handleCollect(scope.$index, scope.row)"
                                            icon="el-icon-star-off"/>
@@ -85,31 +86,36 @@
                     <el-row class="load_more_bt" :class="{no_display:toCreateAlbum.list.length === 0}">
                         <el-col :span="8">
                             <el-button type="primary" @click="handleSaveList" class="load_more_bt"
-                                       icon="el-icon-folder-add">
-                                {{'保存当前清单(' + toCreateAlbum.list.length + ')'}}
+                                       icon="el-icon-folder-add" :loading="loading.saveList">保存
                             </el-button>
                         </el-col>
                         <el-col :span="8">
                             <el-button type="success" @click="handleDownloadSrc(true)" class="load_more_bt"
-                                       icon="el-icon-download">
-                                {{'下载当前资源(' + toCreateAlbum.list.length + ')'}}
+                                       v-loading.fullscreen.lock="loading.fullscreenLoading"
+                                       icon="el-icon-download">下载
                             </el-button>
                         </el-col>
                         <el-col :span="8">
                             <el-button type="danger" @click="handleClearList" class="load_more_bt"
-                                       icon="el-icon-delete">
-                                {{'清空当前清单(' + toCreateAlbum.list.length + ')'}}
+                                       icon="el-icon-delete">清空
                             </el-button>
                         </el-col>
                     </el-row>
                 </div>
             </el-col>
         </el-row>
-        <el-dialog title="选择已有解说词" :visible.sync="toCreateAlbum.descSelectDialogVisible">
-            <el-table :data="toCreateAlbum.toSelectDesc" @row-click="handleSelectDesc">
+        <el-dialog ref="addDialog" title="选择已有解说词" :visible.sync="toCreateAlbum.descSelectDialogVisible" center >
+            <span class="dialog-footer">
+                <img class="preview_img" style="margin: 0 auto" :src="toCreateAlbum.previewUrl">
+            </span>
+            <el-table style="width: 70%" :data="toCreateAlbum.toSelectDesc" @row-click="handleSelectDesc"
+                      empty-text="暂无可用解说词">
                 <el-table-column prop="desc"></el-table-column>
             </el-table>
-            <el-button type="primary" @click="handleCustomDesc" style="margin-top: 10px">不用借鉴别人的解说词，自己编辑</el-button>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="handleCustomDesc"
+                           style="margin-top: 10px" icon="el-icon-circle-plus">不借鉴</el-button>
+            </span>
         </el-dialog>
     </section>
 </template>
@@ -127,28 +133,33 @@
         data() {
             return {
                 search: {
-                    type: 'pic',
+                    type: '',
                     key: '',
                     hasNext: false
                 },
                 userInfo: {},
                 options: {
                     search: [
+                        {value: '', label: '全部', disabled: false},
                         {value: 'pic', label: '图片'},
                         {value: 'video', label: '视频', disabled: true},
-                        {value: '', label: '全部', disabled: true}
                     ]
                 },
                 loading: {
                     search: false,
-                    searchMore: false
+                    searchMore: false,
+                    saveList: false,
+                    fullscreenLoading:false
                 },
                 searchResult: [],
                 toCreateAlbum: {
-                    name: '',
-                    list: [],
+                    idEditMode: false, //是否是编辑模式
+                    editListId: -1,
+                    name: '',       //清单名称
+                    list: [],       //资源列表
                     modifyRow: '',
                     toAddRow: {},
+                    previewUrl: '',
                     descSelectDialogVisible: false,
                     toSelectDesc: []
                 },
@@ -233,13 +244,11 @@
                 }
             },
             handleAdd(index, row) {
-                if (row.desc.length > 0) {
-                    this.toCreateAlbum.toAddRow = row;
-                    this.toCreateAlbum.toSelectDesc = row.desc;
-                    this.toCreateAlbum.descSelectDialogVisible = true;
-                } else {
-                    this.toCreateAlbum.list.push(row);
-                }
+                // this.toCreateAlbum.toAddRow = row;
+                // this.toCreateAlbum.toSelectDesc = row.desc;
+                // this.toCreateAlbum.previewUrl = this.genPreviewUrl(row.neid, row.hash, row.rev);
+                // this.toCreateAlbum.descSelectDialogVisible = true;
+                this.toCreateAlbum.list.push(row);
             },
             handleSelectDesc(row, column, event) {
                 this.toCreateAlbum.toAddRow.joyeaDesc = row.desc;
@@ -253,6 +262,7 @@
                 this.toCreateAlbum.list.push(this.toCreateAlbum.toAddRow);
                 this.toCreateAlbum.toAddRow = {};
                 this.toCreateAlbum.toSelectDesc = [];
+                //this.$set(this.toCreateAlbum,"descSelectDialogVisible",false);
                 this.toCreateAlbum.descSelectDialogVisible = false;
             },
             handleCollect(index, row) {
@@ -289,7 +299,6 @@
                 //是否是取消操作
                 if (!cg) {
                     if (!this.toCreateAlbum.modifyRow.path) {
-
                     }
                     return row.isModify = !row.isModify;
                 }
@@ -314,29 +323,37 @@
                 //+ '&date=' + new Date().getTime();
             },
             handleSaveList() {
-                this.$prompt('请输入清单的名称', '保存提示', {
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消'
-                }).then(action => {
+                this.$prompt(this.toCreateAlbum.idEditMode ? '当前是编辑模式，重命名清单名称！' : '请输入要保存的清单的名称',
+                    this.toCreateAlbum.idEditMode ? '编辑提示' : '保存提示',
+                    {
+                        confirmButtonText: this.toCreateAlbum.idEditMode ? '重新保存' : '保存',
+                        cancelButtonText: '取消',
+                        inputValue: this.toCreateAlbum.name
+                    }
+                ).then(action => {
                     let listName = action.value;
+                    this.loading.saveList = true;
                     api({
                         action: 'album',
-                        method: 'save',
+                        method: this.toCreateAlbum.idEditMode ? 'reSave' : 'save',
+                        id: this.toCreateAlbum.editListId,
                         name: listName,
                         src: this.toCreateAlbum.list
                     }).then(response => {
                         if (response.result) {
                             this.$notify.success({
-                                title: "保存结果",
-                                message: '保存成功'
+                                title: this.toCreateAlbum.idEditMode ? "编辑结果" : "保存结果",
+                                message: this.toCreateAlbum.idEditMode ? "重新保存成功" : '保存成功'
                             })
                         } else {
                             console.log(response.msg);
                             this.$notify.error({
                                 title: "保存结果",
-                                message: '保存失败'
+                                message: this.toCreateAlbum.idEditMode ? "重新保存失败" : '保存失败'
                             })
                         }
+                        this.loading.saveList = false;
+                        this.$router.push("/manage/list");
                     });
                 }).catch(() => {
                     this.$message({
@@ -353,7 +370,13 @@
                     }
                 });
             },
+            handleGoToPreview(row){
+                let previewType = 'pic';    // if video is av
+                let url =  genSrcPreviewSrc(row.neid, row.hash, row.rev, previewType, this.userInfo.session);
+                window.open(url);
+            },
             handleDownloadSrc(isList, row) {
+                this.loading.fullscreenLoading = true;
                 let toDownloadList = [];
                 if (isList) {
                     this.toCreateAlbum.list.forEach(src => {
@@ -384,6 +407,7 @@
                             message: response.msg
                         })
                     }
+                    this.loading.fullscreenLoading = false;
                 })
             }
         },
@@ -392,6 +416,28 @@
             if (user) {
                 this.userInfo = JSON.parse(user)
             }
+            let toEditList = this.$route.params.toEditList;
+            if (toEditList) {
+                this.toCreateAlbum.idEditMode = true;
+                this.toCreateAlbum.name = toEditList.name;
+                this.toCreateAlbum.editListId = toEditList.id;
+                toEditList.list.forEach(src => {
+                    //注意这里直接使用.，视图会不更新，一定要使用this.$set
+                    this.$set(src, "joyeaDesc", src.desc);
+                    this.$set(src, "isModify", false);
+                    this.toCreateAlbum.list.push(src);
+                });
+            }
+            let _this = this;
+            document.onkeydown = function (e) {
+                let key = window.event.keyCode;
+                if (key === 13) {
+                    if (_this.toCreateAlbum.descSelectDialogVisible) {
+                        //_this.handleCustomDesc();
+                        //_this.$refs.addDialog.close();
+                    }
+                }
+            };
         }
     }
 </script>
@@ -441,7 +487,6 @@
         display: none;
     }
 
-
     .center_vertical {
         padding: 1px;
         background: #d3dce6;
@@ -453,9 +498,9 @@
     }
 
     .preview_img {
-        max-height:50px;
-        height:auto;
-        width:auto;
+        max-height: 50px;
+        height: auto;
+        width: auto;
     }
 
 </style>

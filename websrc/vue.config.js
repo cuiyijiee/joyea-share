@@ -6,7 +6,8 @@ function resolve(dir) {
 
 module.exports = {
     lintOnSave: true,
-    devServer:{
+    productionSourceMap: false,
+    devServer: {
         proxy: 'http://localhost:8000'
     },
     chainWebpack: config => {

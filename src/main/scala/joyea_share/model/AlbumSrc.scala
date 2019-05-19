@@ -27,6 +27,7 @@ case class AlbumSrc(
         .add("path", this.srcPath)
         .add("type", this.srcType)
         .add("rev", this.srcRev)
+        .add("hash", this.srcHash)
         .add("size", this.srcSize)
         .add("desc", this.srcDesc)
         .add("created_at", this.createdAt.getTime)

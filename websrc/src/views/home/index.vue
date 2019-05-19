@@ -28,8 +28,8 @@
                             </el-menu-item>
                         </el-submenu>
                         <el-menu-item v-if="item.noChild && item.children && item.children.length > 0"
-                                      :index="item.children[0].path"><i
-                                :class="item.icon"></i>{{item.name}}
+                                      :index="item.children[0].path">
+                            <i :class="item.icon"></i>{{item.name}}
                         </el-menu-item>
                     </template>
                 </el-menu>

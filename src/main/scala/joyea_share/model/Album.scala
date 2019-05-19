@@ -17,6 +17,9 @@ case class Album(
                     createdAt: Timestamp,
                     updatedAt: Option[Timestamp]
                 ) extends ShortenedNames {
+
+    def save(): Future[Album] = Album.save(this)
+
     def toJson: JsonObject = new JsonObject()
         .add("album_id", this.albumId)
         .add("user_id", this.userId)
@@ -48,9 +51,19 @@ object Album extends SQLSyntaxSupport[Album] with ShortenedNames {
         )
     }
 
+    def save(album: Album, updateAt: Option[Timestamp] = Some(new Timestamp(System.currentTimeMillis())))(implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[Album] = withSQL {
+        update(Album).set(
+            column.userId -> album.userId,
+            column.albumName -> album.albumName,
+            column.albumDesc -> album.albumDesc,
+            column.shared -> album.shared,
+            column.updatedAt -> updateAt
+        ).where.eq(column.albumId, album.albumId)
+    }.update().future().map(_ => album)
+
     //查找该用户的所有清单
     def findByUserId(userId: Long)(implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[List[Album]] = withSQL {
-        selectFrom(Album as a).where.eq(column.userId, userId)
+        selectFrom(Album as a).where.eq(column.userId, userId).orderBy(column.albumId).desc
     }.map(Album(a)).list().future()
 
     //查找是否存在同名的

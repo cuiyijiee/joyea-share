@@ -187,7 +187,7 @@ object LenovoUtil {
                     var current = 0
                     while (len != -1) {
                         current = current + len
-                        os.write(buf)
+                        os.write(buf, 0, len)
                         len = is.read(buf)
                     }
                     os.flush()

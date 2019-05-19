@@ -62,8 +62,64 @@ class AlbumHandler extends IAction {
                             listener.onError("已经存在相同名称的清单！")
                         }
                     } else {
-                        listener.onError("查询是否重名失败:" + SUtil.convertExceptionToStr(albumSelectTry.failed.get
-                        ))
+                        listener.onError("查询是否重名失败:" + SUtil.convertExceptionToStr(albumSelectTry.failed.get))
+                    }
+                })
+            case "reSave" =>
+                val toEditId = request.get("id").asLong()
+                val listName = request.get("name").asString().trim
+                val listSrc = request.get("src").asArray()
+
+                Album.findByAlbumId(toEditId).onComplete(findTry => {
+                    if (findTry.isSuccess) {
+                        if (findTry.get.isDefined) {
+                            findTry.get.get.copy(albumName = listName).save().onComplete(saveTry => {
+                                if (saveTry.isSuccess) {
+                                    val album = saveTry.get
+                                    AlbumSrc.deleteByAlbumId(album.albumId).onComplete(delTry => {
+                                        if(delTry.isSuccess){
+                                            var hasError = false
+                                            listSrc.forEach(srcValue => {
+                                                if (!hasError) {
+                                                    val src = srcValue.asObject()
+                                                    AlbumSrc.create(
+                                                        albumId = album.albumId,
+                                                        srcNeid = src.getLong("neid", -1L),
+                                                        srcPath = src.getString("path", ""),
+                                                        srcSize = src.getString("size", ""),
+                                                        srcHash = src.getString("hash", ""),
+                                                        srcRev = src.getString("rev", ""),
+                                                        srcDesc = src.getString("joyeaDesc", ""),
+                                                        srcType = src.getString("type", ""),
+                                                    ).onComplete(insertSrcTry => {
+                                                        if (insertSrcTry.isFailure) {
+                                                            hasError = true
+                                                        }
+                                                    })
+                                                }
+                                            })
+                                            if (hasError) {
+                                                Album.delete(album.albumId).onComplete(delTry => {
+                                                    AlbumSrc.delete(album.albumId).onComplete(delTry => {
+                                                        listener.onError("创建清单失败!")
+                                                    })
+                                                })
+                                            } else {
+                                                listener.onSuccess(respJson = resJson.add("alnumId", album.albumId))
+                                            }
+                                        }else{
+                                            listener.onError("更新旧清单信息出错！!")
+                                        }
+                                    })
+                                } else {
+                                    listener.onError("更新旧清单信息出错！")
+                                }
+                            })
+                        } else {
+                            listener.onError("系统不存在该清单，请确认后再试！")
+                        }
+                    } else {
+                        listener.onError("查找出错")
                     }
                 })
             case "list" =>
