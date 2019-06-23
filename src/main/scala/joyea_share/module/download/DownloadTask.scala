@@ -1,0 +1,91 @@
+package joyea_share.module.download
+
+import java.io.File
+import java.util
+import java.util.{Date, UUID}
+
+import com.json.{JsonArray, JsonObject}
+import com.utils.CommonUtil
+import joyea_share.util.{CommonListener, LenovoUtil, SUtil, ZipUtils}
+
+case class DownloadTask(
+                           id: String = UUID.randomUUID().toString,
+                           downloadFile: java.util.List[DownloadItem] = new util.ArrayList[DownloadItem](),
+                           downloadRoleName: String,
+                           downloadRoleId: Long,
+                       ) {
+
+    def toJson(): JsonObject = {
+
+        val fileArr = new JsonArray()
+        downloadFile.forEach(item => {
+            fileArr.add(item.toJson())
+        })
+
+        new JsonObject()
+            .add("id", id)
+            .add("file", fileArr)
+            .add("downloadRoleName", downloadRoleName)
+            .add("downloadRoleId", downloadRoleId)
+            .add("startTime", SUtil.genDateString(startDate))
+            .add("finishTime", SUtil.genDateString(finishDate))
+
+    }
+
+    private var status: DownloadStatus.Value = DownloadStatus.READY
+    private val startDate: java.util.Date = new Date()
+    private var finishDate: java.util.Date = _
+    private var saveFilePath: String = ""
+    private var downloadListener: DownloadListener = _
+    private var downloadProgress: Int = 0
+    //private val executor: ExecutorService = Executors.newFixedThreadPool(4)
+    private var successNum: Int = 0
+    private var failNum: Int = 0
+    //超时时间为2分钟，超过时间则下载失败
+    //private val DOWNLOAD_TIMEOUT = 2 * 60 * 1000
+
+    def execute(sessionId: String, baseSavePath: String, listener: DownloadListener): Unit = {
+        downloadListener = listener
+        saveFilePath = baseSavePath + "/" + id
+        new File(saveFilePath).mkdirs()
+        downloadListener.onStart(id, downloadFile.size())
+        status = DownloadStatus.DOWNLOAD
+        downloadFile.forEach(item => {
+            LenovoUtil.downloadFileV2(sessionId, item.path, item.neid, item.rev, "ent", saveFilePath + "/" + item.fileName, new CommonListener[File] {
+                override def onSuccess(obj: File): Unit = {
+                    successNum = successNum + 1
+                    downloadProgress = downloadProgress + 1
+                    checkFinish()
+                }
+
+                override def onError(error: String): Unit = {
+                    failNum = failNum + 1
+                    downloadProgress = downloadProgress + 1
+                    checkFinish()
+                }
+            })
+        })
+    }
+
+    def checkFinish(): Unit = {
+        //下载完成
+        downloadListener.onNext(id, downloadProgress, downloadFile.size())
+        if (downloadProgress >= downloadFile.size()) {
+            ZipUtils.compressZip(saveFilePath, saveFilePath + ".zip")
+            CommonUtil.delete(saveFilePath)
+            finishDate = new Date()
+            status = DownloadStatus.FINISH
+            downloadListener.onFinish(taskId = id, successNum, failNum, downloadFile.size())
+        }
+    }
+
+    def clear(): Unit = {
+
+    }
+
+    def queryStatus(): DownloadStatus.Value = {
+        this.status
+    }
+
+
+}

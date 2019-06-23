@@ -13,7 +13,8 @@ object LenovoUtil {
     private val BASE_URL = "https://box.lenovo.com/v2"
     //全局搜索的URL
     private val BASE_SEARCH_FTS_URL = "https://console.box.lenovo.com/v2/fts_search"
-    private val BASE_DOWNLOAD_URL = "https://content.box.lenovo.com/v2/files/databox"
+    private val BASE_DOWNLOAD_URL = "https://box.lenovo.com/v2/dl_router/databox"
+    private val DOWNLOAD_TIMEOUT = 2 * 60 * 1000
 
     /**
       * 登陆接口
@@ -165,9 +166,7 @@ object LenovoUtil {
     }
 
     def downloadFile(sessionId: String, rev: String, neid: String, pathType: String = "ent", downloadFilePath: String, listener: CommonListener[File]): Unit = {
-        //databox/?X-LENOVO-SESS-ID=e715869294f94d5aa455023fb77132bb_346341_696047_meta&path_type=ent&from=&neid=388924315&rev=9d63422c22be44d9819ea4ef2a3521d5&aid=346341&uid=696047
         val requestUrl = s"$BASE_DOWNLOAD_URL/?X-LENOVO-SESS-ID=$sessionId&path_type=$pathType&neid=$neid&rev=$rev"
-        _log.info(s"【download url】: $requestUrl")
         val request = HttpUtil.obtainBaseRequest(sessionId).url(requestUrl).build()
         HttpUtil.obtainHttpClient().newCall(request).enqueue(new Callback {
             override def onFailure(call: Call, e: IOException): Unit = {
@@ -177,7 +176,7 @@ object LenovoUtil {
             override def onResponse(call: Call, response: Response): Unit = {
                 var is: InputStream = null
                 var os: FileOutputStream = null
-                val buf: Array[Byte] = new Array[Byte](2048)
+                val buf: Array[Byte] = new Array[Byte](1024)
                 try {
                     is = response.body().byteStream()
                     val downloadFile = new File(downloadFilePath)
@@ -199,6 +198,49 @@ object LenovoUtil {
                 } finally {
                     if (os != null) os.close()
                     if (is != null) is.close()
+                }
+            }
+        })
+    }
+
+    def downloadFileV2(sessionId: String, path: String, neid: String, rev: String, pathType: String = "ent", downloadFilePath: String, listener: CommonListener[File]): Unit = {
+        val requestUrl = s"$BASE_DOWNLOAD_URL$path?X-LENOVO-SESS-ID=$sessionId&path_type=$pathType&neid=$neid&rev=$rev"
+        val request = HttpUtil.obtainBaseRequest(sessionId).url(requestUrl).build()
+        HttpUtil.obtainHttpClient().newCall(request).enqueue(new Callback {
+            override def onFailure(call: Call, e: IOException): Unit = {
+                listener.onError("请求失败！")
+            }
+
+            override def onResponse(call: Call, response: Response): Unit = {
+                if (response.code() != 200) {
+                    _log.error(s"请求失败：$requestUrl,失败代码：${response.code()},失败信息：${response.body().string()}")
+                    listener.onError(s"请求失败：$requestUrl,失败代码：${response.code()},失败信息：${response.body().string()}")
+                } else {
+                    var is: InputStream = null
+                    var os: FileOutputStream = null
+                    val buf: Array[Byte] = new Array[Byte](1024)
+                    try {
+                        is = response.body().byteStream()
+                        val downloadFile = new File(downloadFilePath)
+                        os = new FileOutputStream(downloadFile)
+                        //val total = response.body().contentLength()
+                        var len = is.read(buf)
+                        var current = 0
+                        while (len != -1) {
+                            current = current + len
+                            os.write(buf, 0, len)
+                            len = is.read(buf)
+                        }
+                        os.flush()
+                        listener.onSuccess(downloadFile)
+                    } catch {
+                        case e: Exception =>
+                            listener.onError("请求失败！")
+                            _log.error("下载失败：" + SUtil.convertExceptionToStr(e))
+                    } finally {
+                        if (os != null) os.close()
+                        if (is != null) is.close()
+                    }
                 }
             }
         })

@@ -81,5 +81,45 @@ public class CommonUtil {
     public static boolean delete(String path) {
         return delete(new File(path));
     }
+
+    public static String readFile(String path, String defaultValue) throws Exception {
+        return readFile(new File(path), defaultValue);
+    }
+
+    public static String readFile(File f, String defaultValue) throws Exception {
+        if (f.isFile()) {
+            FileInputStream fis = new FileInputStream(f);
+            byte[] data = new byte[fis.available()];
+            fis.read(data);
+            fis.close();
+            return new String(data, "utf-8").trim();
+        }
+        return defaultValue;
+    }
+
+    public static void writeFile(String path, String data) throws Exception {
+        writeFile(new File(path), data);
+    }
+
+    public static void writeFile(File f, String data) throws Exception {
+        FileOutputStream o = new FileOutputStream(f);
+        OutputStreamWriter ow = new OutputStreamWriter(o, "utf-8");
+        BufferedWriter fout = new BufferedWriter(ow);
+        fout.write(data);
+        fout.flush();
+        fout.close();
+        ow.close();
+        o.close();
+    }
+
+    public static void appendFile(String path, String data) throws Exception {
+        appendFile(new File(path), data);
+    }
+
+    public static void appendFile(File f, String data) throws Exception {
+        FileWriter fw = new FileWriter(f, true);
+        fw.write(data + "\n");
+        fw.close();
+    }
 }
 

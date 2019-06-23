@@ -104,7 +104,7 @@
                 </div>
             </el-col>
         </el-row>
-        <el-dialog ref="addDialog" title="选择已有解说词" :visible.sync="toCreateAlbum.descSelectDialogVisible" center >
+        <el-dialog ref="addDialog" title="选择已有解说词" :visible.sync="toCreateAlbum.descSelectDialogVisible" center>
             <span class="dialog-footer">
                 <img class="preview_img" style="margin: 0 auto" :src="toCreateAlbum.previewUrl">
             </span>
@@ -149,7 +149,7 @@
                     search: false,
                     searchMore: false,
                     saveList: false,
-                    fullscreenLoading:false
+                    fullscreenLoading: false
                 },
                 searchResult: [],
                 toCreateAlbum: {
@@ -370,12 +370,13 @@
                     }
                 });
             },
-            handleGoToPreview(row){
+            handleGoToPreview(row) {
                 let previewType = 'pic';    // if video is av
-                let url =  genSrcPreviewSrc(row.neid, row.hash, row.rev, previewType, this.userInfo.session);
+                let url = genSrcPreviewSrc(row.neid, row.hash, row.rev, previewType, this.userInfo.session);
                 window.open(url);
             },
             handleDownloadSrc(isList, row) {
+                let _this = this;
                 this.loading.fullscreenLoading = true;
                 let toDownloadList = [];
                 if (isList) {
@@ -384,6 +385,7 @@
                             filename: src.filename,
                             rev: src.rev,
                             neid: src.neid.toString(),
+                            path: src.path,
                             path_type: src.path_type
                         })
                     })
@@ -399,15 +401,37 @@
                     action: "downloadSrc",
                     src: toDownloadList
                 }).then(response => {
-                    if (response.result) {
-                        window.open(window.location.protocol + "//" + window.location.host + "/download/" + response.id)
-                    } else {
-                        this.$notify.error({
-                            title: "提示",
-                            message: response.msg
-                        })
-                    }
-                    this.loading.fullscreenLoading = false;
+                    let taskId = response.id;
+                    console.log("获取到下载ID：" + taskId);
+                    let retryTime = 0;
+                    let timer = 0;
+                    timer = setInterval(function () {
+                        api({
+                            action: "queryDownload",
+                            id: taskId
+                        }).then(response => {
+                            if (response.done) {
+                                window.open(window.location.protocol + "//" + window.location.host + "/download/" + taskId);
+                                clearInterval(timer);
+                                _this.loading.fullscreenLoading = false;
+                            } else {
+                                retryTime += 1;
+                                if (retryTime > 30) {
+                                    _this.$notify.info({
+                                        title: "下载提示",
+                                        message: "当前网速慢，请耐心等待！"
+                                    })
+                                }else if (retryTime > 30 * 5) {
+                                    _this.$notify.error({
+                                        title: "下载错误",
+                                        message: "下载超时，请稍后再试！"
+                                    });
+                                    clearInterval(timer);
+                                    _this.loading.fullscreenLoading = false;
+                                }
+                            }
+                        });
+                    }, 2 * 1000);
                 })
             }
         },
