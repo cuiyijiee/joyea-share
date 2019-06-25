@@ -232,6 +232,10 @@ object LenovoUtil {
                             len = is.read(buf)
                         }
                         os.flush()
+                        os.close()
+                        os = null
+                        is.close()
+                        is = null
                         listener.onSuccess(downloadFile)
                     } catch {
                         case e: Exception =>

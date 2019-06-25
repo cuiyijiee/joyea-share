@@ -1,6 +1,6 @@
 package joyea_share.module.download
 
-import java.io.File
+import java.io.{File, FileFilter}
 import java.util
 import java.util.concurrent.{ExecutorService, Executors}
 import java.util.{Calendar, Timer, TimerTask}
@@ -41,6 +41,13 @@ object DownloadManager {
             override def run(): Unit = {
                 initBaseSaveFilePath()
                 genNewSession()
+
+                val saveDir = new File(baseSaveFilePath)
+                saveDir.getParentFile.listFiles(new FileFilter {
+                    override def accept(pathname: File): Boolean = !pathname.getName.equals(saveDir.getName)
+                }).foreach(file => {
+                    CommonUtil.delete(file)
+                })
             }
         }, {
             //将第一次时间设置在当天晚上的11.59，省去了考虑设置的时间在当前时间之前的情况

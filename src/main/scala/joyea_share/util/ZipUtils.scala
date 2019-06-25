@@ -33,17 +33,15 @@ object ZipUtils {
             dirStr = if(dirStr.length == 0) "" else dir + File.separator
             for(index <- 0 until files.length) compressZip(out,files(index),dirStr + files(index).getName)
         }else{
-            if(!file.getName.equals("spine_conf.json")){
-                val fis = new FileInputStream(file)
-                out.putNextEntry(new ZipEntry(dirStr))
-                val buffer:Array[Byte] = new Array[Byte](8192)
-                var j = fis.read(buffer)
-                while (j > 0){
-                    out.write(buffer,0,j)
-                    j = fis.read(buffer)
-                }
-                fis.close()
+            val fis = new FileInputStream(file)
+            out.putNextEntry(new ZipEntry(dirStr))
+            val buffer:Array[Byte] = new Array[Byte](8192)
+            var j = fis.read(buffer)
+            while (j > 0){
+                out.write(buffer,0,j)
+                j = fis.read(buffer)
             }
+            fis.close()
         }
     }
 

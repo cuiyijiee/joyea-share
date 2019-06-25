@@ -7,13 +7,14 @@ import java.util.{Date, UUID}
 import com.json.{JsonArray, JsonObject}
 import com.utils.CommonUtil
 import joyea_share.util.{CommonListener, LenovoUtil, SUtil, ZipUtils}
+import xitrum.{Config, Log}
 
 case class DownloadTask(
                            id: String = UUID.randomUUID().toString,
                            downloadFile: java.util.List[DownloadItem] = new util.ArrayList[DownloadItem](),
                            downloadRoleName: String,
                            downloadRoleId: Long,
-                       ) {
+                       ) extends Log{
 
     def toJson(): JsonObject = {
 
@@ -55,12 +56,14 @@ case class DownloadTask(
                 override def onSuccess(obj: File): Unit = {
                     successNum = successNum + 1
                     downloadProgress = downloadProgress + 1
+                    log.info(s"下载文件【$item】成功:${obj.getAbsolutePath}")
                     checkFinish()
                 }
 
                 override def onError(error: String): Unit = {
                     failNum = failNum + 1
                     downloadProgress = downloadProgress + 1
+                    log.error(s"下载文件【$item】失败:$error")
                     checkFinish()
                 }
             })
@@ -71,8 +74,11 @@ case class DownloadTask(
         //下载完成
         downloadListener.onNext(id, downloadProgress, downloadFile.size())
         if (downloadProgress >= downloadFile.size()) {
+            //线程等待2秒，避免加密软件冲突
+            CommonUtil.writeFile(s"$saveFilePath/请勿外泄.txt", "仅一公司内部资料，请勿外泄！")
+            Thread.sleep(Config.application.getConfig("download").getInt("wait_seconds") * 1000)
             ZipUtils.compressZip(saveFilePath, saveFilePath + ".zip")
-            CommonUtil.delete(saveFilePath)
+            //CommonUtil.delete(saveFilePath)
             finishDate = new Date()
             status = DownloadStatus.FINISH
             downloadListener.onFinish(taskId = id, successNum, failNum, downloadFile.size())
@@ -86,6 +92,5 @@ case class DownloadTask(
     def queryStatus(): DownloadStatus.Value = {
         this.status
     }
-
 
 }
