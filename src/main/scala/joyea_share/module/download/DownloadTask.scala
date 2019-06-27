@@ -14,7 +14,9 @@ case class DownloadTask(
                            downloadFile: java.util.List[DownloadItem] = new util.ArrayList[DownloadItem](),
                            downloadRoleName: String,
                            downloadRoleId: Long,
-                       ) extends Log{
+                           startTime: java.util.Date = new java.util.Date(),
+                           finishTime: java.util.Date,
+                       ) extends Log {
 
     def toJson(): JsonObject = {
 
@@ -39,7 +41,6 @@ case class DownloadTask(
     private var saveFilePath: String = ""
     private var downloadListener: DownloadListener = _
     private var downloadProgress: Int = 0
-    //private val executor: ExecutorService = Executors.newFixedThreadPool(4)
     private var successNum: Int = 0
     private var failNum: Int = 0
     //超时时间为2分钟，超过时间则下载失败

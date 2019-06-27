@@ -11,7 +11,7 @@
             <el-button slot="append" icon="el-icon-search" v-on:click="handleSearch"></el-button>
         </el-input>
         <el-row :gutter="20" class="px10_divider">
-            <el-col :span="12" class="bg-purple">
+            <el-col :span="13" class="bg-purple">
                 <div>
                     <div style="width: 100%" class="center_vertical">
                         <h1>搜索结果</h1>
@@ -25,6 +25,7 @@
                             </template>
                         </el-table-column>
                         <el-table-column prop="mime_type" label="素材格式" width="100"/>
+                        <el-table-column prop="size" label="大小" width="100"/>
                         <!--                    <el-table-column prop="updator" label="是否有解说词" /> -->
                         <el-table-column label="操作" width="180">
                             <template slot-scope="scope">
@@ -44,7 +45,7 @@
                     </el-button>
                 </div>
             </el-col>
-            <el-col :span="12" class="bg-purple">
+            <el-col :span="11" class="bg-purple">
                 <div class="content_div">
                     <div style="width: 100%" class="center_vertical">
                         <h1>清单编辑列表（{{toCreateAlbum.list.length}}）</h1>
@@ -54,7 +55,7 @@
                             <template slot-scope="scope">
                                 <el-tooltip class="item" effect="dark" :content="scope.row.path" placement="top">
                                     <img class="preview_img"
-                                         :preview="scope.row.path" :preview-text="scope.row.path"
+                                         preview="buildList" :preview-text="scope.row.path"
                                          :src="genPreviewUrl(scope.row.neid,scope.row.hash,scope.row.rev)">
                                 </el-tooltip>
                             </template>
@@ -377,10 +378,12 @@
             },
             handleDownloadSrc(isList, row) {
                 let _this = this;
-                this.loading.fullscreenLoading = true;
+                //this.loading.fullscreenLoading = true;
                 let toDownloadList = [];
+                let totalBytes = 0;
                 if (isList) {
                     this.toCreateAlbum.list.forEach(src => {
+                        totalBytes += src.bytes;
                         toDownloadList.push({
                             filename: src.filename,
                             rev: src.rev,
@@ -397,42 +400,59 @@
                         path_type: row.path_type
                     })
                 }
-                api({
-                    action: "downloadSrc",
-                    src: toDownloadList
-                }).then(response => {
-                    let taskId = response.id;
-                    console.log("获取到下载ID：" + taskId);
-                    let retryTime = 0;
-                    let timer = 0;
-                    timer = setInterval(function () {
-                        api({
-                            action: "queryDownload",
-                            id: taskId
-                        }).then(response => {
-                            if (response.done) {
-                                window.open(window.location.protocol + "//" + window.location.host + "/download/" + taskId);
-                                clearInterval(timer);
-                                _this.loading.fullscreenLoading = false;
-                            } else {
-                                retryTime += 1;
-                                if (retryTime > 30) {
-                                    _this.$notify.info({
-                                        title: "下载提示",
-                                        message: "当前网速慢，请耐心等待！"
-                                    })
-                                }else if (retryTime > 30 * 5) {
-                                    _this.$notify.error({
-                                        title: "下载错误",
-                                        message: "下载超时，请稍后再试！"
-                                    });
+                let totalKb = totalBytes / 1024;
+                let totalMb = totalKb / 1024;
+                let warnMb = 300;
+                console.log(totalBytes, totalKb, totalMb);
+                this.$confirm(
+                    "您已选中【 " + toDownloadList.length +" 】个文件，" + (totalMb > warnMb ? ("待下载文件列表大小为【 " + totalMb.toFixed(2) + "MB 】,文件较大，建议您分批次下载!") : ("待下载文件列表大小为【 " + (totalMb > 1 ? totalMb.toFixed(2) + "MB" : totalKb.toFixed(2) + "KB") + " 】!")),
+                    '下载提示', {
+                        confirmButtonText: '下载',
+                        cancelButtonText: '我再想想',
+                        type: totalMb > warnMb ? "danger" : "primary"
+                    }).then(() => {
+                    api({
+                        action: "downloadSrc",
+                        src: toDownloadList
+                    }).then(response => {
+                        let taskId = response.id;
+                        console.log("获取到下载ID：" + taskId);
+                        let retryTime = 0;
+                        let timer = 0;
+                        timer = setInterval(function () {
+                            api({
+                                action: "queryDownload",
+                                id: taskId
+                            }).then(response => {
+                                if (response.done) {
+                                    window.open(window.location.protocol + "//" + window.location.host + "/download/" + taskId);
                                     clearInterval(timer);
                                     _this.loading.fullscreenLoading = false;
+                                } else {
+                                    retryTime += 1;
+                                    if (retryTime > 30) {
+                                        _this.$notify.info({
+                                            title: "下载提示",
+                                            message: "当前网速慢，请耐心等待！"
+                                        })
+                                    } else if (retryTime > 30 * 5) {
+                                        _this.$notify.error({
+                                            title: "下载错误",
+                                            message: "下载超时，请稍后再试！"
+                                        });
+                                        clearInterval(timer);
+                                        _this.loading.fullscreenLoading = false;
+                                    }
                                 }
-                            }
-                        });
-                    }, 2 * 1000);
-                })
+                            });
+                        }, 2 * 1000);
+                    })
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消下载'
+                    });
+                });
             }
         },
         mounted() {
