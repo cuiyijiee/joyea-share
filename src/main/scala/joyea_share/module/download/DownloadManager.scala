@@ -3,13 +3,12 @@ package joyea_share.module.download
 import java.io.{File, FileFilter}
 import java.util
 import java.util.concurrent.{ExecutorService, Executors}
-import java.util.{Calendar, Timer, TimerTask}
+import java.util.{Timer, TimerTask}
 
 import com.json.{JsonArray, WriterConfig}
 import com.utils.CommonUtil
-import joyea_share.util.{CommonListener, LenovoUtil, SUtil}
-import org.slf4s.{Logger, LoggerFactory}
-import xitrum.Config
+import joyea_share.util.{CommonListener, Constant, LenovoUtil, SUtil}
+import xitrum.{Config, Log}
 
 
 trait DownloadManager {
@@ -19,13 +18,11 @@ trait DownloadManager {
 }
 
 
-object DownloadManager {
+object DownloadManager extends Log {
 
-    private val recordJsonArr: JsonArray = new JsonArray()
-
-    private val _log: Logger = LoggerFactory.getLogger(DownloadManager.getClass)
+    private val baseRecordJsonDir: File = new File(s"./log/download/")
     private var adminSessionId: String = ""
-    private var baseSaveFilePath: String = "./tmp/download/" + SUtil.genDateString(formatString = "yy-MM-dd")
+    private var baseSaveFilePath: String = ""
     private val executor: ExecutorService = Executors.newFixedThreadPool(Runtime.getRuntime.availableProcessors())
 
     //用来存放所有的任务，每天清除一次
@@ -34,14 +31,13 @@ object DownloadManager {
     def init(): Unit = {
         initBaseSaveFilePath()
         genNewSession()
+        baseRecordJsonDir.mkdirs()
 
         //整点刷新配置
-
         new Timer().schedule(new TimerTask {
             override def run(): Unit = {
                 initBaseSaveFilePath()
                 genNewSession()
-
                 val saveDir = new File(baseSaveFilePath)
                 saveDir.getParentFile.listFiles(new FileFilter {
                     override def accept(pathname: File): Boolean = !pathname.getName.equals(saveDir.getName)
@@ -49,14 +45,7 @@ object DownloadManager {
                     CommonUtil.delete(file)
                 })
             }
-        }, {
-            //将第一次时间设置在当天晚上的11.59，省去了考虑设置的时间在当前时间之前的情况
-            val calendar = Calendar.getInstance()
-            calendar.set(Calendar.HOUR_OF_DAY, 0)
-            calendar.set(Calendar.MINUTE, 0)
-            calendar.set(Calendar.SECOND, 0)
-            calendar.getTime
-        }, 1 * 60 * 60 * 1000L)
+        }, SUtil.getNextMinuteHour(0), 1 * 60 * 60 * 1000L)
     }
 
 
@@ -74,15 +63,27 @@ object DownloadManager {
                 }
 
                 override def onFinish(taskId: String, success: Int, failed: Int, total: Int): Unit = {
-                    recordJsonArr.add(task.toJson())
-                    val baseFile = new File("./log/download")
-                    baseFile.mkdirs()
-                    CommonUtil.writeFile(s"${baseFile.getAbsolutePath}/${
-                        SUtil.genDateString(formatString = "yy-MM-dd")
-                    }", recordJsonArr.toString(WriterConfig.PRETTY_PRINT))
+                    val recordJson = getTodayRecordJson()
+                    val recordJsonArr = recordJson._1
+                    recordJsonArr.add(task.toJson()) //记录当前记录
+                    Config.xitrum.cache.put(Constant.DOWNLOAD_RECORD_CACHE_KEY, recordJsonArr) //回写缓存
+                    CommonUtil.writeFile(recordJson._2, recordJsonArr.toString(WriterConfig.PRETTY_PRINT)) //回写文件
                 }
             })
         })
+    }
+
+    def getTodayRecordJson(): (JsonArray, File) = {
+        val recordJsonFile = new File(s"${baseRecordJsonDir.getAbsolutePath}/${SUtil.genDateString(formatString = "yy-MM-dd")}")
+        var recordJsonArr: JsonArray = null
+        if (recordJsonFile.exists()) { //如果今天的日志文件存在，则首先从缓存中读，没有再从文件中读取
+            recordJsonArr = Config.xitrum.cache.get(Constant.DOWNLOAD_RECORD_CACHE_KEY).getOrElse(
+                JsonArray.readFrom(CommonUtil.readFile(recordJsonFile, "[]"))
+            ).asInstanceOf[JsonArray]
+        } else { //如果今天日志文件不存在，则创建新的记录
+            recordJsonArr = new JsonArray()
+        }
+        (recordJsonArr, recordJsonFile)
     }
 
 
@@ -92,12 +93,20 @@ object DownloadManager {
     }
 
     def initBaseSaveFilePath(): Unit = {
-        baseSaveFilePath = Config.application.getConfig("download").getString("tmp_dir") +
+        val newPath = Config.application.getConfig("download").getString("tmp_dir") +
             "/download/" + SUtil.genDateString(formatString = "yy-MM-dd")
+        if (baseSaveFilePath.length != 0 && !baseSaveFilePath.equals(newPath)) {
+            downloadTaskMap.clear()
+        }
+        baseSaveFilePath = newPath
     }
 
     def getBaseSaveFilePath(): String = {
         baseSaveFilePath
+    }
+
+    def getTodayTaskMap(): java.util.Map[String, DownloadTask] = {
+        downloadTaskMap
     }
 
     //TODO 先检查session是否失效再请求新的session
@@ -105,12 +114,12 @@ object DownloadManager {
         val adminConfig = Config.application.getConfig("admin")
         LenovoUtil.login(adminConfig.getString("name"), adminConfig.getString("pwd"), new CommonListener[(String, String, Long)] {
             override def onSuccess(obj: (String, String, Long)): Unit = {
-                _log.info(s"获取到最高权限SessionId：$obj")
+                log.info(s"获取到最高权限SessionId：$obj")
                 adminSessionId = obj._1
             }
 
             override def onError(error: String): Unit = {
-                _log.error(s"获取到最高权限SessionId失败：$error")
+                log.error(s"获取到最高权限SessionId失败：$error")
             }
         })
     }

@@ -13,9 +13,7 @@ case class DownloadTask(
                            id: String = UUID.randomUUID().toString,
                            downloadFile: java.util.List[DownloadItem] = new util.ArrayList[DownloadItem](),
                            downloadRoleName: String,
-                           downloadRoleId: Long,
-                           startTime: java.util.Date = new java.util.Date(),
-                           finishTime: java.util.Date,
+                           downloadRoleId: Long
                        ) extends Log {
 
     def toJson(): JsonObject = {
@@ -31,7 +29,7 @@ case class DownloadTask(
             .add("downloadRoleName", downloadRoleName)
             .add("downloadRoleId", downloadRoleId)
             .add("startTime", SUtil.genDateString(startDate))
-            .add("finishTime", SUtil.genDateString(finishDate))
+            .add("finishTime", if (finishDate == null) "" else SUtil.genDateString(finishDate))
 
     }
 

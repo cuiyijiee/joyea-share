@@ -8,7 +8,7 @@
                 <el-option v-for="item in options.search" :label="item.label" :value="item.value" :key="item.value"
                            :disabled="item.disabled"/>
             </el-select>
-            <el-button slot="append" icon="el-icon-search" v-on:click="handleSearch"></el-button>
+            <el-button slot="append" icon="el-icon-search" v-on:click="handleSearch"/>
         </el-input>
         <el-row :gutter="20" class="px10_divider">
             <el-col :span="13" class="bg-purple">
@@ -378,7 +378,6 @@
             },
             handleDownloadSrc(isList, row) {
                 let _this = this;
-                //this.loading.fullscreenLoading = true;
                 let toDownloadList = [];
                 let totalBytes = 0;
                 if (isList) {
@@ -405,19 +404,19 @@
                 let warnMb = 300;
                 console.log(totalBytes, totalKb, totalMb);
                 this.$confirm(
-                    "您已选中【 " + toDownloadList.length +" 】个文件，" + (totalMb > warnMb ? ("待下载文件列表大小为【 " + totalMb.toFixed(2) + "MB 】,文件较大，建议您分批次下载!") : ("待下载文件列表大小为【 " + (totalMb > 1 ? totalMb.toFixed(2) + "MB" : totalKb.toFixed(2) + "KB") + " 】!")),
+                    "您已选中【 " + toDownloadList.length + " 】个文件，" + (totalMb > warnMb ? ("待下载文件列表大小为【 " + totalMb.toFixed(2) + "MB 】,文件较大，建议您分批次下载!") : ("待下载文件列表大小为【 " + (totalMb > 1 ? totalMb.toFixed(2) + "MB" : totalKb.toFixed(2) + "KB") + " 】!")),
                     '下载提示', {
                         confirmButtonText: '下载',
                         cancelButtonText: '我再想想',
                         type: totalMb > warnMb ? "danger" : "primary"
                     }).then(() => {
+                    //this.loading.fullscreenLoading = true;
                     api({
                         action: "downloadSrc",
                         src: toDownloadList
                     }).then(response => {
                         let taskId = response.id;
                         console.log("获取到下载ID：" + taskId);
-                        let retryTime = 0;
                         let timer = 0;
                         timer = setInterval(function () {
                             api({
@@ -425,24 +424,11 @@
                                 id: taskId
                             }).then(response => {
                                 if (response.done) {
-                                    window.open(window.location.protocol + "//" + window.location.host + "/download/" + taskId);
+                                    _this.$notify.success({
+                                        title: "任务下载提示",
+                                        message: "您有一个任务【" + taskId + "】任务下载成功！"
+                                    });
                                     clearInterval(timer);
-                                    _this.loading.fullscreenLoading = false;
-                                } else {
-                                    retryTime += 1;
-                                    if (retryTime > 30) {
-                                        _this.$notify.info({
-                                            title: "下载提示",
-                                            message: "当前网速慢，请耐心等待！"
-                                        })
-                                    } else if (retryTime > 30 * 5) {
-                                        _this.$notify.error({
-                                            title: "下载错误",
-                                            message: "下载超时，请稍后再试！"
-                                        });
-                                        clearInterval(timer);
-                                        _this.loading.fullscreenLoading = false;
-                                    }
                                 }
                             });
                         }, 2 * 1000);

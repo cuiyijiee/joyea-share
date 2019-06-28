@@ -5,8 +5,28 @@
                 {{sysName}}
             </el-col>
             <el-col :span="4" class="userinfo">
+                <el-popover
+                        style="margin-right: 20px"
+                        placement="bottom-start"
+                        width="550"
+                        @show="handleOpenDownload"
+                        @hide="handleCloseDownload"
+                        trigger="click">
+                    <el-table :data="downloadTask">
+                        <el-table-column width="300" property="id" label="任务ID"></el-table-column>
+                        <el-table-column width="150" property="startTime" label="下载时间"></el-table-column>
+                        <el-table-column width="100" label="状态">
+                            <template slot-scope="scope">
+                                <el-button :type="scope.row.status?'success':'danger'" size="mini" @click="handleDownload(scope.row)"
+                                           :icon="scope.row.status?'el-icon-download':'el-icon-loading'"></el-button>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                    <el-button slot="reference" size="small" circle icon="el-icon-download"></el-button>
+                </el-popover>
                 <el-dropdown trigger="hover">
-                    <!--                    <span class="el-dropdown-link userinfo-inner"><img :src="this.sysUserAvatar" /> {{sysUserName}}</span>-->
+                    <!--                    <span class="el-dropdown-link userinfo-inner"><img-->
+                    <!--                            :src="this.sysUserAvatar"/> {{sysUserName}}</span>-->
                     <span class="el-dropdown-link userinfo-inner">{{userInfo.name}}</span>
                     <el-dropdown-menu slot="dropdown">
                         <el-dropdown-item @click.native="logout">注销登陆</el-dropdown-item>
@@ -59,6 +79,7 @@
     import api from "../../api/index";
 
     const localStorage = window.localStorage;
+    let timer = 0;
 
     export default {
         data() {
@@ -67,7 +88,8 @@
                 userInfo: {
                     name: '',
                     email: ''
-                }
+                },
+                downloadTask: []
             }
         },
         methods: {
@@ -90,6 +112,45 @@
                     })
                 }).catch(() => {
                 });
+            },
+            handleOpenDownload() {
+                let _this = this;
+                api({
+                    action: "todayDownloadList"
+                }).then(response => {
+                    _this.downloadTask = [];
+                    response.task.forEach(task => {
+                        _this.downloadTask.push({
+                            id: task.id,
+                            startTime: task.startTime,
+                            status: task.finishTime.length !== 0
+                        });
+                        _this.downloadTask.reverse();
+                    })
+                });
+                timer = setInterval(function () {
+                    api({
+                        action: "todayDownloadList"
+                    }).then(response => {
+                        _this.downloadTask = [];
+                        response.task.forEach(task => {
+                            _this.downloadTask.push({
+                                id: task.id,
+                                startTime: task.startTime,
+                                status: task.finishTime.length !== 0
+                            });
+                            _this.downloadTask.reverse();
+                        })
+                    })
+                }, 2 * 1000);
+            },
+            handleCloseDownload() {
+                clearInterval(timer);
+            },
+            handleDownload(row) {
+                if (row.status) {
+                    window.open(window.location.protocol + "//" + window.location.host + "/download/" + row.id);
+                }
             }
         },
         mounted() {
