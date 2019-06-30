@@ -12,7 +12,7 @@
                         @show="handleOpenDownload"
                         @hide="handleCloseDownload"
                         trigger="click">
-                    <el-table :data="downloadTask">
+                    <el-table :data="downloadTask" empty-text="今日暂无下载任务">
                         <el-table-column width="300" property="id" label="任务ID"></el-table-column>
                         <el-table-column width="150" property="startTime" label="下载时间"></el-table-column>
                         <el-table-column width="100" label="状态">

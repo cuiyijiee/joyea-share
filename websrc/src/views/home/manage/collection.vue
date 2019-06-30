@@ -6,7 +6,7 @@
                 <el-col :md="8" :xs="24" v-for="(img,fileIndex) in collectList" :key="img.path">
                     <el-card style="padding: 2px;margin: 5px">
                         <img :src="img.url"
-                             style="width: 100%; height: 150px"
+                             style="width: 100%; height: 150px" :onerror="defaultImg"
                              preview="我的收藏" :preview-text="img.path">
                         <div style="height: 20px;margin-top: 10px" class="clearfix">
                             <el-tooltip class="item" effect="dark" :content="img.path" placement="bottom">
@@ -45,7 +45,8 @@
                 curPage: 1,
                 pageSize: 15,
                 total: 0,
-                collectList: []
+                collectList: [],
+                defaultImg: 'this.src="' + require('@assets/error.png') + '"' //默认图地址
             }
         },
         methods: {

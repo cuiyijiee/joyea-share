@@ -4,7 +4,7 @@ import com.json.{JsonArray, JsonObject}
 import joyea_share.db.MySQLSettings
 import joyea_share.handler.interfaces.{ExecListener, IAction}
 import joyea_share.model.{Album, AlbumSrc}
-import joyea_share.util.SUtil
+import joyea_share.util.{SUtil, SessionUtil}
 import scalikejdbc.async.AsyncDB
 
 import scala.concurrent._
@@ -22,7 +22,7 @@ class AlbumHandler extends IAction {
                 Album.findByUserIdAndName(sessionUserId, listName).onComplete(albumSelectTry => {
                     if (albumSelectTry.isSuccess) {
                         if (albumSelectTry.get.isEmpty) {
-                            Album.create(userId = sessionUserId, albumName = listName, albumDesc = Option("")).onComplete(albumTry => {
+                            Album.create(userId = sessionUserId, userName = SessionUtil.getUserName(context), albumName = listName, albumDesc = Option("")).onComplete(albumTry => {
                                 if (albumTry.isSuccess) {
                                     val album = albumTry.get
                                     var hasError = false
@@ -37,6 +37,8 @@ class AlbumHandler extends IAction {
                                                 srcHash = src.getString("hash", ""),
                                                 srcRev = src.getString("rev", ""),
                                                 srcDesc = src.getString("joyeaDesc", ""),
+                                                srcFileName = src.getString("filename", ""),
+                                                srcBytes = src.getLong("bytes", 0),
                                                 srcType = src.getString("type", ""),
                                             ).onComplete(insertSrcTry => {
                                                 if (insertSrcTry.isFailure) {
@@ -77,7 +79,7 @@ class AlbumHandler extends IAction {
                                 if (saveTry.isSuccess) {
                                     val album = saveTry.get
                                     AlbumSrc.deleteByAlbumId(album.albumId).onComplete(delTry => {
-                                        if(delTry.isSuccess){
+                                        if (delTry.isSuccess) {
                                             var hasError = false
                                             listSrc.forEach(srcValue => {
                                                 if (!hasError) {
@@ -90,6 +92,8 @@ class AlbumHandler extends IAction {
                                                         srcHash = src.getString("hash", ""),
                                                         srcRev = src.getString("rev", ""),
                                                         srcDesc = src.getString("joyeaDesc", ""),
+                                                        srcFileName = src.getString("filename", ""),
+                                                        srcBytes = src.getLong("bytes", 0),
                                                         srcType = src.getString("type", ""),
                                                     ).onComplete(insertSrcTry => {
                                                         if (insertSrcTry.isFailure) {
@@ -107,7 +111,7 @@ class AlbumHandler extends IAction {
                                             } else {
                                                 listener.onSuccess(respJson = resJson.add("alnumId", album.albumId))
                                             }
-                                        }else{
+                                        } else {
                                             listener.onError("更新旧清单信息出错！!")
                                         }
                                     })

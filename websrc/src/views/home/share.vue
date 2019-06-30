@@ -15,6 +15,7 @@
                 <el-col :md="8" :xs="24" v-for="(img,fileIndex) in album.list">
                     <el-card style="padding: 2px;margin: 5px">
                         <img :src="img.url" style="width: 100%; height: 150px" :preview="album.name"
+                             :onerror="defaultImg"
                              :preview-text="'解说词：' + img.desc">
                         <div style="height: 20px;margin-top: 10px">
                             <el-tooltip class="item" effect="dark" :content="img.desc" placement="bottom">
@@ -45,7 +46,8 @@
                 album: {
                     name: "",
                     src: {}
-                }
+                },
+                defaultImg: 'this.src="' + require('@assets/error.png') + '"' //默认图地址
             }
         },
         methods: {},

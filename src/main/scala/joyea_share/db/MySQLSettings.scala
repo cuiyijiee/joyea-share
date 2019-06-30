@@ -17,7 +17,7 @@ object MySQLSettings {
     val MYSQL_READ_TIMEOUT: FiniteDuration = 30.seconds
 
     def initialize(): Unit = this.synchronized {
-        LoggerFactory.getLogger("scalikejdbc").asInstanceOf[Logger].setLevel(Level.WARN)
+        //LoggerFactory.getLogger("scalikejdbc").asInstanceOf[Logger].setLevel(Level.WARN)
         //GlobalSettings.loggingSQLErrors = false
 
         val mysqlConfig = Config.application.getConfig("mysql")

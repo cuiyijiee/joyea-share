@@ -12,38 +12,54 @@
         </el-input>
         <el-row :gutter="20" class="px10_divider">
             <el-col :span="13" class="bg-purple">
-                <div>
-                    <div style="width: 100%" class="center_vertical">
-                        <h1>搜索结果</h1>
-                    </div>
-                    <el-table stripe empty-text="暂没有搜索数据" :data="searchResult" style="width: 100%"
-                              v-loading="loading.search">
-                        <el-table-column prop="path" label="素材名"/>
-                        <el-table-column label="解说词" width="80">
-                            <template slot-scope="scope">
-                                <span>{{scope.row.desc.length}}</span>
-                            </template>
-                        </el-table-column>
-                        <el-table-column prop="mime_type" label="素材格式" width="100"/>
-                        <el-table-column prop="size" label="大小" width="100"/>
-                        <!--                    <el-table-column prop="updator" label="是否有解说词" /> -->
-                        <el-table-column label="操作" width="180">
-                            <template slot-scope="scope">
-                                <el-button circle type="primary" @click="handleAdd(scope.$index, scope.row)"
-                                           icon="el-icon-plus"/>
-                                <el-button circle type="" icon="el-icon-search"
-                                           @click="handleGoToPreview(scope.row)"/>
-                                <el-button circle :type="scope.row.collect ? 'warning' : ''"
-                                           @click="handleCollect(scope.$index, scope.row)"
-                                           icon="el-icon-star-off"/>
-                            </template>
-                        </el-table-column>
-                    </el-table>
-                    <el-button class="load_more_bt" :class="{no_display:!search.hasNext}"
-                               :loading="loading.searchMore"
-                               @click="handleLoadMore">加载更多
-                    </el-button>
-                </div>
+                <el-tabs v-model="searchTabName" type="card">
+                    <el-tab-pane label="网盘搜索结果" name="pan">
+                        <el-table stripe empty-text="暂没有搜索数据" :data="searchResult" style="width: 100%"
+                                  v-loading="loading.search">
+                            <el-table-column prop="path" label="素材名"/>
+                            <el-table-column label="解说词" width="80">
+                                <template slot-scope="scope">
+                                    <span>{{scope.row.desc.length}}</span>
+                                </template>
+                            </el-table-column>
+                            <el-table-column prop="mime_type" label="素材格式" width="100"/>
+                            <el-table-column prop="size" label="大小" width="100"/>
+                            <!--                    <el-table-column prop="updator" label="是否有解说词" /> -->
+                            <el-table-column label="操作" width="180">
+                                <template slot-scope="scope">
+                                    <el-button circle type="primary" @click="handleAdd(scope.$index, scope.row)"
+                                               icon="el-icon-plus"/>
+                                    <el-button circle type="" icon="el-icon-search"
+                                               @click="handleGoToPreview(scope.row)"/>
+                                    <el-button circle :type="scope.row.collect ? 'warning' : ''"
+                                               @click="handleCollect(scope.$index, scope.row)"
+                                               icon="el-icon-star-off"/>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                        <el-button class="load_more_bt" :class="{no_display:!search.hasNext}"
+                                   :loading="loading.searchMore"
+                                   @click="handleLoadMore">加载更多
+                        </el-button>
+                    </el-tab-pane>
+                    <el-tab-pane label="清单搜索结果" name="list">
+                        <el-table stripe empty-text="暂没有搜索数据" :data="searchListResult" style="width: 100%"
+                                  v-loading="loading.searchList">
+                            <el-table-column prop="album_id" label="清单ID" width="100"/>
+                            <el-table-column prop="album_name" label="清单名称"/>
+                            <el-table-column prop="user_name" label="创建者" width="150"/>
+                            <el-table-column prop="created_at" label="创建时间" width="150"/>
+                            <el-table-column prop="refer_num" label="引用数" width="100"/>
+                            <el-table-column label="操作" width="100">
+                                <template slot-scope="scope">
+                                    <el-button type="primary" size="mini" icon="el-icon-view"
+                                               @click="handleSeeListDetail(scope.row)"></el-button>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                    </el-tab-pane>
+                    <el-tab-pane label="网盘目录" name="video">网盘目录，正在赶来的路上。</el-tab-pane>
+                </el-tabs>
             </el-col>
             <el-col :span="11" class="bg-purple">
                 <div class="content_div">
@@ -55,6 +71,7 @@
                             <template slot-scope="scope">
                                 <el-tooltip class="item" effect="dark" :content="scope.row.path" placement="top">
                                     <img class="preview_img"
+                                         :onerror="defaultImg"
                                          preview="buildList" :preview-text="scope.row.path"
                                          :src="genPreviewUrl(scope.row.neid,scope.row.hash,scope.row.rev)">
                                 </el-tooltip>
@@ -118,6 +135,34 @@
                            style="margin-top: 10px" icon="el-icon-circle-plus">不借鉴</el-button>
             </span>
         </el-dialog>
+        <el-dialog title="收货地址" :visible.sync="visible.listDetailDialogVisible">
+            <el-table :data="listDetail" @selection-change="handleSelectListItem" v-loading="loading.listDetailLoading">
+                <el-table-column
+                        type="selection"
+                        width="55">
+                </el-table-column>
+                <el-table-column label="预览">
+                    <template slot-scope="scope">
+                        <el-tooltip class="item" effect="dark" :content="scope.row.path" placement="top">
+                            <img class="preview_img"
+                                 :onerror="defaultImg"
+                                 :src="genPreviewUrl(scope.row.neid,scope.row.hash,scope.row.rev)">
+                        </el-tooltip>
+                    </template>
+                </el-table-column>
+                <el-table-column label="解说词">
+                    <template slot-scope="scope">
+                        <span>{{scope.row.desc.length === 0 ? "暂未设置解说词" : scope.row.desc}}</span>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="visible.listDetailDialogVisible = false">取 消</el-button>
+                <el-button type="primary" @click="handleAddListDetailToBuild"
+                           :disabled="selectListItem.length === 0">添 加
+                </el-button>
+            </div>
+        </el-dialog>
     </section>
 </template>
 
@@ -133,8 +178,9 @@
         },
         data() {
             return {
+                searchTabName: "pan",
                 search: {
-                    type: '',
+                    type: 'pic',
                     key: '',
                     hasNext: false
                 },
@@ -143,16 +189,22 @@
                     search: [
                         {value: '', label: '全部', disabled: false},
                         {value: 'pic', label: '图片'},
+                        {value: 'list', label: '清单', disabled: false},
                         {value: 'video', label: '视频', disabled: true},
                     ]
                 },
                 loading: {
                     search: false,
                     searchMore: false,
+                    searchList: false,
                     saveList: false,
-                    fullscreenLoading: false
+                    fullscreenLoading: false,
+                    listDetailLoading: false,
                 },
                 searchResult: [],
+                searchListResult: [],
+                selectListItem: [],
+                listDetail: [],
                 toCreateAlbum: {
                     idEditMode: false, //是否是编辑模式
                     editListId: -1,
@@ -169,44 +221,113 @@
                     key: '',
                     nextOffset: 0
                 },
+                visible: {
+                    listDetailDialogVisible: false
+                },
+                defaultImg: 'this.src="' + require('@assets/error.png') + '"' //默认图地址
             }
         },
         methods: {
+            handleSelectListItem(val) {
+                this.selectListItem = val;
+            },
+            handleAddListDetailToBuild() {
+                this.selectListItem.forEach(item => {
+                    this.toCreateAlbum.list.push({
+                        joyeaDesc: item.desc,
+                        path: item.path,
+                        neid: item.neid,
+                        hash: item.hash,
+                        rev: item.rev,
+                        filename: item.filename,
+                        bytes: item.bytes,
+                        isModify:false
+                    })
+                });
+                this.visible.listDetailDialogVisible = false;
+            },
+            handleSeeListDetail(row) {
+                this.visible.listDetailDialogVisible = true;
+                this.loading.listDetailLoading = true;
+                this.listDetail = [];
+                this.selectListItem = [];
+                api({
+                    action: "listDetail",
+                    albumId: row.album_id,
+                }).then(response => {
+                    if (response.result) {
+                        response.list.forEach(item => {
+                            this.listDetail.push(item)
+                        })
+                    } else {
+                        _this.$notify.error({
+                            title: '查看出错',
+                            message: '查看过程出现错误：' + response.msg
+                        });
+                        console.log(response.msg)
+                    }
+                    this.loading.listDetailLoading = false;
+                })
+            },
             handleSearch() {
                 let _this = this;
                 if (_this.search.key.trim().length === 0) {
                     _this.$message.warning("请输入搜索的关键字！")
                 } else {
-                    _this.loading.search = true;
-                    api({
-                        action: 'search',
-                        searchKey: _this.search.key,
-                        searchType: _this.search.type,
-                        offset: 0
-                    }).then(response => {
-                        if (response.result) {
-                            _this.search.hasNext = response["has_more"];
-                            if (_this.search.hasNext) {
-                                _this.loadMoreForm.type = _this.search.type;
-                                _this.loadMoreForm.key = _this.search.key;
-                                _this.loadMoreForm.nextOffset = response["next_offset"];
+                    if (_this.search.type === 'list') {
+                        _this.loading.searchList = true;
+                        api({
+                            action: "searchList",
+                            searchKey: _this.search.key
+                        }).then(response => {
+                            _this.loading.searchList = false;
+                            if (response.result) {
+                                _this.searchListResult = [];
+                                response.list.forEach(list => {
+                                    _this.searchListResult.push(list)
+                                })
+                            } else {
+                                _this.$notify.error({
+                                    title: '搜索出错',
+                                    message: '搜索过程出现错误：' + response.msg
+                                });
+                                console.log(response.msg)
                             }
-                            _this.searchResult = [];
-                            response.content.forEach(item => {
-                                item.joyeaDesc = "";
-                                item.isModify = false;
-                                _this.searchResult.push(item)
-                            })
-                        } else {
-                            _this.$notify.error({
-                                title: '搜索出错',
-                                message: '搜索过程出现错误：' + response.msg
-                            });
-                            console.log(response.msg)
-                        }
-                    }).finally(() => {
-                        _this.loading.search = false
-                    })
+                        });
+                        _this.searchTabName = "list";
+                    } else {
+                        _this.loading.search = true;
+                        api({
+                            action: 'search',
+                            searchKey: _this.search.key,
+                            searchType: _this.search.type,
+                            offset: 0
+                        }).then(response => {
+                            if (response.result) {
+                                _this.search.hasNext = response["has_more"];
+                                if (_this.search.hasNext) {
+                                    _this.loadMoreForm.type = _this.search.type;
+                                    _this.loadMoreForm.key = _this.search.key;
+                                    _this.loadMoreForm.nextOffset = response["next_offset"];
+                                }
+                                _this.searchResult = [];
+                                response.content.forEach(item => {
+                                    item.joyeaDesc = "";
+                                    item.isModify = false;
+                                    _this.searchResult.push(item)
+                                })
+                            } else {
+                                _this.$notify.error({
+                                    title: '搜索出错',
+                                    message: '搜索过程出现错误：' + response.msg
+                                });
+                                console.log(response.msg)
+                            }
+                        }).finally(() => {
+                            _this.loading.search = false
+                        });
+                        _this.searchTabName = "pan";
+                    }
                 }
             },
             handleLoadMore() {
@@ -250,6 +371,7 @@
                 // this.toCreateAlbum.previewUrl = this.genPreviewUrl(row.neid, row.hash, row.rev);
                 // this.toCreateAlbum.descSelectDialogVisible = true;
                 this.toCreateAlbum.list.push(row);
+                console.log(this.toCreateAlbum.list);
             },
             handleSelectDesc(row, column, event) {
                 this.toCreateAlbum.toAddRow.joyeaDesc = row.desc;

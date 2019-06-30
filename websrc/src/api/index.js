@@ -9,5 +9,8 @@ const service = axios.create({
 });
 
 export default function api(params) {
-    return service.post('api', params).then(res => res.data)
+    return service.post('api', params).then(res => {
+        return res.data;
+    })
 }
+ 

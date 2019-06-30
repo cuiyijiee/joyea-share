@@ -33,13 +33,14 @@
                         <el-card style="padding: 2px;margin: 5px">
                             <img :src="img.url"
                                  style="width: 100%; height: 150px"
-                                 :preview="album.name" :preview-text="'解说词：' + img.desc">
+                                 :onerror="defaultImg"
+                                 :preview="album.name"
+                                 :preview-text="'解说词：' + (img.desc.length === 0 ? '暂未设置解说词' :img.desc)">
                             <div style="height: 20px;margin-top: 10px">
-                                <el-tooltip class="item" effect="dark" :content="img.desc" placement="bottom">
-                                    <span class="svg_name">{{img.desc.length > 30 ? img.desc.substr(0,30) + "..." : img.desc}}</span>
+                                <el-tooltip class="item" effect="dark" :content="img.desc.length === 0 ? '暂未设置解说词' : img.desc" placement="bottom">
+                                    <span class="svg_name">{{img.desc.length > 30 ?
+                                        img.desc.substr(0,30) + "..." : (img.desc.length === 0 ? '暂未设置解说词' : img.desc)}}</span>
                                 </el-tooltip>
-                                <!--                                <el-button type="danger" size="mini" icon="el-icon-delete"-->
-                                <!--                                           @click=""></el-button>-->
                             </div>
                         </el-card>
                     </el-col>
@@ -63,7 +64,8 @@
                 search: {
                     key: ''
                 },
-                albumList: []
+                albumList: [],
+                defaultImg: 'this.src="' + require('@assets/error.png') + '"' //默认图地址
             }
         },
         methods: {
@@ -83,10 +85,14 @@
                             list.src.forEach(src => {
                                 imgUrl.push({
                                     url: genSrcPreviewUrl(src.neid, src.hash, src.rev, previewType, this.userInfo.session),
-                                    desc: src.desc.length === 0 ? "暂未设置解说词" : src.desc,
-                                    neid:src.neid,
-                                    hash:src.hash,
-                                    rev:src.rev,
+                                    desc: src.desc,
+                                    path: src.path,
+                                    neid: src.neid,
+                                    hash: src.hash,
+                                    rev: src.rev,
+                                    filename: src.filename,
+                                    bytes: src.bytes,
+                                    size: src.size,
                                 })
                             });
                             this.albumList.push({
@@ -100,6 +106,7 @@
                         console.log(response.msg);
                         this.$message.error("加载失败！")
                     }
+
                 })
             },
             handleDelete(index) {
@@ -127,6 +134,7 @@
                 });
             },
             handleEdit(index) {
+                console.log(this.albumList[index]);
                 this.$alert('你即将前往编辑页面，编辑【 ' + this.albumList[index].name + ' 】清单', '提示', {
                     confirmButtonText: '确定',
                     callback: action => {

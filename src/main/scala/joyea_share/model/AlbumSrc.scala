@@ -17,6 +17,8 @@ case class AlbumSrc(
                        srcPath: String,
                        srcType: String,
                        srcDesc: String,
+                       srcFileName: String,
+                       srcBytes: Long,
                        createdAt: Timestamp
                    ) extends ShortenedNames {
 
@@ -30,6 +32,8 @@ case class AlbumSrc(
         .add("hash", this.srcHash)
         .add("size", this.srcSize)
         .add("desc", this.srcDesc)
+        .add("bytes", this.srcBytes)
+        .add("filename", this.srcFileName)
         .add("created_at", this.createdAt.getTime)
 }
 
@@ -37,7 +41,7 @@ object AlbumSrc extends SQLSyntaxSupport[AlbumSrc] with ShortenedNames {
 
     lazy val albums: scalikejdbc.QuerySQLSyntaxProvider[scalikejdbc.SQLSyntaxSupport[AlbumSrc], AlbumSrc] = AlbumSrc.syntax("albums")
 
-    override def columnNames: Seq[String] = Seq("id", "album_id", "src_neid", "src_path", "src_type", "src_hash", "src_rev", "src_size", "src_desc", "created_at")
+    override def columnNames: Seq[String] = Seq("id", "album_id", "src_neid", "src_path", "src_type", "src_hash", "src_rev", "src_size", "src_file_name", "src_bytes", "src_desc", "created_at")
 
     def apply(as: SyntaxProvider[AlbumSrc])(rs: WrappedResultSet): AlbumSrc = apply(as.resultName)(rs)
 
@@ -52,12 +56,14 @@ object AlbumSrc extends SQLSyntaxSupport[AlbumSrc] with ShortenedNames {
             srcRev = rs.get[String](as.srcRev),
             srcSize = rs.get[String](as.srcSize),
             srcDesc = rs.get[String](as.srcDesc),
+            srcFileName = rs.get[String](as.srcFileName),
+            srcBytes = rs.get[Long](as.srcBytes),
             createdAt = rs.get[Timestamp](as.createdAt)
         )
     }
 
     def create(srcNeid: Long, albumId: Long, srcPath: String, srcType: String, srcHash: String, srcRev: String,
-               srcSize: String, srcDesc: String, createdAt: Timestamp = new Timestamp(System.currentTimeMillis()))
+               srcSize: String, srcDesc: String, srcFileName: String, srcBytes: Long, createdAt: Timestamp = new Timestamp(System.currentTimeMillis()))
               (implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[AlbumSrc] = {
         for {
             id <- withSQL {
@@ -70,11 +76,13 @@ object AlbumSrc extends SQLSyntaxSupport[AlbumSrc] with ShortenedNames {
                     column.srcRev -> srcRev,
                     column.srcSize -> srcSize,
                     column.srcDesc -> srcDesc,
+                    column.srcFileName -> srcFileName,
+                    column.srcBytes -> srcBytes,
                     column.createdAt -> createdAt
                 )
             }.updateAndReturnGeneratedKey().future()
         } yield AlbumSrc(id = id, srcNeid = srcNeid, albumId = albumId, srcPath = srcPath, srcType = srcType,
-            srcHash = srcHash, srcRev = srcRev, srcSize = srcSize, srcDesc = srcDesc, createdAt = createdAt)
+            srcHash = srcHash, srcRev = srcRev, srcSize = srcSize, srcDesc = srcDesc, srcFileName = srcFileName, srcBytes = srcBytes, createdAt = createdAt)
     }
 
     def delete(id: Long)(implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[Int] = withSQL {
