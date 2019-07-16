@@ -93,6 +93,7 @@
                                     filename: src.filename,
                                     bytes: src.bytes,
                                     size: src.size,
+                                    mime_type:src.mime_type
                                 })
                             });
                             this.albumList.push({

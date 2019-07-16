@@ -29,6 +29,7 @@ case class DownloadTask(
             .add("downloadRoleName", downloadRoleName)
             .add("downloadRoleId", downloadRoleId)
             .add("startTime", SUtil.genDateString(startDate))
+            .add("firstSrcName",downloadFile.get(0).fileName)
             .add("finishTime", if (finishDate == null) "" else SUtil.genDateString(finishDate))
 
     }
@@ -51,7 +52,7 @@ case class DownloadTask(
         downloadListener.onStart(id, downloadFile.size())
         status = DownloadStatus.DOWNLOAD
         downloadFile.forEach(item => {
-            LenovoUtil.downloadFileV2(sessionId, item.path, item.neid, item.rev, "ent", saveFilePath + "/" + item.fileName, new CommonListener[File] {
+            LenovoUtil.downloadFileV2(sessionId, item.path, item.neid, item.rev, "ent", saveFilePath + "/" + item.index + "--" + item.fileName, new CommonListener[File] {
                 override def onSuccess(obj: File): Unit = {
                     successNum = successNum + 1
                     downloadProgress = downloadProgress + 1

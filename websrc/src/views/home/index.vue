@@ -1,78 +1,84 @@
 <template>
-    <el-row class="container">
-        <el-col :span="24" class="header">
-            <el-col :span="10" class="logo logo-width">
-                {{sysName}}
+    <div>
+        <el-row class="container">
+            <el-col :span="24" class="header">
+                <el-col :span="10" class="logo logo-width">
+                    {{sysName}}
+                </el-col>
+                <el-col :span="4" class="userinfo">
+                    <el-popover
+                            style="margin-right: 20px"
+                            placement="bottom-start"
+                            width="550"
+                            @show="handleOpenDownload"
+                            @hide="handleCloseDownload"
+                            trigger="click">
+                        <el-table :data="downloadTask" empty-text="今日暂无下载任务">
+                            <!--                            <el-table-column width="300" property="id" label="任务ID"></el-table-column>-->
+                            <el-table-column width="300" property="firstSrcName" label="任务名称"
+                                             show-overflow-tooltip></el-table-column>
+                            <el-table-column width="150" property="startTime" label="下载时间"></el-table-column>
+                            <el-table-column width="100" label="状态">
+                                <template slot-scope="scope">
+                                    <el-button :type="scope.row.status?'success':'danger'" size="mini"
+                                               @click="handleDownload(scope.row)"
+                                               :icon="scope.row.status?'el-icon-download':'el-icon-loading'"></el-button>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                        <el-button slot="reference" size="small" circle :type="visible?'danger':''"
+                                   :icon="visible ? 'el-icon-loading' :'el-icon-download' "></el-button>
+                    </el-popover>
+                    <el-dropdown trigger="hover">
+                        <!--                    <span class="el-dropdown-link userinfo-inner"><img-->
+                        <!--                            :src="this.sysUserAvatar"/> {{sysUserName}}</span>-->
+                        <span class="el-dropdown-link userinfo-inner">{{userInfo.name}}</span>
+                        <el-dropdown-menu slot="dropdown">
+                            <el-dropdown-item @click.native="logout">注销登陆</el-dropdown-item>
+                        </el-dropdown-menu>
+                    </el-dropdown>
+                </el-col>
             </el-col>
-            <el-col :span="4" class="userinfo">
-                <el-popover
-                        style="margin-right: 20px"
-                        placement="bottom-start"
-                        width="550"
-                        @show="handleOpenDownload"
-                        @hide="handleCloseDownload"
-                        trigger="click">
-                    <el-table :data="downloadTask" empty-text="今日暂无下载任务">
-                        <el-table-column width="300" property="id" label="任务ID"></el-table-column>
-                        <el-table-column width="150" property="startTime" label="下载时间"></el-table-column>
-                        <el-table-column width="100" label="状态">
-                            <template slot-scope="scope">
-                                <el-button :type="scope.row.status?'success':'danger'" size="mini" @click="handleDownload(scope.row)"
-                                           :icon="scope.row.status?'el-icon-download':'el-icon-loading'"></el-button>
-                            </template>
-                        </el-table-column>
-                    </el-table>
-                    <el-button slot="reference" size="small" circle icon="el-icon-download"></el-button>
-                </el-popover>
-                <el-dropdown trigger="hover">
-                    <!--                    <span class="el-dropdown-link userinfo-inner"><img-->
-                    <!--                            :src="this.sysUserAvatar"/> {{sysUserName}}</span>-->
-                    <span class="el-dropdown-link userinfo-inner">{{userInfo.name}}</span>
-                    <el-dropdown-menu slot="dropdown">
-                        <el-dropdown-item @click.native="logout">注销登陆</el-dropdown-item>
-                    </el-dropdown-menu>
-                </el-dropdown>
-            </el-col>
-        </el-col>
-        <el-col :span="24" class="main">
-            <aside class="menu-expanded">
-                <!--导航菜单-->
-                <el-menu :default-active="$route.path" class="el-menu-vertical-demo" @open="handleOpen"
-                         @close="handleClose" @select="handleSelect"
-                         unique-opened router>
-                    <template v-for="(item,index) in $router.options.routes" v-if="!item.hidden">
-                        <el-submenu :index="index+''" v-if="!item.noChild">
-                            <template slot="title"><i :class="item.icon"></i>{{item.name}}</template>
-                            <el-menu-item v-for="child in item.children" :index="child.path" :key="child.path"
-                                          v-if="!child.hidden">{{child.name}}
+            <el-col :span="24" class="main">
+                <aside class="menu-expanded">
+                    <!--导航菜单-->
+                    <el-menu :default-active="$route.path" class="el-menu-vertical-demo" @open="handleOpen"
+                             @close="handleClose" @select="handleSelect"
+                             unique-opened router>
+                        <template v-for="(item,index) in $router.options.routes" v-if="!item.hidden">
+                            <el-submenu :index="index+''" v-if="!item.noChild">
+                                <template slot="title"><i :class="item.icon"></i>{{item.name}}</template>
+                                <el-menu-item v-for="child in item.children" :index="child.path" :key="child.path"
+                                              v-if="!child.hidden">{{child.name}}
+                                </el-menu-item>
+                            </el-submenu>
+                            <el-menu-item v-if="item.noChild && item.children && item.children.length > 0"
+                                          :index="item.children[0].path">
+                                <i :class="item.icon"></i>{{item.name}}
                             </el-menu-item>
-                        </el-submenu>
-                        <el-menu-item v-if="item.noChild && item.children && item.children.length > 0"
-                                      :index="item.children[0].path">
-                            <i :class="item.icon"></i>{{item.name}}
-                        </el-menu-item>
-                    </template>
-                </el-menu>
-            </aside>
-            <section class="content-container">
-                <div class="grid-content bg-purple-light">
-                    <el-col :span="24" class="breadcrumb-container">
-                        <strong class="title">{{$route.desc}}</strong>
-                        <el-breadcrumb separator="/" class="breadcrumb-inner">
-                            <el-breadcrumb-item v-for="item in $route.matched" :key="item.path">
-                                {{ item.name }}
-                            </el-breadcrumb-item>
-                        </el-breadcrumb>
-                    </el-col>
-                    <el-col :span="24" class="content-wrapper">
-                        <transition name="fade" mode="out-in">
-                            <router-view></router-view>
-                        </transition>
-                    </el-col>
-                </div>
-            </section>
-        </el-col>
-    </el-row>
+                        </template>
+                    </el-menu>
+                </aside>
+                <section class="content-container">
+                    <div class="grid-content bg-purple-light">
+                        <el-col :span="24" class="breadcrumb-container">
+                            <strong class="title">{{$route.desc}}</strong>
+                            <el-breadcrumb separator="/" class="breadcrumb-inner">
+                                <el-breadcrumb-item v-for="item in $route.matched" :key="item.path">
+                                    {{ item.name }}
+                                </el-breadcrumb-item>
+                            </el-breadcrumb>
+                        </el-col>
+                        <el-col :span="24" class="content-wrapper">
+                            <transition name="fade" mode="out-in">
+                                <router-view></router-view>
+                            </transition>
+                        </el-col>
+                    </div>
+                </section>
+            </el-col>
+        </el-row>
+    </div>
 </template>
 
 <script>
@@ -80,6 +86,7 @@
 
     const localStorage = window.localStorage;
     let timer = 0;
+    import store from '@/store'
 
     export default {
         data() {
@@ -90,6 +97,11 @@
                     email: ''
                 },
                 downloadTask: []
+            }
+        },
+        computed: {
+            visible() {
+                return store.getters.barVisible;
             }
         },
         methods: {
@@ -123,6 +135,7 @@
                         _this.downloadTask.push({
                             id: task.id,
                             startTime: task.startTime,
+                            firstSrcName: task.firstSrcName.substr(0, task.firstSrcName.lastIndexOf(".")),
                             status: task.finishTime.length !== 0
                         });
                         _this.downloadTask.reverse();
@@ -137,6 +150,7 @@
                             _this.downloadTask.push({
                                 id: task.id,
                                 startTime: task.startTime,
+                                firstSrcName: task.firstSrcName.substr(0, task.firstSrcName.lastIndexOf(".")),
                                 status: task.finishTime.length !== 0
                             });
                             _this.downloadTask.reverse();
@@ -144,12 +158,13 @@
                     })
                 }, 2 * 1000);
             },
+
             handleCloseDownload() {
                 clearInterval(timer);
             },
             handleDownload(row) {
                 if (row.status) {
-                    window.open(window.location.protocol + "//" + window.location.host + "/download/" + row.id);
+                    window.open(window.location.protocol + "//" + window.location.host + "/download/" + row.id + "/" + row.firstSrcName);
                 }
             }
         },
@@ -212,7 +227,7 @@
             }
 
             .logo {
-                //width:230px;
+                //width:150px;
                 height: 60px;
                 font-size: 22px;
                 padding-left: 20px;
@@ -234,7 +249,7 @@
             }
 
             .logo-width {
-                width: 230px;
+                width: 150px;
             }
 
             .tools {
@@ -255,8 +270,8 @@
             overflow: hidden;
 
             aside {
-                flex: 0 0 230px;
-                width: 230px;
+                flex: 0 0 150px;
+                width: 150px;
                 // position: absolute;
                 // top: 0px;
                 // bottom: 0px;
@@ -266,8 +281,8 @@
             }
 
             .menu-expanded {
-                flex: 0 0 230px;
-                width: 230px;
+                flex: 0 0 150px;
+                width: 150px;
             }
 
             .content-container {
@@ -277,14 +292,14 @@
                 // right: 0px;
                 // top: 0px;
                 // bottom: 0px;
-                // left: 230px;
+                // left: 150px;
                 overflow-y: scroll;
                 padding: 20px;
 
                 .breadcrumb-container {
                     //margin-bottom: 15px;
                     .title {
-                        width: 200px;
+                        width: 150px;
                         float: left;
                         color: #475669;
                     }

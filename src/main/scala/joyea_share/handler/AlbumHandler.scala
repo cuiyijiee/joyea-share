@@ -39,7 +39,7 @@ class AlbumHandler extends IAction {
                                                 srcDesc = src.getString("joyeaDesc", ""),
                                                 srcFileName = src.getString("filename", ""),
                                                 srcBytes = src.getLong("bytes", 0),
-                                                srcType = src.getString("type", ""),
+                                                srcType = src.getString("mime_type", ""),
                                             ).onComplete(insertSrcTry => {
                                                 if (insertSrcTry.isFailure) {
                                                     hasError = true
@@ -94,7 +94,7 @@ class AlbumHandler extends IAction {
                                                         srcDesc = src.getString("joyeaDesc", ""),
                                                         srcFileName = src.getString("filename", ""),
                                                         srcBytes = src.getLong("bytes", 0),
-                                                        srcType = src.getString("type", ""),
+                                                        srcType = src.getString("mime_type", ""),
                                                     ).onComplete(insertSrcTry => {
                                                         if (insertSrcTry.isFailure) {
                                                             hasError = true

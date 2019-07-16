@@ -1,14 +1,15 @@
 package joyea_share.util
 
 import java.io.{File, FileOutputStream, IOException, InputStream}
+import java.net.URLEncoder
 
 import com.json.JsonObject
 import okhttp3._
 import org.slf4s.LoggerFactory
+import xitrum.Log
 
-object LenovoUtil {
+object LenovoUtil extends Log{
 
-    private val _log = LoggerFactory.getLogger("LenovoUtil")
 
     private val BASE_URL = "https://box.lenovo.com/v2"
     //全局搜索的URL
@@ -165,8 +166,8 @@ object LenovoUtil {
         })
     }
 
-    def downloadFile(sessionId: String, rev: String, neid: String, pathType: String = "ent", downloadFilePath: String, listener: CommonListener[File]): Unit = {
-        val requestUrl = s"$BASE_DOWNLOAD_URL/?X-LENOVO-SESS-ID=$sessionId&path_type=$pathType&neid=$neid&rev=$rev"
+    def listDir(sessionId: String, path: String, pathType: String = "ent", listener: CommonListener[JsonObject]): Unit = {
+        val requestUrl = s"$BASE_URL/metadata/root${URLEncoder.encode(path,"UTF-8").replaceAll("\\+", "%20")}?X-LENOVO-SESS-ID=$sessionId&path_type=$pathType"
         val request = HttpUtil.obtainBaseRequest(sessionId).url(requestUrl).build()
         HttpUtil.obtainHttpClient().newCall(request).enqueue(new Callback {
             override def onFailure(call: Call, e: IOException): Unit = {
@@ -174,37 +175,18 @@ object LenovoUtil {
             }
 
             override def onResponse(call: Call, response: Response): Unit = {
-                var is: InputStream = null
-                var os: FileOutputStream = null
-                val buf: Array[Byte] = new Array[Byte](1024)
-                try {
-                    is = response.body().byteStream()
-                    val downloadFile = new File(downloadFilePath)
-                    os = new FileOutputStream(downloadFile)
-                    //val total = response.body().contentLength()
-                    var len = is.read(buf)
-                    var current = 0
-                    while (len != -1) {
-                        current = current + len
-                        os.write(buf, 0, len)
-                        len = is.read(buf)
-                    }
-                    os.flush()
-                    listener.onSuccess(downloadFile)
-                } catch {
-                    case e: Exception =>
-                        listener.onError("请求失败！")
-                        _log.error("下载失败：" + SUtil.convertExceptionToStr(e))
-                } finally {
-                    if (os != null) os.close()
-                    if (is != null) is.close()
+                val resultJson = JsonObject.readFrom(response.body().string())
+                if (resultJson.getInt("state", -1) == 401) {
+                    listener.onError(resultJson.get("message").asString())
+                } else {
+                    listener.onSuccess(resultJson)
                 }
             }
         })
     }
 
     def downloadFileV2(sessionId: String, path: String, neid: String, rev: String, pathType: String = "ent", downloadFilePath: String, listener: CommonListener[File]): Unit = {
-        val requestUrl = s"$BASE_DOWNLOAD_URL$path?X-LENOVO-SESS-ID=$sessionId&path_type=$pathType&neid=$neid&rev=$rev"
+        val requestUrl = s"$BASE_DOWNLOAD_URL${URLEncoder.encode(path,"UTF-8").replaceAll("\\+", "%20")}?X-LENOVO-SESS-ID=$sessionId&path_type=$pathType&neid=$neid&rev=$rev"
         val request = HttpUtil.obtainBaseRequest(sessionId).url(requestUrl).build()
         HttpUtil.obtainHttpClient().newCall(request).enqueue(new Callback {
             override def onFailure(call: Call, e: IOException): Unit = {
@@ -213,7 +195,7 @@ object LenovoUtil {
 
             override def onResponse(call: Call, response: Response): Unit = {
                 if (response.code() != 200) {
-                    _log.error(s"请求失败：$requestUrl,失败代码：${response.code()},失败信息：${response.body().string()}")
+                    log.error(s"请求失败：$requestUrl,失败代码：${response.code()},失败信息：${response.body().string()}")
                     listener.onError(s"请求失败：$requestUrl,失败代码：${response.code()},失败信息：${response.body().string()}")
                 } else {
                     var is: InputStream = null
@@ -240,7 +222,7 @@ object LenovoUtil {
                     } catch {
                         case e: Exception =>
                             listener.onError("请求失败！")
-                            _log.error("下载失败：" + SUtil.convertExceptionToStr(e))
+                            log.error("下载失败：" + SUtil.convertExceptionToStr(e))
                     } finally {
                         if (os != null) os.close()
                         if (is != null) is.close()

@@ -3,6 +3,7 @@ package joyea_share.module.download
 import com.json.JsonObject
 
 case class DownloadItem(
+                           index: Int,
                            path: String,
                            rev: String,
                            neid: String,
@@ -13,10 +14,10 @@ case class DownloadItem(
 
     def toJson(): JsonObject = {
         new JsonObject()
-            .add("path",path)
-            .add("rev",rev)
-            .add("neid",neid)
-            .add("fileName",fileName)
-            .add("pathType",pathType)
+            .add("path", path)
+            .add("rev", rev)
+            .add("neid", neid)
+            .add("fileName", fileName)
+            .add("pathType", pathType)
     }
 }

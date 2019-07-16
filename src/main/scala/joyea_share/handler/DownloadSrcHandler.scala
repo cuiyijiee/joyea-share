@@ -1,7 +1,5 @@
 package joyea_share.handler
 
-import java.util.Date
-
 import com.json.JsonObject
 import joyea_share.handler.interfaces.{ExecListener, IAction}
 import joyea_share.module.download.{DownloadItem, DownloadManager, DownloadTask}
@@ -19,6 +17,7 @@ class DownloadSrcHandler extends IAction {
             src.forEach(value => {
                 val toDownloadObj = value.asObject()
                 downloadTask.downloadFile.add(DownloadItem(
+                    index = toDownloadObj.get("index").asInt(),
                     path = toDownloadObj.get("path").asString(),
                     rev = toDownloadObj.get("rev").asString(),
                     neid = toDownloadObj.get("neid").asString(),

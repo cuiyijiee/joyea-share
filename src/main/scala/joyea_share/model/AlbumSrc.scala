@@ -27,7 +27,7 @@ case class AlbumSrc(
         .add("neid", this.srcNeid)
         .add("album_id", this.albumId)
         .add("path", this.srcPath)
-        .add("type", this.srcType)
+        .add("mime_type", this.srcType)
         .add("rev", this.srcRev)
         .add("hash", this.srcHash)
         .add("size", this.srcSize)

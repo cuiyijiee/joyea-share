@@ -3,37 +3,126 @@
         <!--工具条-->
         <el-input placeholder="请输入关键字" v-model="search.key" class="input-with-select px10_divider"
                   @keyup.enter.native="handleSearch">
-            <el-select v-model="search.type" slot="prepend" placeholder="请选择类型" style="width: 80px"
-                       :value="search.type">
-                <el-option v-for="item in options.search" :label="item.label" :value="item.value" :key="item.value"
-                           :disabled="item.disabled"/>
-            </el-select>
             <el-button slot="append" icon="el-icon-search" v-on:click="handleSearch"/>
         </el-input>
         <el-row :gutter="20" class="px10_divider">
             <el-col :span="13" class="bg-purple">
                 <el-tabs v-model="searchTabName" type="card">
+                    <el-tab-pane label="网盘目录" name="dir">
+                        <!--文件路径显示-->
+                        <el-row class="contentHead">
+                            <el-col :span="18">
+                                <span style=" color:#66b1ff;font-size: 15px;cursor:pointer;"
+                                      @click="handleListLenovoDir('/','ent')">根目录</span>
+                                <span style="display: inline" v-for="(item,index) in dir.currentPath">
+                                    /
+                                    <span style=" color:#66b1ff;font-size: 15px;cursor:pointer;"
+                                          @click="handleClickDirPath(item,index)">{{item}}</span>
+                                </span>
+                            </el-col>
+                            <el-col :span="3" :offset="3">
+                                共{{dir.tableData.length}}个资源
+                            </el-col>
+                        </el-row>
+                        <el-table ref="fileTable"
+                                  v-loading="dir.loadingDir"
+                                  :data="dir.tableData"
+                                  tooltip-effect="dark"
+                                  empty-text="文件夹为空"
+                                  @row-click="handleClickDirItem"
+                                  style="width: 100%">
+                            <el-table-column
+                                    show-overflow-tooltip
+                                    label="文件名">
+                                <template slot-scope="scope">
+                                    <i v-if="scope.row.is_dir" class="el-icon-folder-opened"></i>
+                                    <i v-else-if="scope.row.mime_type.startsWith('video')"
+                                       class="el-icon-video-camera"></i>
+                                    <i v-else-if="scope.row.mime_type.startsWith('image')"
+                                       class="el-icon-picture-outline"></i>
+                                    <i v-else-if="scope.row.mime_type.startsWith('doc')" class="el-icon-tickets"></i>
+                                    <i v-else class="el-icon-question"></i>
+                                    {{' ' + scope.row.path.substr(scope.row.path.lastIndexOf('/')+1)}}
+                                </template>
+                            </el-table-column>
+                            <el-table-column label="解说词" width="80">
+                                <template slot-scope="scope">
+                                    <span>{{scope.row.is_dir ? '-' :scope.row.desc.length}}</span>
+                                </template>
+                            </el-table-column>
+                            <el-table-column
+                                    label="素材格式"
+                                    width="100">
+                                <template slot-scope="scope">
+                                    {{scope.row.is_dir ? '-' : scope.row.mime_type}}
+                                </template>
+                            </el-table-column>
+                            <el-table-column
+                                    label="大小"
+                                    width="100">
+                                <template slot-scope="scope">
+                                    {{scope.row.is_dir ? '-' : scope.row.size}}
+                                </template>
+                            </el-table-column>
+                            <el-table-column
+                                    label="操作"
+                                    width="180">
+                                <template slot-scope="scope">
+                                    <span v-if="scope.row.is_dir">-</span>
+                                    <span v-else>
+                                        <el-button circle type="primary" @click="handleAdd(scope.$index, scope.row)"
+                                                   icon="el-icon-plus"/>
+                                        <el-button circle type="" icon="el-icon-view"
+                                                   @click="handleGoToPreview(scope.row)"/>
+                                        <el-button circle :type="scope.row.collect ? 'warning' : ''"
+                                                   @click="handleCollect(scope.$index, scope.row)"
+                                                   icon="el-icon-star-off"/>
+                                    </span>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                    </el-tab-pane>
                     <el-tab-pane label="网盘搜索结果" name="pan">
                         <el-table stripe empty-text="暂没有搜索数据" :data="searchResult" style="width: 100%"
                                   v-loading="loading.search">
-                            <el-table-column prop="path" label="素材名"/>
-                            <el-table-column label="解说词" width="80">
+                            <el-table-column label="素材名" show-overflow-tooltip>
                                 <template slot-scope="scope">
-                                    <span>{{scope.row.desc.length}}</span>
+                                    <h4 style="margin: 2px">
+                                        {{scope.row.path.substr(scope.row.path.lastIndexOf("/")+1)}}</h4>
+                                    {{scope.row.path}}
                                 </template>
                             </el-table-column>
-                            <el-table-column prop="mime_type" label="素材格式" width="100"/>
-                            <el-table-column prop="size" label="大小" width="100"/>
+                            <el-table-column label="解说词" width="80">
+                                <template slot-scope="scope">
+                                    <span>{{scope.row.is_dir ? "-" : scope.row.desc.length}}</span>
+                                </template>
+                            </el-table-column>
+                            <el-table-column label="素材格式" width="100">
+                                <template slot-scope="scope">
+                                    {{scope.row.is_dir ? "-" : scope.row.mime_type}}
+                                </template>
+                            </el-table-column>
+                            <el-table-column label="大小" width="100">
+                                <template slot-scope="scope">
+                                    {{scope.row.is_dir ? "-" : scope.row.size}}
+                                </template>
+                            </el-table-column>
                             <!--                    <el-table-column prop="updator" label="是否有解说词" /> -->
                             <el-table-column label="操作" width="180">
                                 <template slot-scope="scope">
-                                    <el-button circle type="primary" @click="handleAdd(scope.$index, scope.row)"
-                                               icon="el-icon-plus"/>
-                                    <el-button circle type="" icon="el-icon-search"
-                                               @click="handleGoToPreview(scope.row)"/>
-                                    <el-button circle :type="scope.row.collect ? 'warning' : ''"
-                                               @click="handleCollect(scope.$index, scope.row)"
-                                               icon="el-icon-star-off"/>
+                                    <div v-if="scope.row.is_dir">
+                                        <el-button circle type="primary" @click="handleClickDirItem(scope.row)"
+                                                   icon="el-icon-s-promotion"/>
+                                    </div>
+                                    <div v-else>
+                                        <el-button circle type="primary" @click="handleAdd(scope.$index, scope.row)"
+                                                   icon="el-icon-plus"/>
+                                        <el-button circle type="" icon="el-icon-view"
+                                                   @click="handleGoToPreview(scope.row)"/>
+                                        <el-button circle :type="scope.row.collect ? 'warning' : ''"
+                                                   @click="handleCollect(scope.$index, scope.row)"
+                                                   icon="el-icon-star-off"/>
+                                    </div>
                                 </template>
                             </el-table-column>
                         </el-table>
@@ -46,7 +135,7 @@
                         <el-table stripe empty-text="暂没有搜索数据" :data="searchListResult" style="width: 100%"
                                   v-loading="loading.searchList">
                             <el-table-column prop="album_id" label="清单ID" width="100"/>
-                            <el-table-column prop="album_name" label="清单名称"/>
+                            <el-table-column prop="album_name" show-overflow-tooltip label="清单名称"/>
                             <el-table-column prop="user_name" label="创建者" width="150"/>
                             <el-table-column prop="created_at" label="创建时间" width="150"/>
                             <el-table-column prop="refer_num" label="引用数" width="100"/>
@@ -58,7 +147,6 @@
                             </el-table-column>
                         </el-table>
                     </el-tab-pane>
-                    <el-tab-pane label="网盘目录" name="video">网盘目录，正在赶来的路上。</el-tab-pane>
                 </el-tabs>
             </el-col>
             <el-col :span="11" class="bg-purple">
@@ -66,14 +154,16 @@
                     <div style="width: 100%" class="center_vertical">
                         <h1>清单编辑列表（{{toCreateAlbum.list.length}}）</h1>
                     </div>
-                    <el-table stripe empty-text="清单内还没有内容" :data="toCreateAlbum.list" style="width: 100%">
+                    <el-table stripe empty-text="清单内还没有内容"
+                              row-key="neid" ref="table" id="toSortTable"
+                              :data="toCreateAlbum.list" style="width: 100%">
                         <el-table-column label="预览">
                             <template slot-scope="scope">
                                 <el-tooltip class="item" effect="dark" :content="scope.row.path" placement="top">
                                     <img class="preview_img"
                                          :onerror="defaultImg"
                                          preview="buildList" :preview-text="scope.row.path"
-                                         :src="genPreviewUrl(scope.row.neid,scope.row.hash,scope.row.rev)">
+                                         :src="genPreviewUrl(scope.row.neid,scope.row.hash,scope.row.rev,scope.row.mime_type)">
                                 </el-tooltip>
                             </template>
                         </el-table-column>
@@ -104,13 +194,13 @@
                     <el-row class="load_more_bt" :class="{no_display:toCreateAlbum.list.length === 0}">
                         <el-col :span="8">
                             <el-button type="primary" @click="handleSaveList" class="load_more_bt"
-                                       icon="el-icon-folder-add" :loading="loading.saveList">保存
+                                       icon="el-icon-folder-add" :loading="loading.saveList">保存清单
                             </el-button>
                         </el-col>
                         <el-col :span="8">
                             <el-button type="success" @click="handleDownloadSrc(true)" class="load_more_bt"
                                        v-loading.fullscreen.lock="loading.fullscreenLoading"
-                                       icon="el-icon-download">下载
+                                       icon="el-icon-suitcase">准备素材
                             </el-button>
                         </el-col>
                         <el-col :span="8">
@@ -135,7 +225,7 @@
                            style="margin-top: 10px" icon="el-icon-circle-plus">不借鉴</el-button>
             </span>
         </el-dialog>
-        <el-dialog title="收货地址" :visible.sync="visible.listDetailDialogVisible">
+        <el-dialog :title="'【' + selectListName +'】清单详情'" :visible.sync="visible.listDetailDialogVisible">
             <el-table :data="listDetail" @selection-change="handleSelectListItem" v-loading="loading.listDetailLoading">
                 <el-table-column
                         type="selection"
@@ -146,7 +236,7 @@
                         <el-tooltip class="item" effect="dark" :content="scope.row.path" placement="top">
                             <img class="preview_img"
                                  :onerror="defaultImg"
-                                 :src="genPreviewUrl(scope.row.neid,scope.row.hash,scope.row.rev)">
+                                 :src="genPreviewUrl(scope.row.neid,scope.row.hash,scope.row.rev,scope.row.mime_type)">
                         </el-tooltip>
                     </template>
                 </el-table-column>
@@ -170,29 +260,29 @@
     import api from "../../../api";
     import genSrcPreviewSrc from "../../../utils/index"
     import VueLoadImage from 'vue-load-image'
+    import BackPathItem from '../../../components/BackPathItem'
+    import Sortable from 'sortablejs';
 
     export default {
         name: "index",
         components: {
-            'vue-load-image': VueLoadImage
+            'vue-load-image': VueLoadImage,
+            'BackPathItem': BackPathItem
         },
         data() {
             return {
-                searchTabName: "pan",
+                dir: {
+                    currentPath: [],
+                    tableData: [],
+                    loadingDir: false
+                },
+                searchTabName: "dir", // dir ,pan ,list
                 search: {
-                    type: 'pic',
+                    type: '',
                     key: '',
                     hasNext: false
                 },
                 userInfo: {},
-                options: {
-                    search: [
-                        {value: '', label: '全部', disabled: false},
-                        {value: 'pic', label: '图片'},
-                        {value: 'list', label: '清单', disabled: false},
-                        {value: 'video', label: '视频', disabled: true},
-                    ]
-                },
                 loading: {
                     search: false,
                     searchMore: false,
@@ -203,6 +293,8 @@
                 },
                 searchResult: [],
                 searchListResult: [],
+                selectListId: 0,
+                selectListName: 0,
                 selectListItem: [],
                 listDetail: [],
                 toCreateAlbum: {
@@ -217,7 +309,6 @@
                     toSelectDesc: []
                 },
                 loadMoreForm: {
-                    type: '',
                     key: '',
                     nextOffset: 0
                 },
@@ -239,10 +330,21 @@
                         neid: item.neid,
                         hash: item.hash,
                         rev: item.rev,
-                        filename: item.filename,
+                        mime_type:item.mime_type,
+                        filename: item.path.substr(item.path.lastIndexOf("/") + 1),
                         bytes: item.bytes,
-                        isModify:false
+                        isModify: false
                     })
+                });
+                api({
+                    action: "referList",
+                    albumId: this.selectListId
+                }).then(response => {
+                    if (response.result) {
+
+                    } else {
+                        console.log("引用计数失败：" + response.msg)
+                    }
                 });
                 this.visible.listDetailDialogVisible = false;
             },
@@ -251,6 +353,8 @@
                 this.loading.listDetailLoading = true;
                 this.listDetail = [];
                 this.selectListItem = [];
+                this.selectListId = row.album_id;
+                this.selectListName = row.album_name;
                 api({
                     action: "listDetail",
                     albumId: row.album_id,
@@ -258,7 +362,7 @@
                     if (response.result) {
                         response.list.forEach(item => {
                             this.listDetail.push(item)
-                        })
+                        });
                     } else {
                         _this.$notify.error({
                             title: '查看出错',
@@ -274,7 +378,7 @@
                 if (_this.search.key.trim().length === 0) {
                     _this.$message.warning("请输入搜索的关键字！")
                 } else {
-                    if (_this.search.type === 'list') {
+                    if (_this.searchTabName === 'list') {
                         _this.loading.searchList = true;
                         api({
                             action: "searchList",
@@ -300,13 +404,11 @@
                         api({
                             action: 'search',
                             searchKey: _this.search.key,
-                            searchType: _this.search.type,
                             offset: 0
                         }).then(response => {
                             if (response.result) {
                                 _this.search.hasNext = response["has_more"];
                                 if (_this.search.hasNext) {
-                                    _this.loadMoreForm.type = _this.search.type;
                                     _this.loadMoreForm.key = _this.search.key;
                                     _this.loadMoreForm.nextOffset = response["next_offset"];
                                 }
@@ -343,7 +445,6 @@
                         if (response.result) {
                             _this.search.hasNext = response["has_more"];
                             if (_this.search.hasNext) {
-                                _this.loadMoreForm.type = _this.search.type;
                                 _this.loadMoreForm.key = _this.search.key;
                                 _this.loadMoreForm.nextOffset = response["next_offset"];
                             }
@@ -371,7 +472,6 @@
                 // this.toCreateAlbum.previewUrl = this.genPreviewUrl(row.neid, row.hash, row.rev);
                 // this.toCreateAlbum.descSelectDialogVisible = true;
                 this.toCreateAlbum.list.push(row);
-                console.log(this.toCreateAlbum.list);
             },
             handleSelectDesc(row, column, event) {
                 this.toCreateAlbum.toAddRow.joyeaDesc = row.desc;
@@ -404,7 +504,7 @@
                         this.$notify.success({
                             type: "success",
                             title: "提示",
-                            message: row.collect ? "收藏成功:" + row.filename : "取消收藏成功:" + row.filename
+                            message: row.collect ? "收藏成功:" + row.path.substr(row.path.lastIndexOf('/') + 1) : "取消收藏成功:" + row.path.substr(row.path.lastIndexOf('/') + 1)
                         })
                     } else {
                         console.log(response.msg)
@@ -438,18 +538,20 @@
             handleDelete(index, row) {
                 this.toCreateAlbum.list.splice(index, 1);
             },
-            genPreviewUrl(neid, hash, rev) {
+            genPreviewUrl(neid, hash, rev, mime_type) {
                 let previewType = 'pic';    // if video is av
+                if (mime_type.startsWith("doc")) {
+                    previewType = 'doc'
+                } else if (mime_type.startsWith("video")) {
+                    previewType = 'av'
+                }
                 return genSrcPreviewSrc(neid, hash, rev, previewType, this.userInfo.session);
-                // return 'https://console.box.lenovo.com/v2/preview_router?type=' + previewType + '&root=databox&path=&path_type=ent&from=&neid='
-                //     + neid + '&hash=' + hash + '&rev=' + rev + "&X-LENOVO-SESS-ID=" + this.userInfo.session;
-                //+ '&date=' + new Date().getTime();
             },
             handleSaveList() {
                 this.$prompt(this.toCreateAlbum.idEditMode ? '当前是编辑模式，重命名清单名称！' : '请输入要保存的清单的名称',
                     this.toCreateAlbum.idEditMode ? '编辑提示' : '保存提示',
                     {
-                        confirmButtonText: this.toCreateAlbum.idEditMode ? '重新保存' : '保存',
+                        confirmButtonText: this.toCreateAlbum.idEditMode ? '重新保存' : '保存清单',
                         cancelButtonText: '取消',
                         inputValue: this.toCreateAlbum.name
                     }
@@ -495,6 +597,11 @@
             },
             handleGoToPreview(row) {
                 let previewType = 'pic';    // if video is av
+                if (row.mime_type.startsWith("doc")) {
+                    previewType = 'doc'
+                } else if (row.mime_type.startsWith("video")) {
+                    previewType = 'av'
+                }
                 let url = genSrcPreviewSrc(row.neid, row.hash, row.rev, previewType, this.userInfo.session);
                 window.open(url);
             },
@@ -503,19 +610,21 @@
                 let toDownloadList = [];
                 let totalBytes = 0;
                 if (isList) {
+                    let index = 0;
                     this.toCreateAlbum.list.forEach(src => {
                         totalBytes += src.bytes;
                         toDownloadList.push({
-                            filename: src.filename,
+                            index:index += 1,
+                            filename: src.path.substr(src.path.lastIndexOf("/") + 1),
                             rev: src.rev,
                             neid: src.neid.toString(),
-                            path: src.path,
+                            path: src.path.replace("+", "%2b"),
                             path_type: src.path_type
                         })
                     })
                 } else {
                     toDownloadList.push({
-                        filename: row.filename,
+                        filename: row.path.substr(row.path.lastIndexOf("/") + 1),
                         rev: row.rev,
                         neid: row.neid.toString(),
                         path_type: row.path_type
@@ -524,12 +633,11 @@
                 let totalKb = totalBytes / 1024;
                 let totalMb = totalKb / 1024;
                 let warnMb = 300;
-                console.log(totalBytes, totalKb, totalMb);
                 this.$confirm(
-                    "您已选中【 " + toDownloadList.length + " 】个文件，" + (totalMb > warnMb ? ("待下载文件列表大小为【 " + totalMb.toFixed(2) + "MB 】,文件较大，建议您分批次下载!") : ("待下载文件列表大小为【 " + (totalMb > 1 ? totalMb.toFixed(2) + "MB" : totalKb.toFixed(2) + "KB") + " 】!")),
-                    '下载提示', {
-                        confirmButtonText: '下载',
-                        cancelButtonText: '我再想想',
+                    "您已选中【 " + toDownloadList.length + " 】个文件，" + (totalMb > warnMb ? ("待准备文件列表大小为【 " + totalMb.toFixed(2) + "MB 】,文件较大，建议您分批次准备!") : ("待准备文件列表大小为【 " + (totalMb > 1 ? totalMb.toFixed(2) + "MB" : totalKb.toFixed(2) + "KB") + " 】!")),
+                    '提示', {
+                        confirmButtonText: '准备',
+                        cancelButtonText: '取消',
                         type: totalMb > warnMb ? "danger" : "primary"
                     }).then(() => {
                     //this.loading.fullscreenLoading = true;
@@ -539,6 +647,11 @@
                     }).then(response => {
                         let taskId = response.id;
                         console.log("获取到下载ID：" + taskId);
+                        this.$store.dispatch('downloadStatus/setVisible', true);
+                        this.$notify.success({
+                            title: "提示",
+                            message: "成功创建下载任务"
+                        });
                         let timer = 0;
                         timer = setInterval(function () {
                             api({
@@ -551,6 +664,7 @@
                                         message: "您有一个任务【" + taskId + "】任务下载成功！"
                                     });
                                     clearInterval(timer);
+                                    _this.$store.dispatch('downloadStatus/setVisible', false);
                                 }
                             });
                         }, 2 * 1000);
@@ -561,13 +675,59 @@
                         message: '已取消下载'
                     });
                 });
-            }
+            },
+            handleClickDirPath(item, index) {
+                let toReachPath = "";
+                for (let i = 0; i <= index; i++) {
+                    toReachPath = toReachPath + "/" + this.dir.currentPath[i]
+                }
+                this.handleListLenovoDir(toReachPath, "ent")
+            },
+            handleListLenovoDir(path, pathType) {
+                this.dir.loadingDir = true;
+                api({
+                    action: 'listLenovoDir',
+                    path: path.replace("+", "%2B"),
+                    path_type: pathType === undefined ? 'ent' : pathType
+                }).then(response => {
+                    if (response.result) {
+                        this.dir.tableData = [];
+                        if (response.data.content) {
+                            response.data.content.forEach(item => {
+                                item.joyeaDesc = "";
+                                item.isModify = false;
+                                this.dir.tableData.push(item)
+                            });
+                            this.dir.currentPath = [];
+                            response.data.path.split('/').forEach(item => {
+                                if (item.length !== 0) {
+                                    this.dir.currentPath.push(item)
+                                }
+                            });
+                        }
+                    } else {
+                        this.$notify.error({
+                            title: '提示',
+                            message: '文件夹列表获取失败'
+                        });
+                        console.log('文件夹列表获取失败' + response.msg)
+                    }
+                    this.dir.loadingDir = false;
+                });
+            },
+            handleClickDirItem(row, column, event) {
+                this.searchTabName = "dir";
+                if (row.is_dir) {
+                    this.handleListLenovoDir(row.path, 'ent')
+                }
+            },
         },
         mounted() {
             let user = localStorage.getItem('userInfo');
             if (user) {
                 this.userInfo = JSON.parse(user)
             }
+            this.handleListLenovoDir("/", "ent");
             let toEditList = this.$route.params.toEditList;
             if (toEditList) {
                 this.toCreateAlbum.idEditMode = true;
@@ -580,16 +740,17 @@
                     this.toCreateAlbum.list.push(src);
                 });
             }
-            let _this = this;
-            document.onkeydown = function (e) {
-                let key = window.event.keyCode;
-                if (key === 13) {
-                    if (_this.toCreateAlbum.descSelectDialogVisible) {
-                        //_this.handleCustomDesc();
-                        //_this.$refs.addDialog.close();
-                    }
+            const table = document.querySelector('#toSortTable .el-table__body-wrapper tbody');
+            const self = this;
+            Sortable.create(table, {
+                onEnd({ newIndex, oldIndex }) {
+                    const targetRow = self.toCreateAlbum.list.splice(oldIndex, 1)[0];
+                    self.toCreateAlbum.list.splice(newIndex, 0, targetRow)
                 }
-            };
+            });
+
+            var reg = new RegExp(" /\\d+/g");
+            console.log(reg.match("1xxx"));
         }
     }
 </script>
@@ -653,6 +814,12 @@
         max-height: 50px;
         height: auto;
         width: auto;
+    }
+
+    .contentHead {
+        font-size: 12px;
+        color: gray;
+        margin: 10px auto;
     }
 
 </style>
