@@ -84,10 +84,19 @@
                     </el-tab-pane>
                     <el-tab-pane label="网盘搜索结果" name="pan">
                         <el-table stripe empty-text="暂没有搜索数据" :data="searchResult" style="width: 100%"
+                                  @row-click="handleClickSearch"
                                   v-loading="loading.search">
                             <el-table-column label="素材名" show-overflow-tooltip>
                                 <template slot-scope="scope">
                                     <h4 style="margin: 2px">
+                                        <i v-if="scope.row.is_dir" class="el-icon-folder-opened"></i>
+                                        <i v-else-if="scope.row.mime_type.startsWith('video')"
+                                           class="el-icon-video-camera"></i>
+                                        <i v-else-if="scope.row.mime_type.startsWith('image')"
+                                           class="el-icon-picture-outline"></i>
+                                        <i v-else-if="scope.row.mime_type.startsWith('doc')"
+                                           class="el-icon-tickets"></i>
+                                        <i v-else class="el-icon-question"></i>
                                         {{scope.row.path.substr(scope.row.path.lastIndexOf("/")+1)}}</h4>
                                     {{scope.row.path}}
                                 </template>
@@ -112,7 +121,7 @@
                                 <template slot-scope="scope">
                                     <div v-if="scope.row.is_dir">
                                         <el-button circle type="primary" @click="handleClickDirItem(scope.row)"
-                                                   icon="el-icon-s-promotion"/>
+                                                   icon="el-icon-folder-opened"/>
                                     </div>
                                     <div v-else>
                                         <el-button circle type="primary" @click="handleAdd(scope.$index, scope.row)"
@@ -330,7 +339,7 @@
                         neid: item.neid,
                         hash: item.hash,
                         rev: item.rev,
-                        mime_type:item.mime_type,
+                        mime_type: item.mime_type,
                         filename: item.path.substr(item.path.lastIndexOf("/") + 1),
                         bytes: item.bytes,
                         isModify: false
@@ -614,7 +623,7 @@
                     this.toCreateAlbum.list.forEach(src => {
                         totalBytes += src.bytes;
                         toDownloadList.push({
-                            index:index += 1,
+                            index: index += 1,
                             filename: src.path.substr(src.path.lastIndexOf("/") + 1),
                             rev: src.rev,
                             neid: src.neid.toString(),
@@ -634,7 +643,7 @@
                 let totalMb = totalKb / 1024;
                 let warnMb = 300;
                 this.$confirm(
-                    "您已选中【 " + toDownloadList.length + " 】个文件，" + (totalMb > warnMb ? ("待准备文件列表大小为【 " + totalMb.toFixed(2) + "MB 】,文件较大，建议您分批次准备!") : ("待准备文件列表大小为【 " + (totalMb > 1 ? totalMb.toFixed(2) + "MB" : totalKb.toFixed(2) + "KB") + " 】!")),
+                    "您已选中【 " + toDownloadList.length + " 】个文件，" + (totalMb > warnMb ? ("待准备文件列表大小为【 " + totalMb.toFixed(2) + "MB 】,文件较大，建议您分批次准备。") : ("待准备文件列表大小为【 " + (totalMb > 1 ? totalMb.toFixed(2) + "MB" : totalKb.toFixed(2) + "KB") + " 】。")) + "准备完成后会在右上角提示您下载!",
                     '提示', {
                         confirmButtonText: '准备',
                         cancelButtonText: '取消',
@@ -721,6 +730,11 @@
                     this.handleListLenovoDir(row.path, 'ent')
                 }
             },
+            handleClickSearch(row, column, event) {
+                if(row.is_dir){
+                    this.handleClickDirItem(row);
+                }
+            }
         },
         mounted() {
             let user = localStorage.getItem('userInfo');
@@ -743,14 +757,11 @@
             const table = document.querySelector('#toSortTable .el-table__body-wrapper tbody');
             const self = this;
             Sortable.create(table, {
-                onEnd({ newIndex, oldIndex }) {
+                onEnd({newIndex, oldIndex}) {
                     const targetRow = self.toCreateAlbum.list.splice(oldIndex, 1)[0];
                     self.toCreateAlbum.list.splice(newIndex, 0, targetRow)
                 }
             });
-
-            var reg = new RegExp(" /\\d+/g");
-            console.log(reg.match("1xxx"));
         }
     }
 </script>
