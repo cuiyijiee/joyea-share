@@ -29,6 +29,7 @@ class SearchHandler extends IAction {
                         //如果客户端搜索的类型是全部，则需要进一步判断一下
                         contentJsonArr.add(itemJson)
                     })
+
                     //查询资源是否已经收藏
                     contentJsonArr.forEach(contentValue => {
                         val content = contentValue.asObject()
@@ -50,6 +51,16 @@ class SearchHandler extends IAction {
                         })
                         content.add("desc", descArr)
                         content.add("collect", optionSrc.isDefined)
+
+                        //转换tag格式，原格式为字符串
+                        val tagsStrOpt = content.get("tags")
+                        if (tagsStrOpt != null) {
+                            val tagArr = new JsonArray()
+                            tagsStrOpt.asString().split(8197.asInstanceOf[Char]).foreach(str => {
+                                tagArr.add(str)
+                            })
+                            content.set("tags", tagArr)
+                        }
                     })
                     resJson.add("content", contentJsonArr)
                     listener.onSuccess(respJson = resJson)

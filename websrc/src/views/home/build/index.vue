@@ -43,9 +43,14 @@
                                     <i v-else-if="scope.row.mime_type.startsWith('doc')" class="el-icon-tickets"></i>
                                     <i v-else class="el-icon-question"></i>
                                     {{' ' + scope.row.path.substr(scope.row.path.lastIndexOf('/')+1)}}
+                                    <div v-if="scope.row.tags">
+                                        <el-tag style="margin-right: 2px" v-for="tag in scope.row.tags" type="success"
+                                                size="mini">{{tag}}
+                                        </el-tag>
+                                    </div>
                                 </template>
                             </el-table-column>
-                            <el-table-column label="解说词" width="80">
+                            <el-table-column label="解说词" width="70">
                                 <template slot-scope="scope">
                                     <span>{{scope.row.is_dir ? '-' :scope.row.desc.length}}</span>
                                 </template>
@@ -70,12 +75,12 @@
                                 <template slot-scope="scope">
                                     <span v-if="scope.row.is_dir">-</span>
                                     <span v-else>
-                                        <el-button circle type="primary" @click="handleAdd(scope.$index, scope.row)"
+                                        <el-button circle type="primary" @click.stop="handleAdd(scope.$index, scope.row)"
                                                    icon="el-icon-plus"/>
-                                        <el-button circle type="" icon="el-icon-view"
-                                                   @click="handleGoToPreview(scope.row)"/>
+<!--                                        <el-button circle type="" icon="el-icon-view"-->
+<!--                                                   @click="handleGoToPreview(scope.row)"/>-->
                                         <el-button circle :type="scope.row.collect ? 'warning' : ''"
-                                                   @click="handleCollect(scope.$index, scope.row)"
+                                                   @click.stop="handleCollect(scope.$index, scope.row)"
                                                    icon="el-icon-star-off"/>
                                     </span>
                                 </template>
@@ -99,9 +104,14 @@
                                         <i v-else class="el-icon-question"></i>
                                         {{scope.row.path.substr(scope.row.path.lastIndexOf("/")+1)}}</h4>
                                     {{scope.row.path}}
+                                    <div v-if="scope.row.tags">
+                                        <el-tag style="margin-right: 2px" v-for="tag in scope.row.tags" type="success"
+                                                size="mini">{{tag}}
+                                        </el-tag>
+                                    </div>
                                 </template>
                             </el-table-column>
-                            <el-table-column label="解说词" width="80">
+                            <el-table-column label="解说词" width="70">
                                 <template slot-scope="scope">
                                     <span>{{scope.row.is_dir ? "-" : scope.row.desc.length}}</span>
                                 </template>
@@ -120,16 +130,17 @@
                             <el-table-column label="操作" width="180">
                                 <template slot-scope="scope">
                                     <div v-if="scope.row.is_dir">
-                                        <el-button circle type="primary" @click="handleClickDirItem(scope.row)"
+                                        <el-button circle type="primary" @click.stop="handleClickDirItem(scope.row)"
                                                    icon="el-icon-folder-opened"/>
                                     </div>
                                     <div v-else>
-                                        <el-button circle type="primary" @click="handleAdd(scope.$index, scope.row)"
+                                        <el-button circle type="primary" @click.stop="handleAdd(scope.$index, scope.row)"
                                                    icon="el-icon-plus"/>
-                                        <el-button circle type="" icon="el-icon-view"
-                                                   @click="handleGoToPreview(scope.row)"/>
+<!--                                        <el-button circle type="" icon="el-icon-view"-->
+<!--                                                   v-if="!scope.row.mime_type.startsWith('other')"-->
+<!--                                                   @click="handleGoToPreview(scope.row)"/>-->
                                         <el-button circle :type="scope.row.collect ? 'warning' : ''"
-                                                   @click="handleCollect(scope.$index, scope.row)"
+                                                   @click.stop="handleCollect(scope.$index, scope.row)"
                                                    icon="el-icon-star-off"/>
                                     </div>
                                 </template>
@@ -137,7 +148,7 @@
                         </el-table>
                         <el-button class="load_more_bt" :class="{no_display:!search.hasNext}"
                                    :loading="loading.searchMore"
-                                   @click="handleLoadMore">加载更多
+                                   @click.stop="handleLoadMore">加载更多
                         </el-button>
                     </el-tab-pane>
                     <el-tab-pane label="清单搜索结果" name="list">
@@ -151,7 +162,7 @@
                             <el-table-column label="操作" width="100">
                                 <template slot-scope="scope">
                                     <el-button type="primary" size="mini" icon="el-icon-view"
-                                               @click="handleSeeListDetail(scope.row)"></el-button>
+                                               @click.stop="handleSeeListDetail(scope.row)"></el-button>
                                 </template>
                             </el-table-column>
                         </el-table>
@@ -169,10 +180,15 @@
                         <el-table-column label="预览">
                             <template slot-scope="scope">
                                 <el-tooltip class="item" effect="dark" :content="scope.row.path" placement="top">
-                                    <img class="preview_img"
+                                    <img v-if="scope.row.mime_type.startsWith('video')" src="play.png"
+                                         @click="handleGoToPreview(scope.row)">
+                                    <img v-if="scope.row.mime_type.startsWith('doc')" src="doc.png"
+                                         @click="handleGoToPreview(scope.row)">
+                                    <img v-else-if="scope.row.mime_type.startsWith('image')" class="preview_img"
                                          :onerror="defaultImg"
                                          preview="buildList" :preview-text="scope.row.path"
                                          :src="genPreviewUrl(scope.row.neid,scope.row.hash,scope.row.rev,scope.row.mime_type)">
+                                    <img v-else src="unknown.png" @click="handleGoToPreview(scope.row)">
                                 </el-tooltip>
                             </template>
                         </el-table-column>
@@ -187,33 +203,33 @@
                         </el-table-column>
                         <el-table-column label="操作" width="150">
                             <template slot-scope="scope">
-                                <el-button type="primary" @click="handleModify(scope.$index, scope.row,true)"
+                                <el-button type="primary" @click.stop="handleModify(scope.$index, scope.row,true)"
                                            size="mini">
                                     {{scope.row.isModify?'保存':"修改"}}
                                 </el-button>
-                                <el-button v-if="!scope.row.isModify" @click="handleDelete(scope.$index, scope.row)"
+                                <el-button v-if="!scope.row.isModify" @click.stop="handleDelete(scope.$index, scope.row)"
                                            size="mini" type="danger" plain>删除
                                 </el-button>
-                                <el-button v-else size="mini" @click="handleModify(scope.$index,scope.row,false)"
+                                <el-button v-else size="mini" @click.stop="handleModify(scope.$index,scope.row,false)"
                                            type="danger" plain>取消
                                 </el-button>
                             </template>
                         </el-table-column>
                     </el-table>
-                    <el-row class="load_more_bt" :class="{no_display:toCreateAlbum.list.length === 0}">
+                    <el-row class="load_more_bt" :class="{no_display:toCreateAlbum.list.length === 0}" :gutter="5">
                         <el-col :span="8">
-                            <el-button type="primary" @click="handleSaveList" class="load_more_bt"
+                            <el-button type="primary" @click.stop="handleSaveList" class="load_more_bt"
                                        icon="el-icon-folder-add" :loading="loading.saveList">保存清单
                             </el-button>
                         </el-col>
                         <el-col :span="8">
-                            <el-button type="success" @click="handleDownloadSrc(true)" class="load_more_bt"
+                            <el-button type="success" @click.stop="handleDownloadSrc(true)" class="load_more_bt"
                                        v-loading.fullscreen.lock="loading.fullscreenLoading"
-                                       icon="el-icon-suitcase">准备素材
+                                       icon="el-icon-suitcase">下载准备
                             </el-button>
                         </el-col>
                         <el-col :span="8">
-                            <el-button type="danger" @click="handleClearList" class="load_more_bt"
+                            <el-button type="danger" @click.stop="handleClearList" class="load_more_bt"
                                        icon="el-icon-delete">清空
                             </el-button>
                         </el-col>
@@ -230,7 +246,7 @@
                 <el-table-column prop="desc"></el-table-column>
             </el-table>
             <span slot="footer" class="dialog-footer">
-                <el-button type="primary" @click="handleCustomDesc"
+                <el-button type="primary" @click.stop="handleCustomDesc"
                            style="margin-top: 10px" icon="el-icon-circle-plus">不借鉴</el-button>
             </span>
         </el-dialog>
@@ -256,27 +272,47 @@
                 </el-table-column>
             </el-table>
             <div slot="footer" class="dialog-footer">
-                <el-button @click="visible.listDetailDialogVisible = false">取 消</el-button>
-                <el-button type="primary" @click="handleAddListDetailToBuild"
+                <el-button @click.stop="visible.listDetailDialogVisible = false">取 消</el-button>
+                <el-button type="primary" @click.stop="handleAddListDetailToBuild"
                            :disabled="selectListItem.length === 0">添 加
                 </el-button>
             </div>
+        </el-dialog>
+        <el-dialog :title="toPlayVideo.title" :visible.sync="visible.videoDialogVisible" @close="handleCloseVideo"
+                   @opened="playVideo()">
+            <video id="myVideo" class="video-js vjs-big-play-centered vjs-fluid" oncontextmenu="return false">
+                <p class="vjs-no-js">
+                    To view this video please enable JavaScript, and consider upgrading to a
+                    web browser that
+                    <a href="https://videojs.com/html5-video-support/" target="_blank">
+                        supports HTML5 video
+                    </a>
+                </p>
+            </video>
+        </el-dialog>
+        <el-dialog :title="toPlayImage.title" :visible.sync="visible.imageDialogVisible" @close="handleCloseImage">
+            <el-image :src="toPlayImage.url">
+                <div slot="error" class="image-slot">
+                    <i class="el-icon-picture-outline"></i>
+                </div>
+            </el-image>
         </el-dialog>
     </section>
 </template>
 
 <script>
     import api from "../../../api";
-    import genSrcPreviewSrc from "../../../utils/index"
+    import genSrcPreviewSrc from "../../../utils"
     import VueLoadImage from 'vue-load-image'
     import BackPathItem from '../../../components/BackPathItem'
     import Sortable from 'sortablejs';
+    import videojs from 'video.js'
 
     export default {
         name: "index",
         components: {
             'vue-load-image': VueLoadImage,
-            'BackPathItem': BackPathItem
+            'BackPathItem': BackPathItem,
         },
         data() {
             return {
@@ -322,12 +358,85 @@
                     nextOffset: 0
                 },
                 visible: {
-                    listDetailDialogVisible: false
+                    listDetailDialogVisible: false,
+                    videoDialogVisible: false,
+                    imageDialogVisible: false
                 },
-                defaultImg: 'this.src="' + require('@assets/error.png') + '"' //默认图地址
+                defaultImg: 'this.src="' + require('@assets/error.png') + '"', //默认图地址
+                player: null,
+                toPlayVideo: {
+                    title: '',
+                    url: ''
+                },
+                toPlayImage: {
+                    title: '',
+                    url: ''
+                }
             }
         },
         methods: {
+            handlePlayVideo(url, title) {
+                this.visible.videoDialogVisible = true;
+                this.toPlayVideo.url = url;
+                this.toPlayVideo.title = title;
+            },
+            handlePlayImage(url, title) {
+                this.visible.imageDialogVisible = true;
+                this.toPlayImage.url = url;
+                this.toPlayImage.title = title;
+            },
+            playVideo() {
+                let _this = this;
+                if (this.player == null) {
+                    videojs(document.getElementById('myVideo'), {
+                        controls: true, // 是否显示控制条
+                        preload: 'auto',
+                        autoplay: false,
+                        fluid: true, // 自适应宽高
+                        language: 'zh-CN', // 设置语言
+                        muted: false, // 是否静音
+                        inactivityTimeout: false,
+                        controlBar: { // 设置控制条组件
+                            children: [
+                                {name: 'playToggle'}, // 播放按钮
+                                {name: 'currentTimeDisplay'}, // 当前已播放时间
+                                {name: 'progressControl'}, // 播放进度条
+                                {name: 'durationDisplay'}, // 总时间
+                                {
+                                    name: 'volumePanel', // 音量控制
+                                    inline: false, // 不使用水平方式
+                                },
+                                {name: 'FullscreenToggle'} // 全屏
+                            ]
+                        },
+                        sources: [ // 视频源
+                            {
+                                src: _this.toPlayVideo.url,
+                                type: 'video/mp4',
+                            }
+                        ]
+                    }, function () {
+                        _this.player = this;
+                    });
+                } else {
+                    const data = {
+                        src: _this.toPlayVideo.url,
+                        type: 'video/mp4'
+                    };
+                    this.player.pause();
+                    this.player.src(data);
+                    this.player.load(data);
+                    this.player.play();
+                }
+            },
+            handleCloseVideo() {
+                if (this.player != null) {
+                    this.player.pause();
+                }
+            },
+            handleCloseImage() {
+                this.toPlayImage.url = "";
+            },
             handleSelectListItem(val) {
                 this.selectListItem = val;
             },
@@ -476,11 +585,28 @@
                 }
             },
             handleAdd(index, row) {
-                // this.toCreateAlbum.toAddRow = row;
-                // this.toCreateAlbum.toSelectDesc = row.desc;
-                // this.toCreateAlbum.previewUrl = this.genPreviewUrl(row.neid, row.hash, row.rev);
-                // this.toCreateAlbum.descSelectDialogVisible = true;
-                this.toCreateAlbum.list.push(row);
+                let isIn = false;
+                this.toCreateAlbum.list.forEach(item => {
+                    if (item.neid === row.neid) {
+                        isIn = true;
+                    }
+                });
+                if (isIn) {
+                    this.$confirm('编辑列表中已经存在该记录，是否继续添加?', '提示', {
+                        confirmButtonText: '继续添加',
+                        cancelButtonText: '取消添加',
+                        type: 'warning'
+                    }).then(() => {
+                        this.toCreateAlbum.list.push(row);
+                    }).catch(() => {
+                        this.$message({
+                            type: 'info',
+                            message: '取消添加'
+                        });
+                    });
+                } else {
+                    this.toCreateAlbum.list.push(row);
+                }
             },
             handleSelectDesc(row, column, event) {
                 this.toCreateAlbum.toAddRow.joyeaDesc = row.desc;
@@ -546,6 +672,8 @@
             },
             handleDelete(index, row) {
                 this.toCreateAlbum.list.splice(index, 1);
+
+
             },
             genPreviewUrl(neid, hash, rev, mime_type) {
                 let previewType = 'pic';    // if video is av
@@ -612,7 +740,15 @@
                     previewType = 'av'
                 }
                 let url = genSrcPreviewSrc(row.neid, row.hash, row.rev, previewType, this.userInfo.session);
-                window.open(url);
+                if (row.mime_type.startsWith("video")) {
+                    this.handlePlayVideo(url, row.path.substr(row.path.lastIndexOf("/") + 1),);
+                }else if(row.mime_type.startsWith("image")){
+                    this.handlePlayImage(url, row.path.substr(row.path.lastIndexOf("/") + 1),);
+                } else if(row.mime_type.startsWith("doc")) {
+                    window.open(url);
+                }else{
+                    this.$message.error("暂不支持的预览类型！")
+                }
             },
             handleDownloadSrc(isList, row) {
                 let _this = this;
@@ -728,13 +864,15 @@
                 this.searchTabName = "dir";
                 if (row.is_dir) {
                     this.handleListLenovoDir(row.path, 'ent')
+                }else{
+                    this.handleGoToPreview(row);
                 }
             },
             handleClickSearch(row, column, event) {
-                if(row.is_dir){
+                if (row.is_dir) {
                     this.handleClickDirItem(row);
                 }
-            }
+            },
         },
         mounted() {
             let user = localStorage.getItem('userInfo');
@@ -818,6 +956,7 @@
     }
 
     .load_more_bt {
+        margin-top: 5px;
         width: 100%;
     }
 

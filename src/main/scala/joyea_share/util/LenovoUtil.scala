@@ -8,7 +8,7 @@ import okhttp3._
 import org.slf4s.LoggerFactory
 import xitrum.Log
 
-object LenovoUtil extends Log{
+object LenovoUtil extends Log {
 
 
     private val BASE_URL = "https://box.lenovo.com/v2"
@@ -167,7 +167,7 @@ object LenovoUtil extends Log{
     }
 
     def listDir(sessionId: String, path: String, pathType: String = "ent", listener: CommonListener[JsonObject]): Unit = {
-        val requestUrl = s"$BASE_URL/metadata/root${URLEncoder.encode(path,"UTF-8").replaceAll("\\+", "%20")}?X-LENOVO-SESS-ID=$sessionId&path_type=$pathType"
+        val requestUrl = s"$BASE_URL/metadata/root${URLEncoder.encode(path, "UTF-8").replaceAll("\\+", "%20")}?X-LENOVO-SESS-ID=$sessionId&path_type=$pathType"
         val request = HttpUtil.obtainBaseRequest(sessionId).url(requestUrl).build()
         HttpUtil.obtainHttpClient().newCall(request).enqueue(new Callback {
             override def onFailure(call: Call, e: IOException): Unit = {
@@ -186,7 +186,7 @@ object LenovoUtil extends Log{
     }
 
     def downloadFileV2(sessionId: String, path: String, neid: String, rev: String, pathType: String = "ent", downloadFilePath: String, listener: CommonListener[File]): Unit = {
-        val requestUrl = s"$BASE_DOWNLOAD_URL${URLEncoder.encode(path,"UTF-8").replaceAll("\\+", "%20")}?X-LENOVO-SESS-ID=$sessionId&path_type=$pathType&neid=$neid&rev=$rev"
+        val requestUrl = s"$BASE_DOWNLOAD_URL${URLEncoder.encode(path, "UTF-8").replaceAll("\\+", "%20")}?X-LENOVO-SESS-ID=$sessionId&path_type=$pathType&neid=$neid&rev=$rev"
         val request = HttpUtil.obtainBaseRequest(sessionId).url(requestUrl).build()
         HttpUtil.obtainHttpClient().newCall(request).enqueue(new Callback {
             override def onFailure(call: Call, e: IOException): Unit = {
@@ -228,6 +228,44 @@ object LenovoUtil extends Log{
                         if (is != null) is.close()
                     }
                 }
+            }
+        })
+    }
+
+    //{
+    //    "content": [
+    //        {
+    //            "comment_num": 0,
+    //            "bookmark_id": 0,
+    //            "neid": 1084283049,
+    //            "tags": []
+    //        }
+    //    ]
+    //}
+    def getExtraMeta(sessionID: String, neids: java.util.List[Long], listener: CommonListener[JsonObject]): Unit = {
+
+        val requestNeidsSb = new StringBuffer("[")
+        neids.forEach(neid => {
+            requestNeidsSb.append(neid.toString).append(",")
+        })
+        requestNeidsSb.append("]")
+
+        val urlBuilder = HttpUrl.parse("https://console.box.lenovo.com/v2/extra_meta").newBuilder()
+        urlBuilder.addQueryParameter("neids", requestNeidsSb.toString)
+        val request = HttpUtil.obtainBaseRequest(sessionID).url(urlBuilder.build()).get().build()
+        HttpUtil.obtainHttpClient().newCall(request).enqueue(new Callback {
+            override def onFailure(call: Call, e: IOException): Unit = {
+                listener.onError("请求失败！")
+            }
+
+            override def onResponse(call: Call, response: Response): Unit = {
+                val responseJson = JsonObject.readFrom(response.body().string())
+                val resultJson = new JsonObject()
+                responseJson.get("content").asArray().forEach(value => {
+                    val json = value.asObject()
+                    resultJson.add(json.get("neid").asLong().toString, json)
+                })
+                listener.onSuccess(resultJson)
             }
         })
     }

@@ -8,6 +8,14 @@ import 'vue-photo-preview/dist/skin.css';
 import './style/vars.scss'
 import store from './store'
 
+import Video from 'video.js'
+import video_zhCN from 'video.js/dist/lang/zh-CN.json'
+import video_en from  'video.js/dist/lang/en.json'
+import 'video.js/dist/video-js.css'
+
+Video.addLanguage('zh-CN', video_zhCN);
+Video.addLanguage('en', video_en);
+
 Vue.config.productionTip = false;
 Vue.use(ElementUI);
 Vue.use(preview);

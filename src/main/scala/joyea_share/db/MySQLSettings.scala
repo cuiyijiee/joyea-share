@@ -1,12 +1,10 @@
 package joyea_share.db
 
-import ch.qos.logback.classic.{Level, Logger}
-import org.slf4j.LoggerFactory
 import scalikejdbc.async.AsyncConnectionPool
 import xitrum.Config
 
 import scala.concurrent._
-import duration._
+import scala.concurrent.duration._
 
 trait MySQLSettings {
     MySQLSettings.initialize()

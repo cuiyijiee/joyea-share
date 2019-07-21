@@ -15,8 +15,13 @@
                             trigger="click">
                         <el-table :data="downloadTask" empty-text="今日暂无下载任务">
                             <!--                            <el-table-column width="300" property="id" label="任务ID"></el-table-column>-->
-                            <el-table-column width="300" property="firstSrcName" label="任务名称"
-                                             show-overflow-tooltip></el-table-column>
+                            <el-table-column width="300" label="任务名称"
+                                             show-overflow-tooltip>
+                                <template slot-scope="scope">
+                                   <div v-if="scope.row.opened" style="color: #888888"> {{scope.row.firstSrcName}}</div>
+                                   <div v-else="scope.row.opened" style="color: #000000"> {{scope.row.firstSrcName}}</div>
+                                </template>
+                            </el-table-column>
                             <el-table-column width="150" property="startTime" label="下载时间"></el-table-column>
                             <el-table-column width="100" label="状态">
                                 <template slot-scope="scope">
@@ -83,6 +88,7 @@
 
 <script>
     import api from "../../api/index";
+    import getNowFormatDate from "../../utils/time"
 
     const localStorage = window.localStorage;
     let timer = 0;
@@ -136,10 +142,11 @@
                             id: task.id,
                             startTime: task.startTime,
                             firstSrcName: task.firstSrcName.substr(0, task.firstSrcName.lastIndexOf(".")),
-                            status: task.finishTime.length !== 0
+                            status: task.finishTime.length !== 0,
+                            opened:_this.handleQueryRecord(task.id)
                         });
-                        _this.downloadTask.reverse();
-                    })
+                    });
+                    _this.downloadTask.reverse();
                 });
                 timer = setInterval(function () {
                     api({
@@ -151,21 +158,43 @@
                                 id: task.id,
                                 startTime: task.startTime,
                                 firstSrcName: task.firstSrcName.substr(0, task.firstSrcName.lastIndexOf(".")),
-                                status: task.finishTime.length !== 0
+                                status: task.finishTime.length !== 0,
+                                opened:_this.handleQueryRecord(task.id)
                             });
-                            _this.downloadTask.reverse();
-                        })
+                        });
+                        _this.downloadTask.reverse();
+                        console.log(_this.downloadTask)
                     })
                 }, 2 * 1000);
-            },
 
+            },
+            handleQueryRecord(taskId) {
+                let todayOpenTask = localStorage.getItem(this.genTodayDownloadTaskKey());
+                return !(todayOpenTask == null || JSON.parse(todayOpenTask).indexOf(taskId) === -1);
+            },
+            handleAddRecord(taskId) {
+                let todayOpenTask = localStorage.getItem(this.genTodayDownloadTaskKey());
+                if (todayOpenTask == null) {
+                    let record = [];
+                    record[0] = taskId;
+                    localStorage.setItem(this.genTodayDownloadTaskKey(), JSON.stringify(record));
+                } else {
+                    let record = JSON.parse(todayOpenTask);
+                    record[record.length] = taskId;
+                    localStorage.setItem(this.genTodayDownloadTaskKey(),JSON.stringify(record));
+                }
+            },
             handleCloseDownload() {
                 clearInterval(timer);
             },
             handleDownload(row) {
                 if (row.status) {
+                    this.handleAddRecord(row.id);
                     window.open(window.location.protocol + "//" + window.location.host + "/download/" + row.id + "/" + row.firstSrcName);
                 }
+            },
+            genTodayDownloadTaskKey() {
+                return "down_open_" + getNowFormatDate();
             }
         },
         mounted() {

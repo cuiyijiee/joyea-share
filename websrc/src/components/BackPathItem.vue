@@ -12,7 +12,7 @@
 <script>
     export default {
         name: "BackPathItem",
-        props:['completedPath','index'],
+        props:['completedPath','util.js'],
         data(){
             return{
                 path:'',
