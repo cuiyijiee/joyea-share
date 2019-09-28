@@ -1,15 +1,14 @@
 package joyea_share
 
 
+import java.io.File
+
 import com.json.JsonObject
-import joyea_share.util.{CommonListener, LenovoUtil}
+import joyea_share.util.{CommonListener, LenovoUtil, ZipUtils}
 
 object BenchMark {
 
     def main(args: Array[String]): Unit = {
-        val path = "/营销素材展示/005、同行信息"
-        val fileName = path.substring(path.lastIndexOf("/") + 1)
-
-        println(fileName)
+        ZipUtils.compressZip(Array("/Users/cuje/test/123","/Users/cuje/test/234"),"/Users/cuje/test/test.zip")
     }
 }
