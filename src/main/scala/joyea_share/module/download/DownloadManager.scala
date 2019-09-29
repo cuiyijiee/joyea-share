@@ -45,6 +45,12 @@ object DownloadManager extends Log {
         }).foreach(file => {
           CommonUtil.delete(file)
         })
+        val compressSaveDir = new File(baseCompressSaveFilePath)
+        compressSaveDir.getParentFile.listFiles(new FileFilter {
+          override def accept(pathname: File): Boolean = !pathname.getName.equals(compressSaveDir.getName)
+        }).foreach(file => {
+          CommonUtil.delete(file)
+        })
       }
     }, SUtil.getNextMinuteHour(0), 1 * 60 * 60 * 1000L)
   }
@@ -103,6 +109,10 @@ object DownloadManager extends Log {
     }
     baseCompressSaveFilePath = newCompressPath
     baseSaveFilePath = newPath
+  }
+
+  def getBaseCompressSaveFilePath(): String = {
+    baseCompressSaveFilePath
   }
 
   def getBaseSaveFilePath(): String = {

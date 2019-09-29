@@ -505,9 +505,14 @@
                             _this.loading.searchList = false;
                             if (response.result) {
                                 _this.searchListResult = [];
-                                response.list.forEach(list => {
-                                    _this.searchListResult.push(list)
-                                })
+                                if(response.list.length === 0){
+                                    _this.$message.error("没有搜索到与【" + _this.search.key +"】有关的清单！")
+                                }else{
+                                    response.list.forEach(list => {
+                                        _this.searchListResult.push(list)
+                                    })
+                                }
+
                             } else {
                                 _this.$notify.error({
                                     title: '搜索出错',
@@ -531,11 +536,15 @@
                                     _this.loadMoreForm.nextOffset = response["next_offset"];
                                 }
                                 _this.searchResult = [];
-                                response.content.forEach(item => {
-                                    item.joyeaDesc = "";
-                                    item.isModify = false;
-                                    _this.searchResult.push(item)
-                                })
+                                if(response.content.length === 0){
+                                    _this.$message.error("没有搜索到与【" + _this.search.key +"】有关的文件或文件夹！")
+                                }else{
+                                    response.content.forEach(item => {
+                                        item.joyeaDesc = "";
+                                        item.isModify = false;
+                                        _this.searchResult.push(item)
+                                    })
+                                }
                             } else {
                                 _this.$notify.error({
                                     title: '搜索出错',

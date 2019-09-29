@@ -52,18 +52,12 @@ case class DownloadTask(
     saveCompressPath = baseCompressSavePath + "/" + id
 
     new File(saveFilePath).mkdirs()
-    new File(saveCompressPath).mkdirs()
 
     downloadListener.onStart(id, downloadFile.size())
     status = DownloadStatus.DOWNLOAD
     downloadFile.forEach(item => {
       LenovoUtil.downloadFileV2(sessionId, item.path, item.neid, item.rev, "ent",
-
-        if (item.fileName.endsWith(".zip") || item.fileName.endsWith(".rar"))
-          saveCompressPath + "/" + item.index + "--" + item.fileName
-        else
-          saveFilePath + "/" + item.index + "--" + item.fileName
-
+        saveFilePath + "/" + item.index + "--" + item.fileName
         , new CommonListener[File] {
           override def onSuccess(obj: File): Unit = {
             successNum = successNum + 1
@@ -89,7 +83,8 @@ case class DownloadTask(
       //线程等待2秒，避免加密软件冲突
       CommonUtil.writeFile(s"$saveFilePath/请勿外泄.txt", "仅一公司内部资料，请勿外泄！")
       Thread.sleep(Config.application.getConfig("download").getInt("wait_seconds") * 1000)
-      ZipUtils.compressZip(Array(saveFilePath, saveCompressPath), saveFilePath + ".zip")
+
+      ZipUtils.compressZip(Array(saveFilePath), saveCompressPath + ".zip")
       //CommonUtil.delete(saveFilePath)
       finishDate = new Date()
       status = DownloadStatus.FINISH

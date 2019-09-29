@@ -1,9 +1,0 @@
-#!/bin/bash
-if [ -h $0 ]
-then
-  ROOT_DIR="$(cd "$(dirname "$(readlink -n "$0")")/.." && pwd)"
-else
-  ROOT_DIR="$(cd "$(dirname $0)/.." && pwd)"
-fi
-cd "$ROOT_DIR"
-nohup bash ./script/runner joyea_share.Boot>/etc/null 2>&1 &

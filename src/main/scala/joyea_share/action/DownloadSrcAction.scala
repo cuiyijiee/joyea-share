@@ -14,7 +14,7 @@ class DownloadSrcAction extends Action with Log{
     override def execute(): Unit = {
         try {
             val id = paramo[String]("id").getOrElse("")
-            val responseFile = new File(s"${DownloadManager.getBaseSaveFilePath()}/$id.zip")
+            val responseFile = new File(s"${DownloadManager.getBaseCompressSaveFilePath()}/$id.zip")
             if (responseFile.exists()) {
                 respondFile(responseFile.getAbsolutePath)
             } else {
