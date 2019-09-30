@@ -10,7 +10,7 @@
     "axios": "^0.18.0",
     "element-ui": "^2.8.2",
     "sortablejs": "^1.10.0-rc3",
-    "video.js": "^7.6.0",
+    "video.js": "7.6.5",
     "vue": "^2.6.6",
     "vue-load-image": "^0.1.7",
     "vue-photo-preview": "^1.1.3",
