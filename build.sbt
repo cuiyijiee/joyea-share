@@ -17,6 +17,7 @@ libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.2.3"
 
 // For writing condition in logback.xml
 libraryDependencies += "org.codehaus.janino" % "janino" % "3.0.11"
+libraryDependencies += "commons-net" % "commons-net" % "3.6"
 
 // https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp
 libraryDependencies += "com.squareup.okhttp3" % "okhttp" % "3.14.1"

@@ -100,10 +100,8 @@ object DownloadManager extends Log {
   }
 
   def initBaseSaveFilePath(): Unit = {
-    val newPath = Config.application.getConfig("download").getString("tmp_dir") +
-      "/download/" + SUtil.genDateString(formatString = "yy-MM-dd")
-    val newCompressPath = Config.application.getConfig("download").getString("tmp_dir") +
-      "/compress_download/" + SUtil.genDateString(formatString = "yy-MM-dd")
+    val newPath = "./tmp/download/" + SUtil.genDateString(formatString = "yy-MM-dd")
+    val newCompressPath = "./tmp/compress_download/" + SUtil.genDateString(formatString = "yy-MM-dd")
     if (baseSaveFilePath.length != 0 && !baseSaveFilePath.equals(newPath)) {
       downloadTaskMap.clear()
     }

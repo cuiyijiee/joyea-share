@@ -1,11 +1,11 @@
 package joyea_share.module.download
 
-import java.io.File
+import java.io.{File, FileFilter}
 import java.util
 import java.util.{Date, UUID}
 
 import com.json.{JsonArray, JsonObject}
-import com.utils.CommonUtil
+import com.utils.{CommonUtil, FtpUtil}
 import joyea_share.util.{CommonListener, LenovoUtil, SUtil, ZipUtils}
 import xitrum.{Config, Log}
 
@@ -57,8 +57,7 @@ case class DownloadTask(
     status = DownloadStatus.DOWNLOAD
     downloadFile.forEach(item => {
       LenovoUtil.downloadFileV2(sessionId, item.path, item.neid, item.rev, "ent",
-        saveFilePath + "/" + item.index + "--" + item.fileName
-        , new CommonListener[File] {
+        saveFilePath + "/" + item.index + "--" + item.fileName, new CommonListener[File] {
           override def onSuccess(obj: File): Unit = {
             successNum = successNum + 1
             downloadProgress = downloadProgress + 1
@@ -84,6 +83,21 @@ case class DownloadTask(
       CommonUtil.writeFile(s"$saveFilePath/请勿外泄.txt", "仅一公司内部资料，请勿外泄！")
       Thread.sleep(Config.application.getConfig("download").getInt("wait_seconds") * 1000)
 
+      //先上传文件到ftp服务器进行加密再下载下来
+      val ftpUtil = new FtpUtil(
+        Config.application.getConfig("download").getString("ftp_ip"),
+        Config.application.getConfig("download").getString("ftp_name"),
+        Config.application.getConfig("download").getString("ftp_pass")
+      )
+
+      new File(saveFilePath).listFiles(new FileFilter {
+        override def accept(file: File): Boolean = file.isFile
+      }).foreach(file => {
+        ftpUtil.uploadFileToRemoteDir(file.getAbsolutePath, "/download/" + id )
+        file.delete()
+        ftpUtil.downloadFile("/download/" + id + "/" + file.getName, file.getAbsolutePath)
+      })
+      ftpUtil.logout()
       ZipUtils.compressZip(Array(saveFilePath), saveCompressPath + ".zip")
       //CommonUtil.delete(saveFilePath)
       finishDate = new Date()
