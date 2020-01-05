@@ -86,6 +86,7 @@ case class DownloadTask(
       //先上传文件到ftp服务器进行加密再下载下来
       val ftpUtil = new FtpUtil(
         Config.application.getConfig("download").getString("ftp_ip"),
+        Config.application.getConfig("download").getInt("ftp_post"),
         Config.application.getConfig("download").getString("ftp_name"),
         Config.application.getConfig("download").getString("ftp_pass")
       )
