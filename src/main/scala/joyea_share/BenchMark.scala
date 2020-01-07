@@ -1,10 +1,7 @@
 package joyea_share
 
 
-import java.io.File
-
-import com.json.JsonObject
-import joyea_share.util.{CommonListener, LenovoUtil, ZipUtils}
+import joyea_share.util.ZipUtils
 
 object BenchMark {
 
