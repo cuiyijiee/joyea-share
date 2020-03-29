@@ -1,0 +1,73 @@
+Arguments: 
+  /usr/local/Cellar/node/13.8.0/bin/node /usr/local/bin/yarn add @nutui/nutui
+
+PATH: 
+  /Users/cuiyijie/.cargo/bin:/Users/cuiyijie/.cargo/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
+
+Yarn version: 
+  1.22.4
+
+Node version: 
+  13.8.0
+
+Platform: 
+  darwin x64
+
+Trace: 
+  Error: https://registry.npm.taobao.org/core-js: tunneling socket could not be established, cause=connect EHOSTUNREACH 0.0.4.63:80 - Local (192.168.2.102:62924)
+      at ClientRequest.onError (/usr/local/lib/node_modules/yarn/lib/cli.js:152234:17)
+      at Object.onceWrapper (events.js:428:26)
+      at ClientRequest.emit (events.js:321:20)
+      at Socket.socketErrorListener (_http_client.js:432:9)
+      at Socket.emit (events.js:321:20)
+      at emitErrorNT (internal/streams/destroy.js:84:8)
+      at processTicksAndRejections (internal/process/task_queues.js:84:21)
+
+npm manifest: 
+  {
+    "name": "joyea-share-mobile",
+    "version": "0.1.0",
+    "private": true,
+    "scripts": {
+      "serve": "vue-cli-service serve",
+      "build": "vue-cli-service build",
+      "lint": "vue-cli-service lint"
+    },
+    "dependencies": {
+      "core-js": "^3.6.4",
+      "vue": "^2.6.11"
+    },
+    "devDependencies": {
+      "@vue/cli-plugin-babel": "~4.2.0",
+      "@vue/cli-plugin-eslint": "~4.2.0",
+      "@vue/cli-service": "~4.2.0",
+      "babel-eslint": "^10.0.3",
+      "eslint": "^6.7.2",
+      "eslint-plugin-vue": "^6.1.2",
+      "vue-template-compiler": "^2.6.11"
+    },
+    "eslintConfig": {
+      "root": true,
+      "env": {
+        "node": true
+      },
+      "extends": [
+        "plugin:vue/essential",
+        "eslint:recommended"
+      ],
+      "parserOptions": {
+        "parser": "babel-eslint"
+      },
+      "rules": {}
+    },
+    "browserslist": [
+      "> 1%",
+      "last 2 versions"
+    ]
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile

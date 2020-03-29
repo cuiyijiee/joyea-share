@@ -788,8 +788,12 @@
                 let totalMb = totalKb / 1024;
                 let warnMb = 300;
                 this.$confirm(
-                    "您已选中【 " + toDownloadList.length + " 】个文件，" + (totalMb > warnMb ? ("待准备文件列表大小为【 " + totalMb.toFixed(2) + "MB 】,文件较大，建议您分批次准备。") : ("待准备文件列表大小为【 " + (totalMb > 1 ? totalMb.toFixed(2) + "MB" : totalKb.toFixed(2) + "KB") + " 】。")) + "准备完成后会在右上角提示您下载!",
-                    '提示', {
+                    "您已选中【 " + toDownloadList.length + " 】个文件，" + (totalMb > warnMb
+                    ? ("待准备文件列表大小为【 " + totalMb.toFixed(2) + "MB 】,文件较大，建议您分批次准备。")
+                    : ("待准备文件列表大小为【 " + (totalMb > 1 ? totalMb.toFixed(2) + "MB" : totalKb.toFixed(2) + "KB") + " 】。")) + "准备完成后会在右上角提示您下载!",
+
+                    '提示',
+                    {
                         confirmButtonText: '准备',
                         cancelButtonText: '取消',
                         type: totalMb > warnMb ? "danger" : "primary"
