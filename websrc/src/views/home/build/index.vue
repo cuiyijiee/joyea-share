@@ -303,16 +303,12 @@
 <script>
     import api from "../../../api";
     import genSrcPreviewSrc from "../../../utils"
-    import VueLoadImage from 'vue-load-image'
-    import BackPathItem from '../../../components/BackPathItem'
     import Sortable from 'sortablejs';
     import videojs from 'video.js'
 
     export default {
         name: "index",
         components: {
-            'vue-load-image': VueLoadImage,
-            'BackPathItem': BackPathItem,
         },
         data() {
             return {

@@ -7,11 +7,13 @@ import MineContainer from "../components/tabbar/MineContainer";
 
 import Main from "../views/Main";
 import Login from "../views/Login"
+import AlbumList from "../views/AlbumList";
 
 Vue.use(Router);
 
 
 export default new Router({
+    base: "mobile",
     routes: [
         {
             path: '/login',
@@ -21,7 +23,7 @@ export default new Router({
         {
             path: '/',
             redirect: '/home',
-            name:"/",
+            name: "/",
             component: Main,
             children: [
                 {
@@ -40,6 +42,10 @@ export default new Router({
                     component: MineContainer
                 }
             ]
+        }, {
+            path: '/album',
+            name: 'album',
+            component: AlbumList
         }
     ],
     linkActiveClass: 'mui-active'   //覆盖默认的路由的高亮的类，默认的类叫 router-link-active

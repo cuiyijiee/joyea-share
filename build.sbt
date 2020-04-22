@@ -1,6 +1,6 @@
 organization := "com.cuje"
-name         := "joyea_share"
-version      := "1.0-SNAPSHOT"
+name := "joyea_share"
+version := "1.0-SNAPSHOT"
 
 scalaVersion := "2.12.10"
 scalacOptions ++= Seq("-deprecation", "-feature", "-unchecked")
@@ -23,10 +23,10 @@ libraryDependencies += "commons-net" % "commons-net" % "3.6"
 libraryDependencies += "com.squareup.okhttp3" % "okhttp" % "3.14.1"
 
 libraryDependencies ++= Seq(
-  "org.scalikejdbc" %% "scalikejdbc" % "3.2.4",
-  "org.scalikejdbc" %% "scalikejdbc-async" % "0.8.2",
-  "com.github.mauricio" %% "mysql-async" % "0.2.21",
-  "mysql" % "mysql-connector-java" % "8.0.12"
+  "org.scalikejdbc" %% "scalikejdbc" % "3.4.+",
+  "org.scalikejdbc" %% "scalikejdbc-async" % "0.13.+",
+  "com.github.jasync-sql" % "jasync-mysql" % "1.0.+",
+  "mysql" % "mysql-connector-java" % "8.0.19"
 )
 
 // Put config directory in classpath for easier development --------------------

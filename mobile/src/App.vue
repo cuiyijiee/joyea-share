@@ -2,9 +2,8 @@
     <div id="app">
         <van-nav-bar title="仅一素材库" fixed/>
         <transition>
-            <router-view></router-view>
+            <router-view ></router-view>
         </transition>
-
     </div>
 </template>
 

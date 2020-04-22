@@ -12,12 +12,26 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="sbt: ch.qos.logback:logback-classic:1.2.3:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.scalikejdbc:scalikejdbc-async_2.12:0.13.0:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.scala-lang.modules:scala-java8-compat_2.12:0.9.0:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.3.2:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.2:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.3.61:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.3.61:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.jetbrains.kotlin:kotlin-stdlib-common:1.3.61:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.jetbrains.kotlin:kotlin-stdlib:1.3.61:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.jetbrains:annotations:13.0:jar" level="project" />
+    <orderEntry type="library" name="sbt: mysql:mysql-connector-java:8.0.19:jar" level="project" />
+    <orderEntry type="library" name="sbt: io.netty:netty-handler:4.1.34.Final:jar" level="project" />
+    <orderEntry type="library" name="sbt: io.netty:netty-codec:4.1.34.Final:jar" level="project" />
+    <orderEntry type="library" name="sbt: io.github.microutils:kotlin-logging:1.7.6:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.github.jasync-sql:jasync-mysql:1.0.14:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.github.jasync-sql:jasync-common:1.0.14:jar" level="project" />
     <orderEntry type="library" name="sbt: tv.cntt:xitrum_2.12:3.29.0:jar" level="project" />
     <orderEntry type="library" name="sbt: tv.cntt:sclasner_2.12:1.8.0:jar" level="project" />
     <orderEntry type="library" name="sbt: tv.cntt:scaposer_2.12:1.11.1:jar" level="project" />
     <orderEntry type="library" name="sbt: tv.cntt:glokka_2.12:2.6.0:jar" level="project" />
     <orderEntry type="library" name="sbt: org.webjars.bower:jquery-validation:1.19.1:jar" level="project" />
-    <orderEntry type="library" name="sbt: org.slf4j:slf4j-api:1.7.28:jar" level="project" />
     <orderEntry type="library" name="sbt: org.scala-lang:scalap:2.12.10:jar" level="project" />
     <orderEntry type="library" name="sbt: org.scala-lang:scala-reflect:2.12.10:jar" level="project" />
     <orderEntry type="library" name="sbt: org.scala-lang:scala-library:2.12.10:jar" level="project" />
@@ -65,8 +79,6 @@
     <orderEntry type="library" name="sbt: com.esotericsoftware:kryo-shaded:4.0.2:jar" level="project" />
     <orderEntry type="library" name="sbt: com.esotericsoftware:minlog:1.3.0:jar" level="project" />
     <orderEntry type="library" name="sbt: com.fasterxml.jackson.core:jackson-annotations:2.9.0:jar" level="project" />
-    <orderEntry type="library" name="sbt: com.github.mauricio:db-async-common_2.12:0.2.21:jar" level="project" />
-    <orderEntry type="library" name="sbt: com.github.mauricio:mysql-async_2.12:0.2.21:jar" level="project" />
     <orderEntry type="library" name="sbt: com.squareup.okhttp3:okhttp:3.14.1:jar" level="project" />
     <orderEntry type="library" name="sbt: com.squareup.okio:okio:1.17.2:jar" level="project" />
     <orderEntry type="library" name="sbt: com.thoughtworks.paranamer:paranamer:2.8:jar" level="project" />
@@ -76,22 +88,12 @@
     <orderEntry type="library" name="sbt: io.reactivex:rxjava:1.2.4:jar" level="project" />
     <orderEntry type="library" name="sbt: io.reactivex:rxscala_2.12:0.26.5:jar" level="project" />
     <orderEntry type="library" name="sbt: joda-time:joda-time:2.9.7:jar" level="project" />
-    <orderEntry type="library" name="sbt: mysql:mysql-connector-java:8.0.12:jar" level="project" />
-    <orderEntry type="library" name="sbt: org.apache.commons:commons-dbcp2:2.2.0:jar" level="project" />
-    <orderEntry type="library" name="sbt: org.apache.commons:commons-pool2:2.5.0:jar" level="project" />
     <orderEntry type="library" name="sbt: org.codehaus.janino:commons-compiler:3.0.11:jar" level="project" />
     <orderEntry type="library" name="sbt: org.codehaus.janino:janino:3.0.11:jar" level="project" />
     <orderEntry type="library" name="sbt: org.joda:joda-convert:1.8.1:jar" level="project" />
     <orderEntry type="library" name="sbt: org.mozilla:rhino:1.7.7.1:jar" level="project" />
     <orderEntry type="library" name="sbt: org.objenesis:objenesis:2.5.1:jar" level="project" />
-    <orderEntry type="library" name="sbt: org.scala-lang.modules:scala-java8-compat_2.12:0.8.0:jar" level="project" />
     <orderEntry type="library" name="sbt: org.scala-lang.modules:scala-xml_2.12:1.0.6:jar" level="project" />
-    <orderEntry type="library" name="sbt: org.scalikejdbc:scalikejdbc-async_2.12:0.8.2:jar" level="project" />
-    <orderEntry type="library" name="sbt: org.scalikejdbc:scalikejdbc-core_2.12:3.2.4:jar" level="project" />
-    <orderEntry type="library" name="sbt: org.scalikejdbc:scalikejdbc-interpolation-macro_2.12:3.2.4:jar" level="project" />
-    <orderEntry type="library" name="sbt: org.scalikejdbc:scalikejdbc-interpolation_2.12:3.2.4:jar" level="project" />
-    <orderEntry type="library" name="sbt: org.scalikejdbc:scalikejdbc-syntax-support-macro_2.12:3.0.2:jar" level="project" />
-    <orderEntry type="library" name="sbt: org.scalikejdbc:scalikejdbc_2.12:3.2.4:jar" level="project" />
     <orderEntry type="library" name="sbt: org.webjars.bower:d3:3.5.17:jar" level="project" />
     <orderEntry type="library" name="sbt: org.webjars.bower:sockjs-client:1.3.0:jar" level="project" />
     <orderEntry type="library" name="sbt: org.webjars.bower:swagger-ui:3.4.0:jar" level="project" />
@@ -121,5 +123,13 @@
       </library>
     </orderEntry>
     <orderEntry type="library" name="sbt: commons-net:commons-net:3.6:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.apache.commons:commons-dbcp2:2.7.0:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.apache.commons:commons-pool2:2.7.0:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.scala-lang.modules:scala-collection-compat_2.12:2.1.4:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.scalikejdbc:scalikejdbc-core_2.12:3.4.1:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.scalikejdbc:scalikejdbc-interpolation-macro_2.12:3.4.1:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.scalikejdbc:scalikejdbc-interpolation_2.12:3.4.1:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.scalikejdbc:scalikejdbc_2.12:3.4.1:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.slf4j:slf4j-api:1.7.30:jar" level="project" />
   </component>
 </module>

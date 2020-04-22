@@ -8,8 +8,9 @@ module.exports = {
     lintOnSave: true,
     productionSourceMap: false,
     devServer: {
-        proxy: 'http://192.168.2.104:8000'
+        proxy: 'http://127.0.0.1:8000',
     },
+    publicPath: '/mobile/',
     chainWebpack: config => {
         config.resolve.alias
             .set('@', resolve('src'))

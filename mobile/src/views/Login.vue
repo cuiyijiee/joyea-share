@@ -12,7 +12,7 @@
                 <van-icon slot="right-icon" :name="passwordIcon" @click="switchPasswordType"/>
             </van-field>
             <div class="button-wrap">
-                <van-button size="large" @click="handleLogin" type="info">登录</van-button>
+                <van-button :loading="loginLoading" size="large" @click="handleLogin" type="info" loading-text="登录中...">登录</van-button>
             </div>
         </div>
     </div>
@@ -21,11 +21,13 @@
 <script>
 
     import api from "../api"
+    const localStorage = window.localStorage;
 
     export default {
         name: "Login",
         data() {
             return {
+                loginLoading:false,
                 passwordType:"password",
                 loginForm: {
                     user: "zhangxiu@joyea.cn",
@@ -38,6 +40,7 @@
                 this.passwordType = this.passwordType === 'password' ? 'text' : 'password'
             },
             handleLogin() {
+                this.loginLoading = true;
                 api({
                     action: 'user',
                     method: 'login',
@@ -59,6 +62,7 @@
                     } else {
                         this.$notify({type: 'danger', message: '登陆失败，请检查用户名密码！'});
                     }
+                    this.loginLoading = false;
                 })
             }
         },
