@@ -44,9 +44,18 @@
                 <van-list>
                     <van-cell v-for="item in dir.tableData" v-if="!item.is_dir && item.mime_type.startsWith('image')"
                               :key="item.path">
-                        <img class="my_icon my_icon_size" :preview="item.path"
-                             :src="genPreviewUrl(item.neid,item.hash,item.rev,item.mime_type)"/>
-                        {{item.path.substr(item.path.lastIndexOf('/')+1)}}
+                        <van-row>
+                            <van-col span="2">
+                            <img class="my_icon my_icon_size" preview="buildList"
+                                 :src="genPreviewUrl(item.neid,item.hash,item.rev,item.mime_type)"/>
+                        </van-col>
+                            <van-col span="20">
+                                {{item.path.substr(item.path.lastIndexOf('/')+1)}}
+                            </van-col>
+                            <van-col span="2">
+                                <van-icon v-if="!item['is_dir']" name="plus" @click="handleClickAddItem(item)"/>
+                            </van-col>
+                        </van-row>
                     </van-cell>
                 </van-list>
             </van-tab>
@@ -159,7 +168,7 @@
             if (user) {
                 this.userInfo = JSON.parse(user)
             }
-            this.handleListLenovoDir("/", "ent");
+            this.handleListLenovoDir("/营销素材展示", "ent");
         }
     }
 </script>
