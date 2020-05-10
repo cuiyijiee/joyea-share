@@ -1,6 +1,7 @@
 package joyea_share.handler
 
 import com.json.{JsonArray, JsonObject, WriterConfig}
+import joyea_share.Boot
 import joyea_share.db.MySQLSettings
 import joyea_share.handler.interfaces.{ExecListener, IAction}
 import joyea_share.model.{AlbumSrc, SrcCollect}
@@ -16,6 +17,9 @@ class SearchHandler extends IAction {
         val sessionUserId = context.sessiono[Long]("user_id").getOrElse(-1L)
         val searchKey = request.getString("searchKey", "")
         val offset = request.getLong("offset", 0)
+
+        Boot.addSearchKey(searchKey)
+
 
         LenovoUtil.ftsSearch(sessionId, searchKey = searchKey, searchType = "", offset = offset, new CommonListener[JsonObject] {
             override def onSuccess(obj: JsonObject): Unit = {

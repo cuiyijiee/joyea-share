@@ -5,16 +5,37 @@ Vue.use(Vuex);
 
 const store = new Vuex.Store({
     state: {
-        orderList: []
+        orderList: [],
+        orderEditInfo: {
+            name:"",
+            id:""
+        },
+        userInfo: {
+            session: "",
+            name: "",
+            email: ""
+        }
     },
     getters: {
         getStateOrderList: function (state) {
             return state.orderList;
+        },
+        exist: (state) => (neid) => {
+            return state.orderList.filter(item => item['neid'] === neid).length > 0;
+        },
+        userInfo: function (state) {
+            return state.userInfo;
+        },
+        getOrderEditInfo: function (state) {
+            return state.orderEditInfo;
         }
     },
     mutations: {
         add(state, item) {
             state.orderList.push(item);
+        },
+        cleanSession(state) {
+            state.userInfo.session = ""
         },
         remove(state, neid) {
             state.orderList = state.orderList.filter(item => {
@@ -23,6 +44,16 @@ const store = new Vuex.Store({
         },
         clear(state) {
             state.orderList = []
+        },
+        updateUserInfo(state, userInfo) {
+            state.userInfo = {
+                session: userInfo.session,
+                name: userInfo.name,
+                email: userInfo.email
+            }
+        },
+        setEditInfo(state, albumInfo) {
+            state.orderEditInfo = albumInfo;
         }
     },
     actions: {
@@ -34,6 +65,15 @@ const store = new Vuex.Store({
         },
         clearFunc(state) {
             state.commit("clear")
+        },
+        clearUserSessionFunc(state) {
+            state.commit("cleanSession")
+        },
+        updateUserInfoFunc(state, userInfo) {
+            state.commit("updateUserInfo", userInfo)
+        },
+        setOrderEditInfoFunc(state, albumInfo) {
+            state.commit("setEditInfo", albumInfo)
         }
     }
 });

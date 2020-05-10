@@ -1,8 +1,10 @@
 <template>
     <div id="main">
         <!-- 中间的 路由 router-view 区域 -->
-        <transition style="background-color: #f7f8fa;">
-            <router-view ></router-view>
+        <transition style="padding-bottom: 80px">
+            <keep-alive>
+                <router-view></router-view>
+            </keep-alive>
         </transition>
         <van-tabbar
                 v-model="active"
@@ -10,9 +12,9 @@
                 inactive-color="#000"
                 safe-area-inset-bottom
                 z-index="4">
-            <van-tabbar-item icon="home-o" replace to="/home">工作台</van-tabbar-item>
-            <van-tabbar-item icon="shopping-cart-o" :badge="orderListSize" replace to="/order">素材车</van-tabbar-item>
-            <van-tabbar-item icon="manager-o" replace to="/mine">我的</van-tabbar-item>
+            <van-tabbar-item icon="home-o" to="/home">工作台</van-tabbar-item>
+            <van-tabbar-item icon="shopping-cart-o" :badge="orderListSize" to="/order">素材车</van-tabbar-item>
+            <van-tabbar-item icon="manager-o" to="/mine">我的</van-tabbar-item>
         </van-tabbar>
     </div>
 </template>
@@ -32,7 +34,7 @@
         computed: {
             ...mapState({
                 orderListSize: state => state.orderList.length
-            })
+            }),
         }
     }
 </script>

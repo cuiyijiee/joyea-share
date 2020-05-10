@@ -4,21 +4,23 @@ import Router from 'vue-router';
 import HomeContainer from "../components/tabbar/HomeContainer";
 import OrderContainer from "../components/tabbar/OrderContainer";
 import MineContainer from "../components/tabbar/MineContainer";
+import SearchResult from "../components/tabbar/SearchContainer";
 
 import Main from "../views/Main";
 import Login from "../views/Login"
 import AlbumList from "../views/AlbumList";
 
-Vue.use(Router);
+import AlbumDetail from "../views/AlbumDetail";
 
+Vue.use(Router);
 
 export default new Router({
     base: "mobile",
     routes: [
         {
             path: '/login',
-            name: 'login',
-            component: Login
+            name: '仅一素材库',
+            component: Login,
         },
         {
             path: '/',
@@ -28,24 +30,57 @@ export default new Router({
             children: [
                 {
                     path: 'home',
-                    name: 'HomeContainer',
-                    component: HomeContainer
+                    name: '工作台',
+                    component: HomeContainer,
+                    meta: {
+                        allowBack: false,
+                        allowHome: false
+                    }
                 },
                 {
                     path: 'order',
-                    name: 'OrderContainer',
-                    component: OrderContainer
+                    name: '素材车',
+                    component: OrderContainer,
+                    meta: {
+                        allowHome: false
+                    }
                 },
                 {
                     path: 'mine',
-                    name: 'MineContainer',
-                    component: MineContainer
+                    name: '我的',
+                    component: MineContainer,
+                    meta: {
+                        allowHome: false
+                    }
+                },
+                {
+                    path: '/search',
+                    name: '搜索结果',
+                    component: SearchResult,
+                    meta: {
+                        allowBack: true,
+                        allowHome: true
+                    }
                 }
             ]
-        }, {
+        },
+        {
             path: '/album',
-            name: 'album',
-            component: AlbumList
+            name: '我的清单',
+            component: AlbumList,
+            meta: {
+                allowBack: true,
+                allowHome: true
+            }
+        },
+        {
+            path: '/albumDetail',
+            name: '清单详情',
+            component: AlbumDetail,
+            meta: {
+                allowBack: true,
+                allowHome: true
+            }
         }
     ],
     linkActiveClass: 'mui-active'   //覆盖默认的路由的高亮的类，默认的类叫 router-link-active

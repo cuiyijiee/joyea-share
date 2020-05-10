@@ -12,7 +12,9 @@
                 <van-icon slot="right-icon" :name="passwordIcon" @click="switchPasswordType"/>
             </van-field>
             <div class="button-wrap">
-                <van-button :loading="loginLoading" size="large" @click="handleLogin" type="info" loading-text="登录中...">登录</van-button>
+                <van-button :loading="loginLoading" size="large" @click="handleLogin" type="info" loading-text="登录中...">
+                    登录
+                </van-button>
             </div>
         </div>
     </div>
@@ -21,22 +23,27 @@
 <script>
 
     import api from "../api"
+
     const localStorage = window.localStorage;
+    import {mapActions, mapGetters} from 'vuex';
 
     export default {
         name: "Login",
         data() {
             return {
-                loginLoading:false,
-                passwordType:"password",
+                loginLoading: false,
+                passwordType: "password",
                 loginForm: {
-                    user: "zhangxiu@joyea.cn",
-                    pwd: "jinyi@123"
+                    user: "",
+                    pwd: ""
                 }
             }
         },
         methods: {
-            switchPasswordType(){
+            ...mapActions([
+                'updateUserInfoFunc'
+            ]),
+            switchPasswordType() {
                 this.passwordType = this.passwordType === 'password' ? 'text' : 'password'
             },
             handleLogin() {
@@ -50,11 +57,10 @@
                     if (response.result) {
                         this.$notify({type: 'success', message: '欢迎回来，' + response.user_name + '！'});
                         localStorage.setItem("u", btoa(JSON.stringify(this.loginForm)));
-                        localStorage.setItem("userInfo", JSON.stringify({
-                            session: response.session,
-                            name: response.user_name,
-                            email: this.loginForm.user
-                        }));
+                        this.updateUserInfoFunc({
+                            session: response['session'], name: response['user_name'], email: this.loginForm.user
+                        }).then(() => {
+                        })
                         this.$router.push({
                             name: "/",
                             params: {checked: true}
@@ -69,7 +75,13 @@
         computed: {
             passwordIcon: function () {
                 return this.passwordType === 'password' ? 'closed-eye' : 'eye'
-            }
+            },
+            ...mapGetters([
+                'userInfo'
+            ]),
+        },
+        created() {
+            this.loginForm.user = this.userInfo.email;
         }
     }
 </script>

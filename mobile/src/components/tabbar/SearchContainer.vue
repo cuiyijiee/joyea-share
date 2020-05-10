@@ -1,34 +1,14 @@
 <template>
-    <div id="home" style="background-color: #f7f8fa;">
-        <van-search v-model="searchKey" placeholder="请输入搜索要搜索的资源"
-                    @search="onSearch" :show-action="canGoBackSearch">
-            <template #action>
-                <van-button icon="exchange" @click="goBackSearch" type="primary" size="small"/>
-            </template>
-        </van-search>
-        <div>
-            <van-tag v-for="item in topSearchKey" type="success" style="margin: 0 2px" @click="handleClickTopKey(item)">{{item}}</van-tag>
-        </div>
-        <van-sticky :offset-top="46">
-            <van-row style="background-color: #fff;">
-                <van-col span="3">
-                    <van-icon class="my_icon" name="arrow-left"
-                              v-if="dir.currentPath.length !== 0"
-                              @click="handleClickBackDir"/>
-                </van-col>
-                <van-col span="18">{{dir.currentPath.length === 0 ? "/" : dir.currentPath[dir.currentPath.length -1]}}
-                </van-col>
-                <van-col span="3">
-                    <van-icon class="my_icon" name="wap-home-o" @click="handleClickRootDir"
-                              v-if="dir.currentPath.length !== 0"/>
-                </van-col>
-            </van-row>
-        </van-sticky>
+    <div id="search" style="padding-top: 5px;padding-bottom: 80px">
         <van-tabs v-model="currentTypeActive">
             <van-tab title="全部">
-                <van-empty v-if="dir.tableData.length === 0" description="当前路径没有文件"/>
-                <van-list>
-                    <van-cell v-for="item in dir.tableData" :key="item.path">
+                <van-empty v-if="searchResultList.length === 0" description="当前路径没有文件"/>
+                <van-list
+                        v-model="searchLoading"
+                        :finished="searchFinished"
+                        finished-text="没有更多了"
+                        @load="handleSearch">
+                    <van-cell v-for="item in searchResultList" :key="item.path">
                         <van-row>
                             <van-col span="4">
                                 <van-icon v-if="item['is_dir']" class="my_icon" name="credit-pay"/>
@@ -46,16 +26,15 @@
                                 </van-tag>
                             </van-col>
                             <van-col span="4">
-                                <van-button v-if="!item['is_dir']" icon="plus" size="small" type="primary"
-                                            @click="handleClickAddItem(item)"/>
+                                <van-button v-if="!item['is_dir']" icon="plus" size="small" type="primary" @click="handleClickAddItem(item)"/>
                             </van-col>
                         </van-row>
                     </van-cell>
                 </van-list>
             </van-tab>
-            <van-tab title="文件夹" :badge="dir.tableData.filter(item => item.is_dir).length">
+            <van-tab title="文件夹" :badge="searchResultList.filter(item => item.is_dir).length">
                 <van-list>
-                    <van-cell v-for="item in dir.tableData" v-if="item.is_dir"
+                    <van-cell v-for="item in searchResultList" v-if="item.is_dir"
                               :key="item.path" @click="handleClickItem(item)">
                         <van-icon class="my_icon" name="credit-pay"/>
                         {{item.path.substr(item.path.lastIndexOf('/')+1)}}
@@ -64,16 +43,14 @@
                 </van-list>
             </van-tab>
             <van-tab title="图片"
-                     :badge="dir.tableData.filter(item => !item.is_dir && item.mime_type.startsWith('image')).length">
+                     :badge="searchResultList.filter(item => !item.is_dir && item.mime_type.startsWith('image')).length">
                 <van-grid :border="false" :column-num="3">
                     <van-grid-item
-                            v-for="item in dir.tableData.filter(item => !item.is_dir && item.mime_type.startsWith('image'))">
+                            v-for="item in searchResultList.filter(item => !item.is_dir && item.mime_type.startsWith('image'))">
                         <div>
                             <img class="my_icon my_icon_size_large" preview="buildList" :preview-text="item.path"
                                  :src="genPreviewUrl(item.neid,item.hash,item.rev,item.mime_type)"/>
-                            <van-button @click="handleClickAddItem(item)" round
-                                        style="position: absolute; top: 0px; left: 0px;" icon="plus" size="small"
-                                        type="primary"/>
+                            <van-button  @click="handleClickAddItem(item)" style="border-radius:100%;position: absolute; top: 0px; left: 0px;" icon="plus"  size="small" type="primary" />
                         </div>
                         <div>
                             <van-field :value="item.path.substr(item.path.lastIndexOf('/')+1)" placeholder="123"
@@ -84,9 +61,9 @@
                 </van-grid>
             </van-tab>
             <van-tab title="视频"
-                     :badge="dir.tableData.filter(item => !item.is_dir && item.mime_type.startsWith('video')).length">
+                     :badge="searchResultList.filter(item => !item.is_dir && item.mime_type.startsWith('video')).length">
                 <van-list>
-                    <van-cell v-for="item in dir.tableData" v-if="!item.is_dir && item.mime_type.startsWith('video')"
+                    <van-cell v-for="item in searchResultList" v-if="!item.is_dir && item.mime_type.startsWith('video')"
                               :key="item.path">
                         <van-row>
                             <van-col span="4">
@@ -98,17 +75,16 @@
                                 </van-tag>
                             </van-col>
                             <van-col span="4">
-                                <van-button v-if="!item['is_dir']" icon="plus" size="small" type="primary"
-                                            @click="handleClickAddItem(item)"/>
+                                <van-button v-if="!item['is_dir']" icon="plus" size="small" type="primary" @click="handleClickAddItem(item)"/>
                             </van-col>
                         </van-row>
                     </van-cell>
                 </van-list>
             </van-tab>
             <van-tab title="文档"
-                     :badge="dir.tableData.filter(item => !item.is_dir && item.mime_type.startsWith('doc')).length">
+                     :badge="searchResultList.filter(item => !item.is_dir && item.mime_type.startsWith('doc')).length">
                 <van-list>
-                    <van-cell v-for="item in dir.tableData" v-if="!item.is_dir && item.mime_type.startsWith('doc')"
+                    <van-cell v-for="item in searchResultList" v-if="!item.is_dir && item.mime_type.startsWith('doc')"
                               :key="item.path">
                         <van-row>
                             <van-col span="4">
@@ -120,8 +96,7 @@
                                 </van-tag>
                             </van-col>
                             <van-col span="4">
-                                <van-button v-if="!item['is_dir']" icon="plus" size="small" type="primary"
-                                            @click="handleClickAddItem(item)"/>
+                                <van-button v-if="!item['is_dir']" icon="plus" size="small" type="primary" @click="handleClickAddItem(item)"/>
                             </van-col>
                         </van-row>
                     </van-cell>
@@ -132,13 +107,13 @@
 </template>
 
 <script>
-    import api from "../../api/";
-    import {genSrcPreviewSrc, handleGoToPreview} from "../../util/JoyeaUtil"
-    import {mapGetters} from "vuex"
-    import eventBus from "../../service/eventbus";
+    import api from "../../api";
+    import {mapGetters} from "vuex";
+    import {genSrcPreviewSrc, handleGoToPreview} from "../../util/JoyeaUtil";
+    import eventBus from "../../service/eventbus"
 
     export default {
-        name: "HomeContainer",
+        name: "SearchResult",
         computed: {
             ...mapGetters([
                 'userInfo'
@@ -146,35 +121,28 @@
         },
         data() {
             return {
-                topSearchKey:[],
-                canGoBackSearch: false,
                 markReg: /<mark>|<\/mark>/g,
-                globalPathType: "ent",
-                searchKey: "",
                 currentTypeActive: 0,
+                searchResultList: [],
+                searchKey: "",
+                searchOffset: 0,
+                searchLoading: false,
+                searchFinished: false,
                 dir: {
                     currentPath: [],
                     tableData: [],
                     loadingDir: false
-                },
-                isFirst: true
+                }
             }
         },
         methods: {
-            goBackSearch() {
-                this.$router.push("/search");
-            },
-            handleClickTopKey(key){
-                this.canGoBackSearch = true;
-                this.$router.push({path: "/search", query: {searchKey: key}});
-            },
-            onSearch() {
-                if (this.searchKey.trim().length === 0) {
-                    this.$dialog({message: "要搜索的关键字不能为空！"});
-                    return;
+            handleClickItem(item) {
+                if (item['is_dir']) {
+                    eventBus.$emit('showDir', item);
+                    this.$router.back();
+                } else {
+                    this.handlePreview(item)
                 }
-                this.canGoBackSearch = true;
-                this.$router.push({path: "/search", query: {searchKey: this.searchKey}});
             },
             handlePreview(item) {
                 handleGoToPreview(item, this.userInfo.session)
@@ -195,25 +163,6 @@
                     })
                 }
             },
-            handleClickItem(item) {
-                if (item['is_dir']) {
-                    this.handleListLenovoDir(item.path, this.globalPathType)
-                } else {
-                    this.handlePreview(item)
-                }
-            },
-            handleClickRootDir() {
-                this.handleListLenovoDir("/");
-            },
-            handleClickBackDir() {
-                if (this.dir.currentPath.length > 0) {
-                    let backPath = "/";
-                    for (let i = 0; i < this.dir.currentPath.length - 1; i++) {
-                        backPath = backPath + this.dir.currentPath[i] + "/"
-                    }
-                    this.handleListLenovoDir(backPath);
-                }
-            },
             genPreviewUrl(neid, hash, rev, mime_type) {
                 let previewType = 'pic';    // if video is av
                 if (mime_type.startsWith("doc")) {
@@ -223,59 +172,73 @@
                 }
                 return genSrcPreviewSrc(neid, hash, rev, previewType, this.userInfo.session);
             },
-            handleGetTopSearchKey(){
-                api({
-                    action:"getTopSearchKey"
-                }).then(resp => {
-                    this.topSearchKey = resp["data"];
-                })
+            handleGoToPreview(row) {
+                let previewType = 'pic';    // if video is av
+                if (row.mime_type.startsWith("doc")) {
+                    previewType = 'doc'
+                } else if (row.mime_type.startsWith("video")) {
+                    previewType = 'av'
+                }
+                let url = genSrcPreviewSrc(row.neid, row.hash, row.rev, previewType, this.userInfo.session);
+                if (row.mime_type.startsWith("doc")) {
+                    window.open(url);
+                } else if (row.mime_type.startsWith("video")) {
+                    window.open(url);
+                }
             },
-            handleListLenovoDir(path, pathType) {
-                this.dir.loadingDir = true;
+            handleSearch() {
+                this.searchLoading = true;
                 api({
-                    action: 'listLenovoDir',
-                    path: path.replace("+", "%2B"),
-                    path_type: pathType === undefined ? 'ent' : pathType
+                    action: 'search',
+                    searchKey: this.searchKey,
+                    offset: this.searchOffset,
                 }).then(response => {
                     if (response.result) {
-                        this.dir.tableData = [];
-                        if (response.data.content) {
-                            response.data.content.forEach(item => {
+                        this.searchFinished = !response["has_more"];
+                        if (!this.searchFinished) {
+                            this.searchOffset = response["next_offset"];
+                        }
+                        if (response.content.length === 0) {
+                            this.$dialog({
+                                message: "没有搜索到与【" + this.searchKey + "】有关的文件或文件夹！"
+                            });
+                            //this.$router.back();
+                        } else {
+                            response.content.forEach(item => {
                                 item.joyeaDesc = "";
                                 item.isModify = false;
-                                this.dir.tableData.push(item)
-                            });
-                            this.dir.currentPath = [];
-                            response.data.path.split('/').forEach(item => {
-                                if (item.length !== 0) {
-                                    this.dir.currentPath.push(item)
-                                }
-                            });
+                                this.searchResultList.push(item);
+                            })
                         }
                     } else {
-                        console.log('文件夹列表获取失败' + response.msg)
+                        this.$notify.error({
+                            title: '搜索出错',
+                            message: '搜索过程出现错误：' + response.msg
+                        });
+                        console.log(response.msg)
                     }
-                    this.dir.loadingDir = false;
+                }).finally(() => {
+                    // 加载状态结束
+                    this.searchLoading = false;
                 });
             },
         },
-        mounted() {
-            this.handleListLenovoDir("/营销素材展示", "ent");
-        },
         activated() {
-            eventBus.$on('showDir', function (data) {
-                this.handleListLenovoDir(data.path, "ent");
-            }.bind(this));
-            this.handleGetTopSearchKey();
+            if(this.$route.query.searchKey){
+                this.searchKey = this.$route.query.searchKey;
+                this.searchResultList = [];
+                this.searchOffset = 0;
+                this.searchFinished = false;
+                this.handleSearch();
+            }
         }
     }
 </script>
 
 <style scoped>
-    .my_icon {
-        padding-left: 10px;
-        padding-right: 10px;
-        padding-top: 5px;
+    .my_icon_size_large {
+        width: 100%;
+        height: 100px;
     }
 
     .my_icon {
@@ -286,12 +249,8 @@
 
 
     .my_icon_size {
-        width: 30px;
-        height: 30px;
+        width: 15px;
+        height: 15px;
     }
 
-    .my_icon_size_large {
-        width: 100%;
-        height: 100px;
-    }
 </style>
