@@ -1,8 +1,9 @@
 <template>
-    <div id="search" style="padding-top: 5px;padding-bottom: 80px">
-        <van-tabs v-model="currentTypeActive">
+    <div id="search" style="padding-top: 5px;padding-bottom: 80px" >
+        <vm-back-top :bottom="100" :duration="1000" :timing="'ease'"></vm-back-top>
+        <van-tabs v-model="currentTypeActive" sticky>
             <van-tab title="全部">
-                <van-empty v-if="searchResultList.length === 0" description="当前路径没有文件"/>
+                <van-empty v-if="searchResultList.length === 0" description="没有找到搜索结果！"/>
                 <van-list
                         v-model="searchLoading"
                         :finished="searchFinished"
@@ -22,11 +23,11 @@
                             </van-col>
                             <van-col span="16" @click="handleClickItem(item)">
                                 {{item.path.substr(item.path.lastIndexOf('/')+1)}}
-                                <van-tag round type="success" v-for="tag in item.tags">{{tag.replace(markReg,"")}}
+                                <van-tag mark style="margin-right: 2px" v-for="tag in item.tags">{{tag.replace(markReg,"")}}
                                 </van-tag>
                             </van-col>
                             <van-col span="4">
-                                <van-button v-if="!item['is_dir']" icon="plus" size="small" type="primary" @click="handleClickAddItem(item)"/>
+                                <van-button v-if="!item['is_dir']" icon="plus" size="small" type="danger" plain style="border: #ffffff" @click="handleClickAddItem(item)"/>
                             </van-col>
                         </van-row>
                     </van-cell>
@@ -38,24 +39,24 @@
                               :key="item.path" @click="handleClickItem(item)">
                         <van-icon class="my_icon" name="credit-pay"/>
                         {{item.path.substr(item.path.lastIndexOf('/')+1)}}
-                        <van-tag round type="success" v-for="tag in item.tags">{{tag.replace(markReg,"")}}</van-tag>
+                        <van-tag mark style="margin-right: 2px" v-for="tag in item.tags">{{tag.replace(markReg,"")}}</van-tag>
                     </van-cell>
                 </van-list>
             </van-tab>
             <van-tab title="图片"
                      :badge="searchResultList.filter(item => !item.is_dir && item.mime_type.startsWith('image')).length">
-                <van-grid :border="false" :column-num="3">
+                <van-grid :border="false" :column-num="3" style="background: #ffffff">
                     <van-grid-item
                             v-for="item in searchResultList.filter(item => !item.is_dir && item.mime_type.startsWith('image'))">
                         <div>
                             <img class="my_icon my_icon_size_large" preview="buildList" :preview-text="item.path"
                                  :src="genPreviewUrl(item.neid,item.hash,item.rev,item.mime_type)"/>
-                            <van-button  @click="handleClickAddItem(item)" style="border-radius:100%;position: absolute; top: 0px; left: 0px;" icon="plus"  size="small" type="primary" />
+                            <van-button @click="handleClickAddItem(item)" round plain hairline type="danger"
+                                        style="position: absolute; top: 0; left: 0; border:#ffffff" icon="plus" size="small"/>
                         </div>
                         <div>
-                            <van-field :value="item.path.substr(item.path.lastIndexOf('/')+1)" placeholder="123"
-                                       readonly/>
-                            <van-tag round type="success" v-for="tag in item.tags">{{tag.replace(markReg,"")}}</van-tag>
+                            <div style="font-size:10px;-webkit-text-size-adjust: none;">{{item.path.substr(item.path.lastIndexOf('/')+1)}}</div>
+                            <van-tag mark style="margin-right: 2px" v-for="tag in item.tags">{{tag.replace(markReg,"")}}</van-tag>
                         </div>
                     </van-grid-item>
                 </van-grid>
@@ -71,11 +72,11 @@
                             </van-col>
                             <van-col span="16" @click="handlePreview(item)">
                                 {{item.path.substr(item.path.lastIndexOf('/')+1)}}
-                                <van-tag round type="success" v-for="tag in item.tags">{{tag.replace(markReg,"")}}
+                                <van-tag mark style="margin-right: 2px" v-for="tag in item.tags">{{tag.replace(markReg,"")}}
                                 </van-tag>
                             </van-col>
                             <van-col span="4">
-                                <van-button v-if="!item['is_dir']" icon="plus" size="small" type="primary" @click="handleClickAddItem(item)"/>
+                                <van-button v-if="!item['is_dir']" icon="plus" size="small" type="danger" plain style="border: #ffffff" @click="handleClickAddItem(item)"/>
                             </van-col>
                         </van-row>
                     </van-cell>
@@ -92,11 +93,11 @@
                             </van-col>
                             <van-col span="16" @click="handlePreview(item)">
                                 {{item.path.substr(item.path.lastIndexOf('/')+1)}}
-                                <van-tag round type="success" v-for="tag in item.tags">{{tag.replace(markReg,"")}}
+                                <van-tag mark style="margin-right: 2px" v-for="tag in item.tags">{{tag.replace(markReg,"")}}
                                 </van-tag>
                             </van-col>
                             <van-col span="4">
-                                <van-button v-if="!item['is_dir']" icon="plus" size="small" type="primary" @click="handleClickAddItem(item)"/>
+                                <van-button v-if="!item['is_dir']" icon="plus" size="small" type="danger" plain style="border: #ffffff" @click="handleClickAddItem(item)"/>
                             </van-col>
                         </van-row>
                     </van-cell>
@@ -111,9 +112,13 @@
     import {mapGetters} from "vuex";
     import {genSrcPreviewSrc, handleGoToPreview} from "../../util/JoyeaUtil";
     import eventBus from "../../service/eventbus"
+    import VmBackTop from 'vue-multiple-back-top'
 
     export default {
         name: "SearchResult",
+        components:{
+            VmBackTop
+        },
         computed: {
             ...mapGetters([
                 'userInfo'
@@ -251,6 +256,14 @@
     .my_icon_size {
         width: 15px;
         height: 15px;
+    }
+
+    .top{
+        padding: 10px;
+        background: #ee0a24;
+        color: #fff;
+        text-align: center;
+        border-radius: 2px;
     }
 
 </style>

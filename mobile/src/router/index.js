@@ -59,7 +59,7 @@ export default new Router({
                     component: SearchResult,
                     meta: {
                         allowBack: true,
-                        allowHome: true
+                        allowHome: false
                     }
                 }
             ]

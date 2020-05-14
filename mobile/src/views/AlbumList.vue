@@ -5,7 +5,7 @@
                     :num="item.list.length"
                     @click="handleShowAlbum(item)"
                     :title="item.name"
-                    thumb="play.png"/>
+                    thumb="mobile/cover.png"/>
             <template #right>
                 <van-button square text="编辑" type="primary" class="delete-button" @click="handleEditAlbum(item)"/>
                 <van-button square text="删除" type="danger" class="delete-button" @click="handleDeleteAlbum(item)"/>
@@ -15,10 +15,14 @@
             <van-grid border :column-num="3">
                 <van-grid-item
                         v-for="item in albumItem.list">
-                    <van-image class="my_icon my_icon_size_large" @click="handlePreview(albumItem)"
-                               :src="item.mime_type.startsWith('image') ? genPreviewUrl(item.neid,item.hash,item.rev,item.mime_type) :'unknown.png'"/>
+                    <van-image v-if="item.mime_type.startsWith('image')" class="my_icon my_icon_size_large" @click="handlePreview(albumItem)"
+                               :src="genPreviewUrl(item.neid,item.hash,item.rev,item.mime_type)"/>
+                    <van-image v-else-if="item.mime_type.startsWith('video')" class="my_icon my_icon_size_large" @click="handlePreview(albumItem)"
+                               src="play.png"/>
+                    <van-image v-else class="my_icon my_icon_size_large" @click="handlePreview(albumItem)"
+                               src="unknown.png"/>
                     <div>
-                        <van-field :value="item.path.substr(item.path.lastIndexOf('/')+1)" placeholder="123" readonly/>
+                        <div style="font-size:10px;-webkit-text-size-adjust: none;">{{item.path.substr(item.path.lastIndexOf('/')+1)}}</div>
                         <van-tag round type="success" v-for="tag in item.tags">{{tag.replace(markReg,"")}}</van-tag>
                     </div>
                 </van-grid-item>

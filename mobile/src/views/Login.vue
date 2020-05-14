@@ -61,7 +61,7 @@
                             session: response['session'], name: response['user_name'], email: this.loginForm.user
                         }).then(() => {
                         })
-                        this.$router.push({
+                        this.$router.replace({
                             name: "/",
                             params: {checked: true}
                         });
