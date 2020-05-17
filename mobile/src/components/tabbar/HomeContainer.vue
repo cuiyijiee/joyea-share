@@ -28,7 +28,7 @@
                 </van-col>
             </van-row>
         </van-sticky>
-        <van-tabs v-model="currentTypeActive" sticky>
+        <van-tabs v-model="currentTypeActive" sticky style="margin-bottom: 80px">
             <van-tab title="全部">
                 <van-empty v-if="dir.tableData.length === 0" description="当前路径没有文件"/>
                 <van-list>
@@ -209,7 +209,7 @@
                 }
             },
             handleClickRootDir() {
-                this.handleListLenovoDir("/");
+                this.handleListLenovoDir("/营销素材展示");
             },
             handleClickBackDir() {
                 if (this.dir.currentPath.length > 0) {

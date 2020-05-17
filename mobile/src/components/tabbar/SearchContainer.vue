@@ -1,5 +1,5 @@
 <template>
-    <div id="search" style="padding-top: 5px;padding-bottom: 80px" >
+    <div id="search" style="padding-top: 5px;margin-bottom: 80px">
         <vm-back-top :bottom="100" :duration="1000" :timing="'ease'"></vm-back-top>
         <van-tabs v-model="currentTypeActive" sticky>
             <van-tab title="全部">
@@ -23,47 +23,69 @@
                             </van-col>
                             <van-col span="16" @click="handleClickItem(item)">
                                 {{item.path.substr(item.path.lastIndexOf('/')+1)}}
-                                <van-tag mark style="margin-right: 2px" v-for="tag in item.tags">{{tag.replace(markReg,"")}}
+                                <van-tag mark style="margin-right: 2px" v-for="tag in item.tags">
+                                    {{tag.replace(markReg,"")}}
                                 </van-tag>
                             </van-col>
                             <van-col span="4">
-                                <van-button v-if="!item['is_dir']" icon="plus" size="small" type="danger" plain style="border: #ffffff" @click="handleClickAddItem(item)"/>
+                                <van-button v-if="!item['is_dir']" icon="plus" size="small" type="danger" plain
+                                            style="border: #ffffff" @click="handleClickAddItem(item)"/>
                             </van-col>
                         </van-row>
                     </van-cell>
                 </van-list>
             </van-tab>
             <van-tab title="文件夹" :badge="searchResultList.filter(item => item.is_dir).length">
-                <van-list>
+                <van-list
+                        v-model="searchLoading"
+                        :finished="searchFinished"
+                        finished-text="没有更多了"
+                        @load="handleSearch">
                     <van-cell v-for="item in searchResultList" v-if="item.is_dir"
                               :key="item.path" @click="handleClickItem(item)">
                         <van-icon class="my_icon" name="credit-pay"/>
                         {{item.path.substr(item.path.lastIndexOf('/')+1)}}
-                        <van-tag mark style="margin-right: 2px" v-for="tag in item.tags">{{tag.replace(markReg,"")}}</van-tag>
+                        <van-tag mark style="margin-right: 2px" v-for="tag in item.tags">{{tag.replace(markReg,"")}}
+                        </van-tag>
                     </van-cell>
                 </van-list>
             </van-tab>
             <van-tab title="图片"
                      :badge="searchResultList.filter(item => !item.is_dir && item.mime_type.startsWith('image')).length">
-                <van-grid :border="false" :column-num="3" style="background: #ffffff">
-                    <van-grid-item
-                            v-for="item in searchResultList.filter(item => !item.is_dir && item.mime_type.startsWith('image'))">
-                        <div>
-                            <img class="my_icon my_icon_size_large" preview="buildList" :preview-text="item.path"
-                                 :src="genPreviewUrl(item.neid,item.hash,item.rev,item.mime_type)"/>
-                            <van-button @click="handleClickAddItem(item)" round plain hairline type="danger"
-                                        style="position: absolute; top: 0; left: 0; border:#ffffff" icon="plus" size="small"/>
-                        </div>
-                        <div>
-                            <div style="font-size:10px;-webkit-text-size-adjust: none;">{{item.path.substr(item.path.lastIndexOf('/')+1)}}</div>
-                            <van-tag mark style="margin-right: 2px" v-for="tag in item.tags">{{tag.replace(markReg,"")}}</van-tag>
-                        </div>
-                    </van-grid-item>
-                </van-grid>
+                <van-list
+                        v-model="searchLoading"
+                        :finished="searchFinished"
+                        finished-text="没有更多了"
+                        @load="handleSearch">
+                    <van-grid :border="false" :column-num="3" style="background: #ffffff">
+                        <van-grid-item
+                                v-for="item in searchResultList.filter(item => !item.is_dir && item.mime_type.startsWith('image'))">
+                            <div>
+                                <img class="my_icon my_icon_size_large" preview="buildList" :preview-text="item.path"
+                                     :src="genPreviewUrl(item.neid,item.hash,item.rev,item.mime_type)"/>
+                                <van-button @click="handleClickAddItem(item)" round plain hairline type="danger"
+                                            style="position: absolute; top: 0; left: 0; border:#ffffff" icon="plus"
+                                            size="small"/>
+                            </div>
+                            <div>
+                                <div style="font-size:10px;-webkit-text-size-adjust: none;">
+                                    {{item.path.substr(item.path.lastIndexOf('/')+1)}}
+                                </div>
+                                <van-tag mark style="margin-right: 2px" v-for="tag in item.tags">
+                                    {{tag.replace(markReg,"")}}
+                                </van-tag>
+                            </div>
+                        </van-grid-item>
+                    </van-grid>
+                </van-list>
             </van-tab>
             <van-tab title="视频"
                      :badge="searchResultList.filter(item => !item.is_dir && item.mime_type.startsWith('video')).length">
-                <van-list>
+                <van-list
+                        v-model="searchLoading"
+                        :finished="searchFinished"
+                        finished-text="没有更多了"
+                        @load="handleSearch">
                     <van-cell v-for="item in searchResultList" v-if="!item.is_dir && item.mime_type.startsWith('video')"
                               :key="item.path">
                         <van-row>
@@ -72,11 +94,13 @@
                             </van-col>
                             <van-col span="16" @click="handlePreview(item)">
                                 {{item.path.substr(item.path.lastIndexOf('/')+1)}}
-                                <van-tag mark style="margin-right: 2px" v-for="tag in item.tags">{{tag.replace(markReg,"")}}
+                                <van-tag mark style="margin-right: 2px" v-for="tag in item.tags">
+                                    {{tag.replace(markReg,"")}}
                                 </van-tag>
                             </van-col>
                             <van-col span="4">
-                                <van-button v-if="!item['is_dir']" icon="plus" size="small" type="danger" plain style="border: #ffffff" @click="handleClickAddItem(item)"/>
+                                <van-button v-if="!item['is_dir']" icon="plus" size="small" type="danger" plain
+                                            style="border: #ffffff" @click="handleClickAddItem(item)"/>
                             </van-col>
                         </van-row>
                     </van-cell>
@@ -84,7 +108,11 @@
             </van-tab>
             <van-tab title="文档"
                      :badge="searchResultList.filter(item => !item.is_dir && item.mime_type.startsWith('doc')).length">
-                <van-list>
+                <van-list
+                        v-model="searchLoading"
+                        :finished="searchFinished"
+                        finished-text="没有更多了"
+                        @load="handleSearch">
                     <van-cell v-for="item in searchResultList" v-if="!item.is_dir && item.mime_type.startsWith('doc')"
                               :key="item.path">
                         <van-row>
@@ -93,11 +121,13 @@
                             </van-col>
                             <van-col span="16" @click="handlePreview(item)">
                                 {{item.path.substr(item.path.lastIndexOf('/')+1)}}
-                                <van-tag mark style="margin-right: 2px" v-for="tag in item.tags">{{tag.replace(markReg,"")}}
+                                <van-tag mark style="margin-right: 2px" v-for="tag in item.tags">
+                                    {{tag.replace(markReg,"")}}
                                 </van-tag>
                             </van-col>
                             <van-col span="4">
-                                <van-button v-if="!item['is_dir']" icon="plus" size="small" type="danger" plain style="border: #ffffff" @click="handleClickAddItem(item)"/>
+                                <van-button v-if="!item['is_dir']" icon="plus" size="small" type="danger" plain
+                                            style="border: #ffffff" @click="handleClickAddItem(item)"/>
                             </van-col>
                         </van-row>
                     </van-cell>
@@ -116,7 +146,7 @@
 
     export default {
         name: "SearchResult",
-        components:{
+        components: {
             VmBackTop
         },
         computed: {
@@ -229,7 +259,8 @@
             },
         },
         activated() {
-            if(this.$route.query.searchKey){
+            this.currentTypeActive = 0;
+            if (this.$route.query.searchKey) {
                 this.searchKey = this.$route.query.searchKey;
                 this.searchResultList = [];
                 this.searchOffset = 0;
@@ -258,7 +289,7 @@
         height: 15px;
     }
 
-    .top{
+    .top {
         padding: 10px;
         background: #ee0a24;
         color: #fff;
