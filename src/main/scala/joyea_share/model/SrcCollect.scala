@@ -11,7 +11,7 @@ import scala.concurrent.Future
 case class SrcCollect(
                        id: Long,
                        srcNeid: Long,
-                       userId: Long,
+                       userId: String,
                        srcPath: String,
                        srcType: String,
                        srcHash: String,
@@ -43,7 +43,7 @@ object SrcCollect extends SQLSyntaxSupport[SrcCollect] with ShortenedNames {
     new SrcCollect(
       id = rs.get[Long](p.id),
       srcNeid = rs.get[Long](p.srcNeid),
-      userId = rs.get[Long](p.userId),
+      userId = rs.get[String](p.userId),
       srcPath = rs.get[String](p.srcPath),
       srcType = rs.get[String](p.srcType),
       srcHash = rs.get[String](p.srcHash),
@@ -53,7 +53,7 @@ object SrcCollect extends SQLSyntaxSupport[SrcCollect] with ShortenedNames {
     )
   }
 
-  def create(srcNeid: Long, userId: Long, srcPath: String, srcType: String, srcHash: String, srcRev: String,
+  def create(srcNeid: Long, userId: String, srcPath: String, srcType: String, srcHash: String, srcRev: String,
              srcSize: String, createdAt: Timestamp = new Timestamp(System.currentTimeMillis()))
             (implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[SrcCollect] = {
 
@@ -87,7 +87,7 @@ object SrcCollect extends SQLSyntaxSupport[SrcCollect] with ShortenedNames {
     * @param cxt
     * @return
     */
-  def findByUserIdAndNeid(userId: Long, neid: Long)(implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[Option[SrcCollect]] = withSQL {
+  def findByUserIdAndNeid(userId: String, neid: Long)(implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[Option[SrcCollect]] = withSQL {
     selectFrom(SrcCollect as sc).where.eq(column.userId, userId).and.eq(column.srcNeid, neid)
   }.map(SrcCollect(sc)).single().future()
 

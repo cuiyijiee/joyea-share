@@ -14,7 +14,7 @@ class SrcCollectHandler extends IAction {
         method match {
             case "collect" =>
                 val srcNeid = request.getLong("neid", -1)
-                val sessionUserId = context.sessiono[Long]("user_id").getOrElse(-1L)
+                val sessionUserId = context.sessiono[String]("user_id").getOrElse("")
 
                 SrcCollect.findByUserIdAndNeid(sessionUserId, srcNeid).onComplete(optionSrcTry => {
                     if (optionSrcTry.isSuccess) {
@@ -23,7 +23,7 @@ class SrcCollectHandler extends IAction {
                         } else {
                             SrcCollect.create(
                                 srcNeid = request.getLong("neid", -1),
-                                userId = context.sessiono[Long]("user_id").getOrElse(-1),
+                                userId = context.sessiono[String]("user_id").getOrElse(""),
                                 srcPath = request.getString("path", ""),
                                 srcType = request.getString("type", ""),
                                 srcHash = request.getString("hash", ""),

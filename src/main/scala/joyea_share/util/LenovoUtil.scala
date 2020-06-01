@@ -2,13 +2,23 @@ package joyea_share.util
 
 import java.io.{File, FileOutputStream, IOException, InputStream}
 import java.net.URLEncoder
+import java.util.concurrent.{ExecutorService, Executors}
 
+import cats.effect.{Blocker, ContextShift, IO}
 import com.json.JsonObject
 import okhttp3._
+import org.http4s.client.{Client, JavaNetClientBuilder}
 import org.slf4s.LoggerFactory
 import xitrum.Log
 
+import scala.concurrent.ExecutionContext
+
 object LenovoUtil extends Log {
+
+    implicit val cs: ContextShift[IO] = IO.contextShift(ExecutionContext.global)
+    val blockingPool: ExecutorService = Executors.newFixedThreadPool(Runtime.getRuntime.availableProcessors() + 1)
+    val blocker: Blocker = Blocker.liftExecutorService(blockingPool)
+    val httpClient: Client[IO] = JavaNetClientBuilder[IO](blocker).create
 
 
     private val BASE_URL = "https://box.lenovo.com/v2"

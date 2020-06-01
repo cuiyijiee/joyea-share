@@ -1,7 +1,6 @@
 package joyea_share.model
 
 import java.sql.Timestamp
-import java.util.Date
 
 import scalikejdbc._
 import async._
@@ -12,7 +11,7 @@ import scala.concurrent.Future
 
 case class Album(
                     albumId: Long,
-                    userId: Long,
+                    userId: String,
                     userName: String,
                     albumName: String,
                     albumDesc: Option[String],
@@ -48,7 +47,7 @@ object Album extends SQLSyntaxSupport[Album] with ShortenedNames {
     def apply(a: ResultName[Album])(rs: WrappedResultSet): Album = {
         new Album(
             albumId = rs.get[Long](a.albumId),
-            userId = rs.get[Long](a.userId),
+            userId = rs.get[String](a.userId),
             userName = rs.get[String](a.userName),
             albumName = rs.get[String](a.albumName),
             albumDesc = rs.get[Option[String]](a.albumDesc),
@@ -59,7 +58,8 @@ object Album extends SQLSyntaxSupport[Album] with ShortenedNames {
         )
     }
 
-    def save(album: Album, updateAt: Option[Timestamp] = Some(new Timestamp(System.currentTimeMillis())))(implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[Album] = withSQL {
+    def save(album: Album, updateAt: Option[Timestamp] = Some(new Timestamp(System.currentTimeMillis())))
+            (implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[Album] = withSQL {
         update(Album).set(
             column.userId -> album.userId,
             column.userName -> album.userName,
@@ -72,12 +72,12 @@ object Album extends SQLSyntaxSupport[Album] with ShortenedNames {
     }.update().future().map(_ => album)
 
     //查找该用户的所有清单
-    def findByUserId(userId: Long)(implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[List[Album]] = withSQL {
+    def findByUserId(userId: String)(implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[List[Album]] = withSQL {
         selectFrom(Album as a).where.eq(column.userId, userId).orderBy(column.albumId).desc
     }.map(Album(a)).list().future()
 
     //查找是否存在同名的
-    def findByUserIdAndName(userId: Long, albumName: String)(implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[Option[Album]] = withSQL {
+    def findByUserIdAndName(userId: String, albumName: String)(implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[Option[Album]] = withSQL {
         selectFrom(Album as a).where.eq(column.userId, userId).and.eq(column.albumName, albumName)
     }.map(Album(a)).single().future()
 
@@ -85,7 +85,7 @@ object Album extends SQLSyntaxSupport[Album] with ShortenedNames {
         selectFrom(Album as a).where.eq(column.albumId, albumId)
     }.map(Album(a)).single().future()
 
-    def create(userId: Long, userName: String, albumName: String, albumDesc: Option[String], shared: Boolean = false, referNum: Long = 0, createdAt: Timestamp = new Timestamp(System.currentTimeMillis()), updatedAt: Option[Timestamp] = None)
+    def create(userId: String, userName: String, albumName: String, albumDesc: Option[String], shared: Boolean = false, referNum: Long = 0, createdAt: Timestamp = new Timestamp(System.currentTimeMillis()), updatedAt: Option[Timestamp] = None)
               (implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[Album] = {
         for {
             albumId <- withSQL {

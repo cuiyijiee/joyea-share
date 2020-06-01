@@ -18,7 +18,7 @@ class AlbumHandler extends IAction {
                 val listName = request.get("name").asString().trim
                 val listSrc = request.get("src").asArray()
                 //查询该名称的album是否存在
-                val sessionUserId = context.sessiono[Long]("user_id").getOrElse(-1L)
+                val sessionUserId = context.sessiono[String]("user_id").getOrElse("")
                 Album.findByUserIdAndName(sessionUserId, listName).onComplete(albumSelectTry => {
                     if (albumSelectTry.isSuccess) {
                         if (albumSelectTry.get.isEmpty) {
@@ -127,7 +127,7 @@ class AlbumHandler extends IAction {
                     }
                 })
             case "list" =>
-                val sessionUserId = context.sessiono[Long]("user_id").getOrElse(-1L)
+                val sessionUserId = context.sessiono[String]("user_id").getOrElse("")
                 Album.findByUserId(sessionUserId).onComplete(findTry => {
                     if (findTry.isSuccess) {
                         val albumList = findTry.get

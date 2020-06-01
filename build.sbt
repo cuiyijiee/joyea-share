@@ -23,11 +23,19 @@ libraryDependencies += "commons-net" % "commons-net" % "3.6"
 libraryDependencies += "com.squareup.okhttp3" % "okhttp" % "3.14.1"
 
 libraryDependencies ++= Seq(
-  "org.scalikejdbc" %% "scalikejdbc" % "3.4.+",
-  "org.scalikejdbc" %% "scalikejdbc-async" % "0.13.+",
-  "com.github.jasync-sql" % "jasync-mysql" % "1.0.+",
+  "org.scalikejdbc" %% "scalikejdbc" % "3.4.2",
+  "org.scalikejdbc" %% "scalikejdbc-async" % "0.13.0",
+  "org.scalikejdbc" %% "scalikejdbc-syntax-support-macro" % "3.4.2",
+  "com.github.jasync-sql" % "jasync-mysql" % "1.1.1-kts-9",
   "mysql" % "mysql-connector-java" % "8.0.19"
 )
+
+libraryDependencies ++= Seq(
+  "org.http4s" %% "http4s-blaze-client" % "0.21.4",
+)
+
+// https://mvnrepository.com/artifact/com.alibaba/easyexcel
+libraryDependencies += "com.alibaba" % "easyexcel" % "2.2.3"
 
 // Put config directory in classpath for easier development --------------------
 // For "sbt console"

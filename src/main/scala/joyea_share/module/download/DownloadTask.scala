@@ -13,7 +13,7 @@ case class DownloadTask(
                          id: String = UUID.randomUUID().toString,
                          downloadFile: java.util.List[DownloadItem] = new util.ArrayList[DownloadItem](),
                          downloadRoleName: String,
-                         downloadRoleId: Long
+                         downloadRoleId: String
                        ) extends Log {
 
   def toJson(): JsonObject = {

@@ -14,7 +14,7 @@ class SearchHandler extends IAction {
 
     override def execute(request: JsonObject, listener: ExecListener): Unit = {
         val sessionId = context.sessiono[String]("lenovo_session").getOrElse("")
-        val sessionUserId = context.sessiono[Long]("user_id").getOrElse(-1L)
+        val sessionUserId = context.sessiono[String]("user_id").getOrElse("")
         val searchKey = request.getString("searchKey", "")
         val offset = request.getLong("offset", 0)
 

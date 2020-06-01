@@ -135,4 +135,8 @@ object DownloadManager extends Log {
       }
     })
   }
+
+  def getAdminToken(): String = {
+    adminSessionId
+  }
 }

@@ -9,8 +9,8 @@ object SessionUtil {
         action.sessiono[String]("user_name").getOrElse("")
     }
 
-    def getUserId(action:Action): Long = {
-        action.sessiono[Long]("user_id").getOrElse(-1L)
+    def getUserId(action:Action): String = {
+        action.sessiono[String]("user_id").getOrElse("")
     }
 
     def getSessionId(action:Action): String = {

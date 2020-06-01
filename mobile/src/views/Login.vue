@@ -23,6 +23,7 @@
 <script>
 
     import api from "../api"
+    import {login} from "../api";
 
     const localStorage = window.localStorage;
     import {mapActions, mapGetters} from 'vuex';
@@ -48,27 +49,22 @@
             },
             handleLogin() {
                 this.loginLoading = true;
-                api({
-                    action: 'user',
-                    method: 'login',
-                    user: this.loginForm.user,
-                    pwd: btoa(this.loginForm.pwd)
-                }).then(response => {
-                    if (response.result) {
-                        this.$notify({type: 'success', message: '欢迎回来，' + response.user_name + '！'});
-                        localStorage.setItem("u", btoa(JSON.stringify(this.loginForm)));
-                        this.updateUserInfoFunc({
-                            session: response['session'], name: response['user_name'], email: this.loginForm.user
-                        }).then(() => {
-                        })
-                        this.$router.replace({
-                            name: "/",
-                            params: {checked: true}
-                        });
-                    } else {
-                        this.$notify({type: 'danger', message: '登陆失败，请检查用户名密码！'});
-                    }
-                    this.loginLoading = false;
+                let _this = this;
+                login(this.loginForm.user,btoa(this.loginForm.pwd)).then(resp => {
+                   if(resp.code === 2000){
+                       this.$notify({type: 'success', message: '欢迎回来，' + resp.data.userName + '！'});
+                       localStorage.setItem("u", btoa(JSON.stringify(this.loginForm)));
+                       _this.updateUserInfoFunc({
+                           session: resp.data['session'], name: resp.data['userName'], email: this.loginForm.user
+                       }).then(() => {
+                       })
+                       this.$router.replace({
+                           name: "/",
+                           params: {checked: true}
+                       });
+                   }else{
+                       this.$notify({type: 'danger', message: '登陆失败，请检查用户名密码！'});
+                   }
                 })
             }
         },
