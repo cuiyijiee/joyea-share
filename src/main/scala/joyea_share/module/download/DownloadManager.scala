@@ -31,14 +31,19 @@ object DownloadManager extends Log {
 
   def init(): Unit = {
     initBaseSaveFilePath()
-    genNewSession()
     baseRecordJsonDir.mkdirs()
+
+    new Thread(() => {
+      while (true){
+        genNewSession()
+        Thread.sleep(10 * 60 * 1000)
+      }
+    }).start()
 
     //整点刷新配置
     new Timer().schedule(new TimerTask {
       override def run(): Unit = {
         initBaseSaveFilePath()
-        genNewSession()
         val saveDir = new File(baseSaveFilePath)
         saveDir.getParentFile.listFiles(new FileFilter {
           override def accept(pathname: File): Boolean = !pathname.getName.equals(saveDir.getName)
