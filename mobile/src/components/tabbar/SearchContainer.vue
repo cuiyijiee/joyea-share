@@ -16,7 +16,7 @@
                                 <van-icon v-else-if="item.mime_type.startsWith('video')" class="my_icon"
                                           name="video-o"/>
                                 <img v-else-if="item.mime_type.startsWith('image')" class="my_icon my_icon_size"
-                                     preview="previewList" :preview-text="item.path"
+                                     @click="handleGotoPreviewImage(searchResultList,item)"
                                      :src="genPreviewUrl(item.neid,item.hash,item.rev,item.mime_type)"/>
                                 <van-icon v-else-if="item.mime_type.startsWith('doc')" class="my_icon" name="orders-o"/>
                                 <van-icon v-else class="my_icon" name="info-o"/>
@@ -61,7 +61,8 @@
                         <van-grid-item
                                 v-for="item in searchResultList.filter(item => !item.is_dir && item.mime_type.startsWith('image'))">
                             <div>
-                                <img class="my_icon my_icon_size_large" preview="buildList" :preview-text="item.path"
+                                <img class="my_icon my_icon_size_large"
+                                     @click="handleGotoPreviewImage(searchResultList,item)"
                                      :src="genPreviewUrl(item.neid,item.hash,item.rev,item.mime_type)"/>
                                 <van-button @click="handleClickAddItem(item)" round plain hairline type="danger"
                                             style="position: absolute; top: 0; left: 0; border:#ffffff" icon="plus"
@@ -143,6 +144,8 @@
     import {genSrcPreviewSrc, handleGoToPreview} from "../../util/JoyeaUtil";
     import eventBus from "../../service/eventbus"
     import VmBackTop from 'vue-multiple-back-top'
+    import {GenImageListView} from "../../util/ImageViewUtil";
+    import {Toast} from "vant";
 
     export default {
         name: "SearchResult",
@@ -171,6 +174,9 @@
             }
         },
         methods: {
+            handleGotoPreviewImage(itemList, clickItem) {
+                GenImageListView(this, itemList, this.userInfo.session, clickItem)
+            },
             handleClickItem(item) {
                 if (item['is_dir']) {
                     eventBus.$emit('showDir', item);
@@ -223,11 +229,17 @@
             },
             handleSearch() {
                 this.searchLoading = true;
+                const toast = Toast.loading({
+                    duration: 0, // 持续展示 toast
+                    forbidClick: true,
+                    message: '拼命加载中...',
+                });
                 api({
                     action: 'search',
                     searchKey: this.searchKey,
                     offset: this.searchOffset,
                 }).then(response => {
+                    toast.clear()
                     if (response.result) {
                         this.searchFinished = !response["has_more"];
                         if (!this.searchFinished) {
@@ -272,29 +284,4 @@
 </script>
 
 <style scoped>
-    .my_icon_size_large {
-        width: 100%;
-        height: 100px;
-    }
-
-    .my_icon {
-        padding-left: 10px;
-        padding-right: 10px;
-        padding-top: 5px;
-    }
-
-
-    .my_icon_size {
-        width: 15px;
-        height: 15px;
-    }
-
-    .top {
-        padding: 10px;
-        background: #ee0a24;
-        color: #fff;
-        text-align: center;
-        border-radius: 2px;
-    }
-
 </style>

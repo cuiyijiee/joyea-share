@@ -8,7 +8,8 @@
             </template>
         </van-search>
         <div>
-            <van-tag v-for="item in topSearchKey" style="margin: 5px 2px" @click="handleClickTopKey(item)">{{item}}</van-tag>
+            <van-tag v-for="item in topSearchKey" style="margin: 5px 2px" @click="handleClickTopKey(item)">{{item}}
+            </van-tag>
         </div>
         <van-sticky :offset-top="46">
             <van-row style="background-color: #fff;padding: 8px 0">
@@ -35,22 +36,25 @@
                     <van-cell v-for="item in dir.tableData" :key="item.path">
                         <van-row>
                             <van-col span="4">
-                                <van-icon v-if="item['is_dir']" class="my_icon" name="credit-pay"/>
-                                <van-icon v-else-if="item.mime_type.startsWith('video')" class="my_icon"
+                                <van-icon size="30" v-if="item['is_dir']" class="my_icon" name="credit-pay"/>
+                                <van-icon size="30" v-else-if="item.mime_type.startsWith('video')" class="my_icon"
                                           name="video-o"/>
                                 <img v-else-if="item.mime_type.startsWith('image')" class="my_icon my_icon_size"
-                                     preview="previewList" :preview-text="item.path"
+                                     @click="handleGotoPreviewImage(dir.tableData,item)"
                                      :src="genPreviewUrl(item.neid,item.hash,item.rev,item.mime_type)"/>
-                                <van-icon v-else-if="item.mime_type.startsWith('doc')" class="my_icon" name="orders-o"/>
-                                <van-icon v-else class="my_icon" name="info-o"/>
+                                <van-icon size="30" v-else-if="item.mime_type.startsWith('doc')" class="my_icon"
+                                          name="orders-o"/>
+                                <van-icon size="30" v-else class="my_icon" name="info-o"/>
                             </van-col>
                             <van-col span="16" @click="handleClickItem(item)">
                                 {{item.path.substr(item.path.lastIndexOf('/')+1)}}
-                                <van-tag style="margin-right: 2px" mark v-for="tag in item.tags">{{tag.replace(markReg,"")}}
+                                <van-tag style="margin-right: 2px" mark v-for="tag in item.tags">
+                                    {{tag.replace(markReg,"")}}
                                 </van-tag>
                             </van-col>
                             <van-col span="4">
-                                <van-button v-if="!item['is_dir']" icon="plus" size="small" type="danger" plain  style="border: #ffffff"
+                                <van-button v-if="!item['is_dir']" icon="plus" size="small" type="danger" plain
+                                            style="border: #ffffff"
                                             @click="handleClickAddItem(item)"/>
                             </van-col>
                         </van-row>
@@ -61,9 +65,14 @@
                 <van-list>
                     <van-cell v-for="item in dir.tableData" v-if="item.is_dir"
                               :key="item.path" @click="handleClickItem(item)">
-                        <van-icon class="my_icon" name="credit-pay"/>
-                        {{item.path.substr(item.path.lastIndexOf('/')+1)}}
-                        <van-tag style="margin-right: 2px" mark v-for="tag in item.tags">{{tag.replace(markReg,"")}}</van-tag>
+                        <van-col span="4">
+                            <van-icon size="30" class="my_icon" name="credit-pay"/>
+                        </van-col>
+                        <van-col span="20">
+                            {{item.path.substr(item.path.lastIndexOf('/')+1)}}
+                            <van-tag style="margin-right: 2px" mark v-for="tag in item.tags">{{tag.replace(markReg,"")}}
+                            </van-tag>
+                        </van-col>
                     </van-cell>
                 </van-list>
             </van-tab>
@@ -73,14 +82,20 @@
                     <van-grid-item
                             v-for="item in dir.tableData.filter(item => !item.is_dir && item.mime_type.startsWith('image'))">
                         <div>
-                            <img class="my_icon my_icon_size_large" preview="buildList" :preview-text="item.path"
+                            <img class="my_icon my_icon_size_large"
+                                 @click="handleGotoPreviewImage(dir.tableData,item)"
                                  :src="genPreviewUrl(item.neid,item.hash,item.rev,item.mime_type)"/>
                             <van-button @click="handleClickAddItem(item)" round plain hairline type="danger"
-                                        style="position: absolute; top: 0; left: 0; border:#ffffff" icon="plus" size="small"/>
+                                        style="position: absolute; top: 0; left: 0; border:#ffffff" icon="plus"
+                                        size="small"/>
                         </div>
                         <div>
-                            <div style="font-size:10px;-webkit-text-size-adjust: none;">{{item.path.substr(item.path.lastIndexOf('/')+1)}}</div>
-                            <van-tag style="margin-right: 2px" mark v-for="tag in item.tags">{{tag.replace(markReg,"")}}</van-tag>
+                            <div style="font-size:10px;-webkit-text-size-adjust: none;">
+                                {{item.path.substr(item.path.lastIndexOf('/')+1)}}
+                            </div>
+                            <van-tag style="margin-right: 2px" mark v-for="tag in item.tags">
+                                {{tag.replace(markReg,"")}}
+                            </van-tag>
                         </div>
                     </van-grid-item>
                 </van-grid>
@@ -92,15 +107,17 @@
                               :key="item.path">
                         <van-row>
                             <van-col span="4">
-                                <van-icon class="my_icon" name="video-o"/>
+                                <van-icon size="30" class="my_icon" name="video-o"/>
                             </van-col>
                             <van-col span="16" @click="handlePreview(item)">
                                 {{item.path.substr(item.path.lastIndexOf('/')+1)}}
-                                <van-tag style="margin-right: 2px" mark v-for="tag in item.tags">{{tag.replace(markReg,"")}}
+                                <van-tag style="margin-right: 2px" mark v-for="tag in item.tags">
+                                    {{tag.replace(markReg,"")}}
                                 </van-tag>
                             </van-col>
                             <van-col span="4">
-                                <van-button v-if="!item['is_dir']" icon="plus" size="small" type="danger" plain style="border: #ffffff"
+                                <van-button v-if="!item['is_dir']" icon="plus" size="small" type="danger" plain
+                                            style="border: #ffffff"
                                             @click="handleClickAddItem(item)"/>
                             </van-col>
                         </van-row>
@@ -114,15 +131,17 @@
                               :key="item.path">
                         <van-row>
                             <van-col span="4">
-                                <van-icon class="my_icon" name="video-o"/>
+                                <van-icon size="30" class="my_icon" name="video-o"/>
                             </van-col>
                             <van-col span="16" @click="handlePreview(item)">
                                 {{item.path.substr(item.path.lastIndexOf('/')+1)}}
-                                <van-tag style="margin-right: 2px" mark v-for="tag in item.tags">{{tag.replace(markReg,"")}}
+                                <van-tag style="margin-right: 2px" mark v-for="tag in item.tags">
+                                    {{tag.replace(markReg,"")}}
                                 </van-tag>
                             </van-col>
                             <van-col span="4">
-                                <van-button v-if="!item['is_dir']" icon="plus" size="small" type="danger" plain style="border: #ffffff"
+                                <van-button v-if="!item['is_dir']" icon="plus" size="small" type="danger" plain
+                                            style="border: #ffffff"
                                             @click="handleClickAddItem(item)"/>
                             </van-col>
                         </van-row>
@@ -139,10 +158,12 @@
     import {mapGetters} from "vuex"
     import eventBus from "../../service/eventbus";
     import VmBackTop from 'vue-multiple-back-top'
+    import {GenImageListView} from "../../util/ImageViewUtil";
+    import {Toast} from 'vant';
 
     export default {
         name: "HomeContainer",
-        components:{
+        components: {
             VmBackTop
         },
         computed: {
@@ -152,7 +173,7 @@
         },
         data() {
             return {
-                topSearchKey:[],
+                topSearchKey: [],
                 canGoBackSearch: false,
                 markReg: /<mark>|<\/mark>/g,
                 globalPathType: "ent",
@@ -167,10 +188,13 @@
             }
         },
         methods: {
+            handleGotoPreviewImage(itemList, clickItem) {
+                GenImageListView(this, itemList, this.userInfo.session, clickItem)
+            },
             goBackSearch() {
                 this.$router.push("/search");
             },
-            handleClickTopKey(key){
+            handleClickTopKey(key) {
                 this.canGoBackSearch = true;
                 this.$router.push({path: "/search", query: {searchKey: key}});
             },
@@ -229,20 +253,26 @@
                 }
                 return genSrcPreviewSrc(neid, hash, rev, previewType, this.userInfo.session);
             },
-            handleGetTopSearchKey(){
+            handleGetTopSearchKey() {
                 api({
-                    action:"getTopSearchKey"
+                    action: "getTopSearchKey"
                 }).then(resp => {
                     this.topSearchKey = resp["data"];
                 })
             },
             handleListLenovoDir(path, pathType) {
                 this.dir.loadingDir = true;
+                const toast = Toast.loading({
+                    duration: 0, // 持续展示 toast
+                    forbidClick: true,
+                    message: '拼命加载中...',
+                });
                 api({
                     action: 'listLenovoDir',
                     path: path.replace("+", "%2B"),
                     path_type: pathType === undefined ? 'ent' : pathType
                 }).then(response => {
+                    toast.clear();
                     if (response.result) {
                         this.dir.tableData = [];
                         if (response.data.content) {
@@ -278,23 +308,7 @@
 </script>
 
 <style scoped>
-    .my_icon {
-        padding-left: 10px;
-        padding-right: 10px;
-        padding-top: 5px;
-    }
-
-    .my_icon_size {
-        width: 30px;
-        height: 30px;
-    }
-
-    .my_icon_size_large {
-        width: 100%;
-        height: 100px;
-    }
-
-    .top{
+    .top {
         padding: 10px;
         background: #ee0a24;
         color: #fff;

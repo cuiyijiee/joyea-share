@@ -5,7 +5,7 @@
                     :num="item.list.length"
                     @click="handleShowAlbum(item)"
                     :title="item.name"
-                    thumb="mobile/cover.png"/>
+                    thumb="cover.png"/>
             <template #right>
                 <van-button square text="编辑" type="primary" class="delete-button" @click="handleEditAlbum(item)"/>
                 <van-button square text="删除" type="danger" class="delete-button" @click="handleDeleteAlbum(item)"/>
@@ -15,14 +15,18 @@
             <van-grid border :column-num="3">
                 <van-grid-item
                         v-for="item in albumItem.list">
-                    <van-image v-if="item.mime_type.startsWith('image')" class="my_icon my_icon_size_large" @click="handlePreview(albumItem)"
+                    <van-image v-if="item.mime_type.startsWith('image')" class="my_icon my_icon_size_large"
+                               @click="handlePreview(albumItem)"
                                :src="genPreviewUrl(item.neid,item.hash,item.rev,item.mime_type)"/>
-                    <van-image v-else-if="item.mime_type.startsWith('video')" class="my_icon my_icon_size_large" @click="handlePreview(albumItem)"
+                    <van-image v-else-if="item.mime_type.startsWith('video')" class="my_icon my_icon_size_large"
+                               @click="handlePreview(albumItem)"
                                src="play.png"/>
                     <van-image v-else class="my_icon my_icon_size_large" @click="handlePreview(albumItem)"
                                src="unknown.png"/>
                     <div>
-                        <div style="font-size:10px;-webkit-text-size-adjust: none;">{{item.path.substr(item.path.lastIndexOf('/')+1)}}</div>
+                        <div style="font-size:10px;-webkit-text-size-adjust: none;">
+                            {{item.path.substr(item.path.lastIndexOf('/')+1)}}
+                        </div>
                         <van-tag round type="success" v-for="tag in item.tags">{{tag.replace(markReg,"")}}</van-tag>
                     </div>
                 </van-grid-item>
@@ -38,9 +42,7 @@
     import {ImagePreview} from 'vant';
 
     export default {
-        components: {
-            [ImagePreview.Component.name]: ImagePreview.Component,
-        },
+
         name: "AlbumList",
         data() {
             return {
@@ -64,8 +66,8 @@
                             this.addFunc(src)
                         });
                         this.setOrderEditInfoFunc({
-                            name:item.name,
-                            id:item.id
+                            name: item.name,
+                            id: item.id
                         }).then(() => {
                             this.$router.push("/order");
                         })
@@ -173,23 +175,4 @@
 </script>
 
 <style scoped>
-    .my_icon_size_large {
-        width: 100%;
-        height: 100px;
-    }
-
-    .my_icon {
-        padding-left: 10px;
-        padding-right: 10px;
-        padding-top: 5px;
-    }
-
-    .my_icon_size {
-        width: 15px;
-        height: 15px;
-    }
-
-    .delete-button {
-        height: 100%;
-    }
 </style>

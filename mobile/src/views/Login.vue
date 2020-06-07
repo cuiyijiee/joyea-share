@@ -22,7 +22,6 @@
 
 <script>
 
-    import api from "../api"
     import {login} from "../api";
 
     const localStorage = window.localStorage;
@@ -65,6 +64,7 @@
                    }else{
                        this.$notify({type: 'danger', message: '登陆失败，请检查用户名密码！'});
                    }
+                    this.loginLoading = false;
                 })
             }
         },

@@ -34,21 +34,21 @@ class ListLenovoDirHandler extends IAction {
                         tempMap.put(fileName, content)
 
                         //查询数据库获取收藏次数
-                        val optionSrc = Await.result(AsyncDB.withPool {
-                            implicit tx => {
-                                SrcCollect.findByUserIdAndNeid(userId = SessionUtil.getUserId(context), neid = srcNeid)
-                            }
-                        }, MySQLSettings.MYSQL_READ_TIMEOUT)
-                        val usedSrcList = Await.result(AsyncDB.withPool {
-                            implicit tx =>
-                                AlbumSrc.findByNeid(srcNeid)
-                        }, MySQLSettings.MYSQL_READ_TIMEOUT)
+                        val optionSrc = None;
+//                        val optionSrc = Await.result(AsyncDB.withPool {
+//                            implicit tx => {
+//                                SrcCollect.findByUserIdAndNeid(userId = SessionUtil.getUserId(context), neid = srcNeid)
+//                            }
+//                        }, MySQLSettings.MYSQL_READ_TIMEOUT)
                         val descArr = new JsonArray()
-                        usedSrcList.foreach(src => {
-                            if (src.srcDesc != null && src.srcDesc.trim.length > 0) {
-                                descArr.add(src.toJson)
-                            }
-                        })
+//                        Await.result(AsyncDB.withPool {
+//                            implicit tx =>
+//                                AlbumSrc.findByNeid(srcNeid)
+//                        }, MySQLSettings.MYSQL_READ_TIMEOUT).foreach(src => {
+//                            if (src.srcDesc != null && src.srcDesc.trim.length > 0) {
+//                                descArr.add(src.toJson)
+//                            }
+//                        })
                         content.add("desc", descArr)
                         content.add("collect", optionSrc.isDefined)
                     })
