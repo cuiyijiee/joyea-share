@@ -30,7 +30,7 @@ export default new Router({
         },
         {
             path: '/',
-            name: '工作台',
+            name: '仅一素材库系统工作台',
             desc: '工作台',
             component: Home,
             icon: 'el-icon-edit',

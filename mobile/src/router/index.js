@@ -19,7 +19,7 @@ export default new Router({
     routes: [
         {
             path: '/login',
-            name: '仅一素材库',
+            name: '仅一素材库系统',
             component: Login,
         },
         {
@@ -30,7 +30,7 @@ export default new Router({
             children: [
                 {
                     path: 'home',
-                    name: '工作台',
+                    name: '仅一素材库系统工作台',
                     component: HomeContainer,
                     meta: {
                         allowBack: false,

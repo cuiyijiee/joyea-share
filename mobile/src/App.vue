@@ -1,6 +1,6 @@
 <template>
     <div id="app">
-        <van-nav-bar :title="this.$route.name" fixed
+        <van-nav-bar :title="this.$route.name" fixed style="background: #1f1731;color: #ffffff"
                      :left-arrow="this.$route.meta.allowBack" @click-left="handleClickLeftNav"
                      >
             <template #right>

@@ -23,3 +23,32 @@
 .delete-button {
     height: 100%;
 }
+
+.van-nav-bar__title{
+    color: #ffffff;
+}
+
+.van-hairline--bottom::after{
+    padding: 0;
+    border-bottom-width:0;
+}
+
+.van-grid{
+    background: #ffffff;
+}
+
+.van-grid-item__content{
+    padding: 0;
+    border: 0.5px solid #c7c7c7;
+}
+
+.menu-content{
+    width: 100%;
+    background-image: linear-gradient(to bottom right, #ffffff, #c7c7c7);
+    text-align:center;
+}
+
+.my-center{
+    text-align:center
+}
+

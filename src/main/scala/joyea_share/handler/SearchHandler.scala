@@ -27,6 +27,7 @@ class SearchHandler extends IAction {
                 if (searchResultValue != null && searchResultValue.isArray) {
                     resJson.add("has_more", obj.getBoolean("has_more", false))
                     resJson.add("next_offset", obj.getLong("next_offset", 0))
+                    resJson.add("hello","world")
                     val contentJsonArr = new JsonArray()
                     searchResultValue.asArray().forEach(value => {
                         val itemJson = value.asObject()
