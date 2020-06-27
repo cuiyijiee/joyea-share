@@ -7,7 +7,6 @@ import xitrum.annotation.POST
 @POST("api/v1/user/logout")
 class LogoutAction extends BaseAction[EmptyReq] {
   override def safeExecute(req: EmptyReq): Unit = {
-    session.remove("lenovo_session")
     cyjResponseSuccess(true)
   }
 }

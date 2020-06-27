@@ -7,8 +7,8 @@ const store = new Vuex.Store({
     state: {
         orderList: [],
         orderEditInfo: {
-            name:"",
-            id:""
+            name: "",
+            id: ""
         },
         userInfo: {
             session: "",
@@ -33,6 +33,9 @@ const store = new Vuex.Store({
     mutations: {
         add(state, item) {
             state.orderList.push(item);
+        },
+        refreshSession(state, newToken) {
+            state.userInfo.session = newToken
         },
         cleanSession(state) {
             state.userInfo.session = ""
@@ -74,6 +77,9 @@ const store = new Vuex.Store({
         },
         setOrderEditInfoFunc(state, albumInfo) {
             state.commit("setEditInfo", albumInfo)
+        },
+        refreshSessionFunc(state, token) {
+            state.commit("refreshSession", token)
         }
     }
 });

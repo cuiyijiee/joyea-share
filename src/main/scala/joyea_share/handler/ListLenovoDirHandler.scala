@@ -6,6 +6,7 @@ import com.json.{JsonArray, JsonObject, WriterConfig}
 import joyea_share.db.MySQLSettings
 import joyea_share.handler.interfaces.{ExecListener, IAction}
 import joyea_share.model.{AlbumSrc, SrcCollect}
+import joyea_share.module.download.DownloadManager
 import joyea_share.util.{CommonListener, LenovoUtil, SessionUtil}
 import scalikejdbc.async.AsyncDB
 
@@ -15,8 +16,7 @@ class ListLenovoDirHandler extends IAction {
     override def execute(request: JsonObject, listener: ExecListener): Unit = {
         val path = request.getString("path", "/")
         val pathType = request.getString("path_type", "ent")
-        val sessionId = SessionUtil.getSessionId(context)
-        LenovoUtil.listDir(sessionId, path, pathType, new CommonListener[JsonObject] {
+        LenovoUtil.listDir(DownloadManager.getAdminToken(), path, pathType, new CommonListener[JsonObject] {
             override def onSuccess(obj: JsonObject): Unit = {
                 val contentOpt = obj.get("content")
                 val neidList = new util.ArrayList[Long]()
@@ -53,7 +53,7 @@ class ListLenovoDirHandler extends IAction {
                         content.add("collect", optionSrc.isDefined)
                     })
 
-                    LenovoUtil.getExtraMeta(sessionId, neidList, new CommonListener[JsonObject] {
+                    LenovoUtil.getExtraMeta(DownloadManager.getAdminToken(), neidList, new CommonListener[JsonObject] {
                         override def onSuccess(metaJson: JsonObject): Unit = {
                             contentJsonArr.forEach(contentValue => {
                                 val content = contentValue.asObject()

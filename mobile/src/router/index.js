@@ -5,6 +5,7 @@ import HomeContainer from "../components/tabbar/HomeContainer";
 import OrderContainer from "../components/tabbar/OrderContainer";
 import MineContainer from "../components/tabbar/MineContainer";
 import SearchResult from "../components/tabbar/SearchContainer";
+import UploadIndex from "../views/upload/Index"
 
 import Main from "../views/Main";
 import Login from "../views/Login"
@@ -30,7 +31,7 @@ export default new Router({
             children: [
                 {
                     path: 'home',
-                    name: '仅一素材库系统工作台',
+                    name: '仅一素材库系统',
                     component: HomeContainer,
                     meta: {
                         allowBack: false,
@@ -77,6 +78,15 @@ export default new Router({
             path: '/albumDetail',
             name: '清单详情',
             component: AlbumDetail,
+            meta: {
+                allowBack: true,
+                allowHome: true
+            }
+        },
+        {
+            path: '/upload/index',
+            name: '素材上传',
+            component: UploadIndex,
             meta: {
                 allowBack: true,
                 allowHome: true

@@ -5,6 +5,7 @@ import joyea_share.Boot
 import joyea_share.db.MySQLSettings
 import joyea_share.handler.interfaces.{ExecListener, IAction}
 import joyea_share.model.{AlbumSrc, SrcCollect}
+import joyea_share.module.download.DownloadManager
 import joyea_share.util.{CommonListener, LenovoUtil}
 import scalikejdbc.async.AsyncDB
 
@@ -13,7 +14,6 @@ import scala.concurrent.Await
 class SearchHandler extends IAction {
 
     override def execute(request: JsonObject, listener: ExecListener): Unit = {
-        val sessionId = context.sessiono[String]("lenovo_session").getOrElse("")
         val sessionUserId = context.sessiono[String]("user_id").getOrElse("")
         val searchKey = request.getString("searchKey", "")
         val offset = request.getLong("offset", 0)
@@ -21,7 +21,7 @@ class SearchHandler extends IAction {
         Boot.addSearchKey(searchKey)
 
 
-        LenovoUtil.ftsSearch(sessionId, searchKey = searchKey, searchType = "", offset = offset, new CommonListener[JsonObject] {
+        LenovoUtil.ftsSearch(DownloadManager.getAdminToken(), searchKey = searchKey, searchType = "", offset = offset, new CommonListener[JsonObject] {
             override def onSuccess(obj: JsonObject): Unit = {
                 val searchResultValue = obj.get("content")
                 if (searchResultValue != null && searchResultValue.isArray) {

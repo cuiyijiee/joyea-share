@@ -1,5 +1,4 @@
 .my_icon {
-    padding: 5px;
 }
 
 .my_icon_size {
@@ -8,8 +7,13 @@
 }
 
 .my_icon_size_large {
-    width: 100%;
+    width: 100px;
     height: 100px;
+}
+
+.my_preview_size{
+    width: 60px;
+    height: 60px;
 }
 
 .top {
@@ -24,31 +28,48 @@
     height: 100%;
 }
 
-.van-nav-bar__title{
+.van-nav-bar__title {
     color: #ffffff;
 }
 
-.van-hairline--bottom::after{
+.van-hairline--bottom::after {
     padding: 0;
-    border-bottom-width:0;
+    border-bottom-width: 0;
 }
 
-.van-grid{
+.van-grid {
     background: #ffffff;
 }
 
-.van-grid-item__content{
-    padding: 0;
-    border: 0.5px solid #c7c7c7;
-}
-
-.menu-content{
+.menu-content {
     width: 100%;
     background-image: linear-gradient(to bottom right, #ffffff, #c7c7c7);
-    text-align:center;
+    text-align: center;
 }
 
-.my-center{
-    text-align:center
+.my-center {
+    text-align: center
 }
 
+.van-search__action {
+    color: #ffffff;
+    padding: 10px 10px 0px 10px;
+}
+
+.van-grid-item__content::after {
+    border-width: 0;
+}
+
+.van-grid-item__content {
+    padding: 0 !important;
+}
+
+.my_van-grid-item {
+    border: 1px solid #c7c7c7 !important;
+}
+
+.single-line-text {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis
+}

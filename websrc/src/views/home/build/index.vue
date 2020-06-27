@@ -180,9 +180,9 @@
                         <el-table-column label="预览">
                             <template slot-scope="scope">
                                 <el-tooltip class="item" effect="dark" :content="scope.row.path" placement="top">
-                                    <img v-if="scope.row.mime_type.startsWith('video')" src="play.png"
+                                    <img v-if="scope.row.mime_type.startsWith('video')" src="video.png"
                                          @click="handleGoToPreview(scope.row)">
-                                    <img v-if="scope.row.mime_type.startsWith('doc')" src="doc.png"
+                                    <img v-if="scope.row.mime_type.startsWith('doc')" src="document.png"
                                          @click="handleGoToPreview(scope.row)">
                                     <img v-else-if="scope.row.mime_type.startsWith('image')" class="preview_img"
                                          :onerror="defaultImg"

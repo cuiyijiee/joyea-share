@@ -13,8 +13,6 @@ object SessionUtil {
         action.sessiono[String]("user_id").getOrElse("")
     }
 
-    def getSessionId(action:Action): String = {
-        action.sessiono[String]("lenovo_session").getOrElse("")
-    }
+
 
 }

@@ -3,7 +3,8 @@
         <van-cell>
             <van-row>
                 <van-col span="8">
-                    <van-image round width="5rem" height="5rem" fit="fill" src="https://img.yzcdn.cn/vant/cat.jpeg"/>
+<!--                    <van-image round width="5rem" height="5rem" fit="fill" src="avatar.jpg"/>-->
+                    <avatars backgroundColor="#eb7808" color="#ffffff" :size="80" :username="userInfo.name"></avatars>
                 </van-col>
                 <van-col span="16">
                     <h3 style="margin: 2px 0 0 0;">{{userInfo.name}}</h3>
@@ -14,16 +15,20 @@
         </van-cell>
         <van-divider/>
         <van-cell title="我的清单" is-link @click="handleClickMyList"/>
-        <van-cell title="我的收藏" is-link @click="handleClickMyLike"/>
-
+        <van-cell title="素材上传" is-link @click="handleClickUpload"/>
+<!--        <van-cell title="我的收藏" is-link @click="handleClickMyLike"/>-->
         <van-button type="info" round block style="margin-top: 100px" @click="handleLogout">注销登录</van-button>
     </div>
 </template>
 
 <script>
     import {mapGetters, mapActions} from "vuex";
+    import avatars from 'vue-avatars'
 
     export default {
+        components:{
+            avatars
+        },
         name: "MineContainer",
         data() {
             return {}
@@ -42,6 +47,9 @@
             },
             handleClickMyList() {
                 this.$router.push("/album")
+            },
+            handleClickUpload(){
+              this.$router.push("/upload/index")
             },
             handleLogout() {
                 this.$dialog.confirm({

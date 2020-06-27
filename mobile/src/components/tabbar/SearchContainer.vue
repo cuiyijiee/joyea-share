@@ -12,14 +12,14 @@
                     <van-cell v-for="item in searchResultList" :key="item.path">
                         <van-row>
                             <van-col span="4">
-                                <van-icon v-if="item['is_dir']" class="my_icon" name="credit-pay"/>
-                                <van-icon v-else-if="item.mime_type.startsWith('video')" class="my_icon"
+                                <van-icon size="30" v-if="item['is_dir']" class="my_icon" name="credit-pay"/>
+                                <van-icon size="30" v-else-if="item.mime_type.startsWith('video')" class="my_icon"
                                           name="video-o"/>
                                 <img v-else-if="item.mime_type.startsWith('image')" class="my_icon my_icon_size"
                                      @click="handleGotoPreviewImage(searchResultList,item)"
                                      :src="genPreviewUrl(item.neid,item.hash,item.rev,item.mime_type)"/>
-                                <van-icon v-else-if="item.mime_type.startsWith('doc')" class="my_icon" name="orders-o"/>
-                                <van-icon v-else class="my_icon" name="info-o"/>
+                                <van-icon size="30" v-else-if="item.mime_type.startsWith('doc')" class="my_icon" name="orders-o"/>
+                                <van-icon size="30" v-else class="my_icon" name="info-o"/>
                             </van-col>
                             <van-col span="16" @click="handleClickItem(item)">
                                 {{item.path.substr(item.path.lastIndexOf('/')+1)}}
@@ -118,7 +118,7 @@
                               :key="item.path">
                         <van-row>
                             <van-col span="4">
-                                <van-icon class="my_icon" name="video-o"/>
+                                <van-image  style="width: 40px" :src="handleGetDocumentImage(item.mime_type)"/>
                             </van-col>
                             <van-col span="16" @click="handlePreview(item)">
                                 {{item.path.substr(item.path.lastIndexOf('/')+1)}}
@@ -141,7 +141,7 @@
 <script>
     import api from "../../api";
     import {mapGetters} from "vuex";
-    import {genSrcPreviewSrc, handleGoToPreview} from "../../util/JoyeaUtil";
+    import {genSrcPreviewSrc, getDocumentImage, handleGoToPreview} from "../../util/JoyeaUtil";
     import eventBus from "../../service/eventbus"
     import VmBackTop from 'vue-multiple-back-top'
     import {GenImageListView} from "../../util/ImageViewUtil";
@@ -166,14 +166,12 @@
                 searchOffset: 0,
                 searchLoading: false,
                 searchFinished: false,
-                dir: {
-                    currentPath: [],
-                    tableData: [],
-                    loadingDir: false
-                }
             }
         },
         methods: {
+            handleGetDocumentImage(mimeType){
+                return getDocumentImage(mimeType)
+            },
             handleGotoPreviewImage(itemList, clickItem) {
                 GenImageListView(this, itemList, this.userInfo.session, clickItem)
             },
@@ -181,6 +179,8 @@
                 if (item['is_dir']) {
                     eventBus.$emit('showDir', item);
                     this.$router.back();
+                } else if (item.mime_type.startsWith("image")) {
+                    this.handleGotoPreviewImage(this.searchResultList, item);
                 } else {
                     this.handlePreview(item)
                 }

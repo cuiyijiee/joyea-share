@@ -5,7 +5,7 @@
                     background="#1f1731" shape="round"
                     @search="onSearch" :show-action="canGoBackSearch">
             <template #action>
-                <van-icon name="description" @click="goBackSearch" style="margin-top: 3px" size="20"/>
+                <van-icon name="exchange" @click="goBackSearch" style="margin-top: 3px" size="20"/>
             </template>
         </van-search>
         <div>
@@ -14,7 +14,8 @@
         </div>
         <div v-if="dir.currentPath.length === 1 && dir.currentPath[0] === '营销素材展示'" style="margin-bottom: 50px">
             <van-grid :column-num="2">
-                <van-grid-item v-for="menu in menuPath" @click="handleClickRootMenu(menu.path)">
+                <van-grid-item class="my_van-grid-item" v-for="menu in menuPath"
+                               @click="handleClickRootMenu(menu.path)">
                     <div class="menu-content">
                         <van-image :src="menu.icon" fit="contain"
                                    style="width: 50px;height: 50px;padding: 30px 20px 10px 20px"/>
@@ -146,7 +147,7 @@
                                   :key="item.path">
                             <van-row>
                                 <van-col span="4">
-                                    <van-icon size="30" class="my_icon" name="video-o"/>
+                                    <van-image style="width: 40px" :src="handleGetDocumentImage(item.mime_type)"/>
                                 </van-col>
                                 <van-col span="16" @click="handlePreview(item)">
                                     {{item.path.substr(item.path.lastIndexOf('/')+1)}}
@@ -170,7 +171,7 @@
 
 <script>
     import api from "../../api/";
-    import {genSrcPreviewSrc, handleGoToPreview} from "../../util/JoyeaUtil"
+    import {genSrcPreviewSrc, getDocumentImage, handleGoToPreview} from "../../util/JoyeaUtil"
     import {mapGetters} from "vuex"
     import eventBus from "../../service/eventbus";
     import VmBackTop from 'vue-multiple-back-top'
@@ -203,30 +204,33 @@
                 isFirst: true,
                 menuPath: [
                     {
-                        name: "STICK线", path: "STICK线", icon: "mobile/menu-icon/1.png"
+                        name: "STICK线", path: "STICK线", icon: "menu-icon/1.png"
                     },
                     {
-                        name: "听装线", path: "听装线", icon: "mobile/menu-icon/2.png"
+                        name: "听装线", path: "听装线", icon: "menu-icon/2.png"
                     },
                     {
-                        name: "软双铝线", path: "软双铝线", icon: "mobile/menu-icon/3.png"
+                        name: "软双铝线", path: "软双铝线", icon: "menu-icon/3.png"
                     },
                     {
-                        name: "制粒线", path: "制粒线", icon: "mobile/menu-icon/4.png"
+                        name: "制粒线", path: "制粒线", icon: "menu-icon/4.png"
                     },
                     {
-                        name: "泡罩线", path: "泡罩线", icon: "mobile/menu-icon/5.png"
+                        name: "泡罩线", path: "泡罩线", icon: "menu-icon/5.png"
                     },
                     {
-                        name: "公司介绍", path: "公司介绍", icon: "mobile/menu-icon/6.png"
+                        name: "公司介绍", path: "公司介绍", icon: "menu-icon/6.png"
                     },
                     {
-                        name: "同行信息", path: "同行信息", icon: "mobile/menu-icon/7.png"
+                        name: "同行信息", path: "同行信息", icon: "menu-icon/7.png"
                     }
                 ]
             }
         },
         methods: {
+            handleGetDocumentImage(mimeType) {
+                return getDocumentImage(mimeType)
+            },
             handleGotoPreviewImage(itemList, clickItem) {
                 GenImageListView(this, itemList, this.userInfo.session, clickItem)
             },
@@ -267,6 +271,8 @@
             handleClickItem(item) {
                 if (item['is_dir']) {
                     this.handleListLenovoDir(item.path, this.globalPathType)
+                } else if (item.mime_type.startsWith("image")) {
+                    this.handleGotoPreviewImage(this.dir.tableData, item);
                 } else {
                     this.handlePreview(item)
                 }
@@ -274,7 +280,7 @@
             handleClickRootDir() {
                 this.handleListLenovoDir("/营销素材展示");
             },
-            handleClickRootMenu(path){
+            handleClickRootMenu(path) {
                 this.handleListLenovoDir("/营销素材展示/" + path);
             },
             handleClickBackDir() {

@@ -2,8 +2,7 @@ package joyea_share.module.download
 
 import java.io.{File, FileFilter}
 import java.util
-import java.util.concurrent.{ExecutorService, Executors}
-import java.util.{Timer, TimerTask}
+import java.util.concurrent.{ExecutorService, Executors, TimeUnit}
 
 import com.json.{JsonArray, WriterConfig}
 import com.utils.CommonUtil
@@ -24,6 +23,7 @@ object DownloadManager extends Log {
   private var adminSessionId: String = ""
   private var baseSaveFilePath: String = ""
   private var baseCompressSaveFilePath: String = ""
+  private val getAdminTokenExecutor = Executors.newScheduledThreadPool(4)
   private val executor: ExecutorService = Executors.newFixedThreadPool(Runtime.getRuntime.availableProcessors())
 
   //用来存放所有的任务，每天清除一次
@@ -33,31 +33,26 @@ object DownloadManager extends Log {
     initBaseSaveFilePath()
     baseRecordJsonDir.mkdirs()
 
-    new Thread(() => {
-      while (true){
-        genNewSession()
-        Thread.sleep(10 * 60 * 1000)
-      }
-    }).start()
+    getAdminTokenExecutor.scheduleWithFixedDelay(() => {
+      genNewSession()
+    }, 0, 30, TimeUnit.MINUTES)
 
     //整点刷新配置
-    new Timer().schedule(new TimerTask {
-      override def run(): Unit = {
-        initBaseSaveFilePath()
-        val saveDir = new File(baseSaveFilePath)
-        saveDir.getParentFile.listFiles(new FileFilter {
-          override def accept(pathname: File): Boolean = !pathname.getName.equals(saveDir.getName)
-        }).foreach(file => {
-          CommonUtil.delete(file)
-        })
-        val compressSaveDir = new File(baseCompressSaveFilePath)
-        compressSaveDir.getParentFile.listFiles(new FileFilter {
-          override def accept(pathname: File): Boolean = !pathname.getName.equals(compressSaveDir.getName)
-        }).foreach(file => {
-          CommonUtil.delete(file)
-        })
-      }
-    }, SUtil.getNextMinuteHour(0), 1 * 60 * 60 * 1000L)
+    getAdminTokenExecutor.scheduleWithFixedDelay(() => {
+      initBaseSaveFilePath()
+      val saveDir = new File(baseSaveFilePath)
+      saveDir.getParentFile.listFiles(new FileFilter {
+        override def accept(pathname: File): Boolean = !pathname.getName.equals(saveDir.getName)
+      }).foreach(file => {
+        CommonUtil.delete(file)
+      })
+      val compressSaveDir = new File(baseCompressSaveFilePath)
+      compressSaveDir.getParentFile.listFiles(new FileFilter {
+        override def accept(pathname: File): Boolean = !pathname.getName.equals(compressSaveDir.getName)
+      }).foreach(file => {
+        CommonUtil.delete(file)
+      })
+    }, System.currentTimeMillis() - SUtil.getNextMinuteHour(0).getTime, 1 * 60 * 60 * 1000, TimeUnit.MILLISECONDS)
   }
 
 

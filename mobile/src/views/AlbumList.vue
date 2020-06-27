@@ -5,26 +5,28 @@
                     :num="item.list.length"
                     @click="handleShowAlbum(item)"
                     :title="item.name"
-                    thumb="cover.png"/>
+                    :thumb="item.cover"/>
             <template #right>
                 <van-button square text="编辑" type="primary" class="delete-button" @click="handleEditAlbum(item)"/>
                 <van-button square text="删除" type="danger" class="delete-button" @click="handleDeleteAlbum(item)"/>
             </template>
         </van-swipe-cell>
         <van-action-sheet v-model="albumVisible" :title="albumItem.name">
-            <van-grid border :column-num="3">
+            <van-grid border :column-num="3" :gutter="5">
                 <van-grid-item
                         v-for="item in albumItem.list">
-                    <van-image v-if="item.mime_type.startsWith('image')" class="my_icon my_icon_size_large"
-                               @click="handlePreview(albumItem)"
+                    <van-image v-if="item.mime_type.startsWith('image')" class="my_icon my_preview_size"
+                               @click="handlePreview(item)"
                                :src="genPreviewUrl(item.neid,item.hash,item.rev,item.mime_type)"/>
-                    <van-image v-else-if="item.mime_type.startsWith('video')" class="my_icon my_icon_size_large"
-                               @click="handlePreview(albumItem)"
-                               src="play.png"/>
-                    <van-image v-else class="my_icon my_icon_size_large" @click="handlePreview(albumItem)"
+                    <van-image v-else-if="item.mime_type.startsWith('video')" class="my_icon my_preview_size"
+                               @click="handlePreview(item)"
+                               src="video.png"/>
+                    <van-image v-else-if="item.mime_type.startsWith('doc')" class="my_icon my_preview_size"
+                               :src="handleGetDocumentImage(item.mime_type)"/>
+                    <van-image v-else class="my_icon my_preview_size" @click="handlePreview(item)"
                                src="unknown.png"/>
-                    <div>
-                        <div style="font-size:10px;-webkit-text-size-adjust: none;">
+                    <div style="width: 98%">
+                        <div style="font-size:10px;-webkit-text-size-adjust: none;word-break:break-all;">
                             {{item.path.substr(item.path.lastIndexOf('/')+1)}}
                         </div>
                         <van-tag round type="success" v-for="tag in item.tags">{{tag.replace(markReg,"")}}</van-tag>
@@ -37,9 +39,10 @@
 
 <script>
     import api from "../api";
-    import {genSrcPreviewSrc} from "../util/JoyeaUtil"
+    import {genSrcPreviewSrc, getDocumentImage} from "../util/JoyeaUtil"
     import {mapGetters, mapActions} from "vuex";
     import {ImagePreview} from 'vant';
+    import {GenImageListView} from "../util/ImageViewUtil";
 
     export default {
 
@@ -53,6 +56,9 @@
             }
         },
         methods: {
+            handleGetDocumentImage(mimeType) {
+                return getDocumentImage(mimeType)
+            },
             ...mapActions([
                 'clearFunc', 'addFunc', 'setOrderEditInfoFunc'
             ]),
@@ -96,20 +102,8 @@
                     })
                 })
             },
-            handlePreview(album) {
-                let list = album.list.filter(item => {
-                    return item.mime_type.startsWith('image')
-                }).map(item => item.url);
-                if (list.length === 0) {
-                    this.$notify({
-                        message: "当前清单没有可以预览的图片！"
-                    });
-                } else {
-                    ImagePreview({
-                        images: list,
-                        closeable: true
-                    })
-                }
+            handlePreview(clickItem) {
+                GenImageListView(this, this.albumItem.list, this.userInfo.session, clickItem);
             },
             genPreviewUrl(neid, hash, rev, mime_type) {
                 let previewType = 'pic';    // if video is av
@@ -153,7 +147,8 @@
                                 id: list.album_id,
                                 name: list.album_name,
                                 shared: list.shared,
-                                list: imgUrl
+                                list: imgUrl,
+                                cover: imgUrl.length > 0 ? imgUrl[0].url : 'cover.png',
                             })
                         })
                     } else {

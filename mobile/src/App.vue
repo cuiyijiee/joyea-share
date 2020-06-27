@@ -2,12 +2,12 @@
     <div id="app">
         <van-nav-bar :title="this.$route.name" fixed style="background: #1f1731;color: #ffffff"
                      :left-arrow="this.$route.meta.allowBack" @click-left="handleClickLeftNav"
-                     >
+        >
             <template #right>
                 <van-icon v-if="allowHome" @click="handleClickRightNav" name="home-o" size="18"/>
             </template>
         </van-nav-bar>
-        <transition >
+        <transition>
             <router-view/>
         </transition>
     </div>
@@ -15,7 +15,8 @@
 
 <script>
 
-    import {mapGetters} from 'vuex'
+    import {mapActions, mapGetters} from 'vuex'
+    import {check} from "./api";
 
     export default {
         name: "App",
@@ -23,37 +24,44 @@
             return {}
         },
         methods: {
+            ...mapActions([
+                'refreshSessionFunc'
+            ]),
             handleClickLeftNav() {
                 this.$router.back();
             },
             handleClickRightNav() {
                 this.$router.push("/home")
-                // this.$dialog.confirm({
-                //     title: '跳转提示',
-                //     message: '是否一键返回工作台',
-                // }).then(() => {
-                //
-                // })
             }
         },
         created() {
             //在页面加载时读取sessionStorage里的状态信息
-            if (sessionStorage.getItem("store")) {
-                this.$store.replaceState(Object.assign({}, this.$store.state, JSON.parse(sessionStorage.getItem("store"))))
+            if (localStorage.getItem("store")) {
+                this.$store.replaceState(Object.assign({}, this.$store.state, JSON.parse(localStorage.getItem("store"))))
             }
             //在页面刷新时将vuex里的信息保存到sessionStorage里
             window.addEventListener("beforeunload", () => {
-                sessionStorage.setItem("store", JSON.stringify(this.$store.state))
+                localStorage.setItem("store", JSON.stringify(this.$store.state))
             });
             if (this.userInfo.session.length === 0 && this.$route.path !== '/login') {
                 this.$router.push("/login")
             }
+            setInterval(() => {
+                check().then(resp => {
+                    if (resp.code === 4001) {
+                        this.$message.error("登录信息已过期，请重新登陆！")
+                        this.$router.push("/login");
+                    } else {
+                        this.refreshSessionFunc(resp.data);
+                    }
+                })
+            }, 5000)
         },
         computed: {
             ...mapGetters([
                 'userInfo'
             ]),
-            allowHome:function () {
+            allowHome: function () {
                 return this.$route.meta.allowHome;
             }
         },

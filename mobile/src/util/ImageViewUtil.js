@@ -1,5 +1,5 @@
 import {ImagePreview} from 'vant';
-import {genSrcPreviewSrc} from './JoyeaUtil'
+import {genSrcPreviewSrc, newGenSrcPreviewSrc} from './JoyeaUtil'
 
 export function GenImageListView(context, itemList, sessionId, clickItem) {
     let index = 0;
@@ -10,8 +10,8 @@ export function GenImageListView(context, itemList, sessionId, clickItem) {
         if (item.neid === clickItem.neid) {
             index = tmp;
         }
-        tmp ++;
-        return genSrcPreviewSrc(item.neid, item.hash, item.rev, "pic", sessionId);
+        tmp++;
+        return newGenSrcPreviewSrc(item.path, item.neid, sessionId);
     });
     if (list.length === 0) {
         context.$notify({
@@ -21,6 +21,8 @@ export function GenImageListView(context, itemList, sessionId, clickItem) {
         ImagePreview({
             images: list,
             startPosition: index ? index : 0,
+            maxZoom: 10,
+            minZoom: 1 / 10,
             closeable: true
         })
     }

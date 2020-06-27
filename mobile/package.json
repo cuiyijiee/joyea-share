@@ -12,7 +12,9 @@
     "core-js": "^3.6.4",
     "scss": "^0.2.4",
     "vant": "^2.8.0",
+    "vconsole": "^3.3.4",
     "vue": "^2.6.11",
+    "vue-avatars": "^2.3.5",
     "vue-multiple-back-top": "^1.0.2",
     "vue-router": "^3.1.6",
     "vuex": "^3.2.0"

@@ -12,6 +12,12 @@ import store from "./store";
 
 Vue.config.productionTip = false;
 
+
+import VConsole from 'vconsole'
+if (process.env.NODE_ENV !== 'production') {
+    new VConsole()
+}
+
 Vue.use(Vant);
 Vue.use(VueRouter);
 

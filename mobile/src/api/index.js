@@ -22,3 +22,9 @@ export function login(user, pwd) {
         return res.data;
     })
 }
+
+export function check() {
+    return service.post('api/v1/user/check', {}).then(res => {
+        return res.data;
+    })
+}

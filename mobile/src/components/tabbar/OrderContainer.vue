@@ -1,15 +1,17 @@
 <template>
-    <div id="order">
+    <div id="order" >
         <van-empty v-if="orderList.length === 0" description="清单车空空如也"/>
-        <van-swipe-cell v-for="item in orderList" :key="item.path">
-            <van-card @click="handleClickOrderItem(item)"
-                      :desc="item.joyeaDesc.length > 0 ? item.joyeaDesc :'暂未设置解说词'"
-                      :title="item.path.substr(item.path.lastIndexOf('/')+1)"
-                      :thumb="item.mime_type.startsWith('image') ? genPreviewUrl(item.neid,item.hash,item.rev,item.mime_type):'unknown.png'"/>
-            <template #right>
-                <van-button square text="删除" type="danger" class="delete-button" @click="handleDeleteOrderList(item)"/>
-            </template>
-        </van-swipe-cell>
+        <div style="margin-bottom: 100px">
+            <van-swipe-cell v-for="item in orderList" :key="item.path" >
+                <van-card @click="handleClickOrderItem(item)"
+                          :desc="item.joyeaDesc.length > 0 ? item.joyeaDesc :'暂未设置解说词'"
+                          :title="item.path.substr(item.path.lastIndexOf('/')+1)"
+                          :thumb="item.mime_type.startsWith('image') ? genPreviewUrl(item.neid,item.hash,item.rev,item.mime_type):handleGetDocumentImage(item.mime_type)"/>
+                <template #right>
+                    <van-button square text="删除" type="danger" class="delete-button" @click="handleDeleteOrderList(item)"/>
+                </template>
+            </van-swipe-cell>
+        </div>
         <!-- 底部占位 -->
         <van-submit-bar style="margin-bottom: 50px" :button-text="getOrderEditInfo.name ? '重新保存':'提交清单'"
                         :safe-area-inset-bottom="false"
@@ -48,6 +50,7 @@
     import {mapState, mapActions, mapGetters} from "vuex"
     import {genSrcPreviewSrc} from "../../util/JoyeaUtil";
     import api from "../../api";
+    import {getDocumentImage} from '../../util/JoyeaUtil';
 
     export default {
         name: "OrderContainer",
@@ -69,6 +72,9 @@
                 'removeFunc',
                 'setOrderEditInfoFunc'
             ]),
+            handleGetDocumentImage(mimeType){
+                return getDocumentImage(mimeType)
+            },
             handleClickOrderItem(item) {
                 this.orderItemEdit.item = item;
                 this.orderItemEdit.visible = true;
