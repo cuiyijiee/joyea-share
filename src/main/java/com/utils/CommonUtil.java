@@ -1,5 +1,7 @@
 package com.utils;
 
+import org.apache.commons.io.IOUtils;
+
 import java.io.*;
 
 public class CommonUtil {
@@ -110,6 +112,11 @@ public class CommonUtil {
         fout.close();
         ow.close();
         o.close();
+    }
+
+    public static void writeFile(File file, InputStream inputStream) throws Exception {
+        OutputStream outputStream = new FileOutputStream(file);
+        IOUtils.copy(inputStream, outputStream);
     }
 
     public static void appendFile(String path, String data) throws Exception {

@@ -1,11 +1,12 @@
 package joyea_share.util
 
-import java.io.{File, FileOutputStream, IOException, InputStream}
+import java.io.{BufferedInputStream, File, FileOutputStream, IOException, InputStream}
 import java.net.URLEncoder
 import java.util.concurrent.{ExecutorService, Executors}
 
 import cats.effect.{Blocker, ContextShift, IO}
 import com.json.JsonObject
+import com.utils.CommonUtil
 import okhttp3._
 import org.http4s.client.{Client, JavaNetClientBuilder}
 import org.slf4s.LoggerFactory
@@ -103,14 +104,14 @@ object LenovoUtil extends Log {
 
         val urlBuilder = HttpUrl.parse(BASE_SEARCH_FTS_URL).newBuilder()
         urlBuilder.addQueryParameter("with_fts", "true")
-            .addQueryParameter("neid", "")
-            .addQueryParameter("aid", "")
-            .addQueryParameter("path_type", "ent")
-            .addQueryParameter("path", "/")
-            .addQueryParameter("X-LENOVO-SESS-ID", sessionID)
-            .addQueryParameter("query", searchKey)
-            .addQueryParameter("type", searchType)
-            .addQueryParameter("offset", offset.toString)
+          .addQueryParameter("neid", "")
+          .addQueryParameter("aid", "")
+          .addQueryParameter("path_type", "ent")
+          .addQueryParameter("path", "/")
+          .addQueryParameter("X-LENOVO-SESS-ID", sessionID)
+          .addQueryParameter("query", searchKey)
+          .addQueryParameter("type", searchType)
+          .addQueryParameter("offset", offset.toString)
 
         val request = HttpUtil.obtainBaseRequest().url(urlBuilder.build()).build()
 
@@ -133,12 +134,12 @@ object LenovoUtil extends Log {
     def obtainFilePreviewUrl(sessionID: String, filePath: String, rev: String, listener: CommonListener[JsonObject]): Unit = {
         val urlBuilder = HttpUrl.parse(s"$BASE_URL/dl_router/databox$filePath").newBuilder()
         urlBuilder
-            //.addQueryParameter("root", "/")
-            //.addQueryParameter("path", filePath)
-            .addQueryParameter("rev", rev)
-            .addQueryParameter("path_type", "ent")
-            //.addQueryParameter("type", "pic")
-            .addQueryParameter("X-LENOVO-SESS-ID", sessionID)
+          //.addQueryParameter("root", "/")
+          //.addQueryParameter("path", filePath)
+          .addQueryParameter("rev", rev)
+          .addQueryParameter("path_type", "ent")
+          //.addQueryParameter("type", "pic")
+          .addQueryParameter("X-LENOVO-SESS-ID", sessionID)
 
         val request = HttpUtil.obtainBaseRequest().url(urlBuilder.build()).build()
 
@@ -204,38 +205,19 @@ object LenovoUtil extends Log {
             }
 
             override def onResponse(call: Call, response: Response): Unit = {
+                log.info(s"$path size is ${response.body().contentLength()}")
                 if (response.code() != 200) {
                     log.error(s"请求失败：$requestUrl,失败代码：${response.code()},失败信息：${response.body().string()}")
                     listener.onError(s"请求失败：$requestUrl,失败代码：${response.code()},失败信息：${response.body().string()}")
                 } else {
-                    var is: InputStream = null
-                    var os: FileOutputStream = null
-                    val buf: Array[Byte] = new Array[Byte](1024)
                     try {
-                        is = response.body().byteStream()
                         val downloadFile = new File(downloadFilePath)
-                        os = new FileOutputStream(downloadFile)
-                        //val total = response.body().contentLength()
-                        var len = is.read(buf)
-                        var current = 0
-                        while (len != -1) {
-                            current = current + len
-                            os.write(buf, 0, len)
-                            len = is.read(buf)
-                        }
-                        os.flush()
-                        os.close()
-                        os = null
-                        is.close()
-                        is = null
+                        CommonUtil.writeFile(downloadFile, response.body().byteStream())
                         listener.onSuccess(downloadFile)
                     } catch {
                         case e: Exception =>
                             listener.onError("请求失败！")
                             log.error("下载失败：" + SUtil.convertExceptionToStr(e))
-                    } finally {
-                        if (os != null) os.close()
-                        if (is != null) is.close()
                     }
                 }
             }

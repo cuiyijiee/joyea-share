@@ -3,7 +3,7 @@
         <van-cell>
             <van-row>
                 <van-col span="8">
-<!--                    <van-image round width="5rem" height="5rem" fit="fill" src="avatar.jpg"/>-->
+                    <!--                    <van-image round width="5rem" height="5rem" fit="fill" src="avatar.jpg"/>-->
                     <avatars backgroundColor="#eb7808" color="#ffffff" :size="80" :username="userInfo.name"></avatars>
                 </van-col>
                 <van-col span="16">
@@ -16,7 +16,7 @@
         <van-divider/>
         <van-cell title="我的清单" is-link @click="handleClickMyList"/>
         <van-cell title="素材上传" is-link @click="handleClickUpload"/>
-<!--        <van-cell title="我的收藏" is-link @click="handleClickMyLike"/>-->
+        <!--        <van-cell title="我的收藏" is-link @click="handleClickMyLike"/>-->
         <van-button type="info" round block style="margin-top: 100px" @click="handleLogout">注销登录</van-button>
     </div>
 </template>
@@ -24,9 +24,10 @@
 <script>
     import {mapGetters, mapActions} from "vuex";
     import avatars from 'vue-avatars'
+    import {logout} from "../../api";
 
     export default {
-        components:{
+        components: {
             avatars
         },
         name: "MineContainer",
@@ -48,18 +49,21 @@
             handleClickMyList() {
                 this.$router.push("/album")
             },
-            handleClickUpload(){
-              this.$router.push("/upload/index")
+            handleClickUpload() {
+                this.$router.push("/upload/index")
             },
             handleLogout() {
                 this.$dialog.confirm({
                     message: "确定退出登录？"
                 }).then(() => {
-                    this.clearUserSessionFunc().then(() => {
-                        this.$router.push("/login");
+                    logout().then(resp => {
+                        console.log(resp)
+                        this.clearUserSessionFunc().then(() => {
+                            this.$router.push("/login");
+                        })
                     })
                 }).catch(e => {
-
+                    console.log(e)
                 })
             }
         },

@@ -13,4 +13,25 @@ export default function api(params) {
         return res.data;
     })
 }
- 
+
+export function login(user, pwd) {
+    return service.post('api/v1/user/login', {
+        user: user,
+        pwd: pwd
+    }).then(res => {
+        return res.data;
+    })
+}
+
+export function logout() {
+    return service.post('api/v1/user/logout', {
+    }).then(res => {
+        return res.data;
+    })
+}
+
+export function check() {
+    return service.post('api/v1/user/check', {}).then(res => {
+        return res.data;
+    })
+}

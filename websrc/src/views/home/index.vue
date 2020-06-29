@@ -18,8 +18,10 @@
                             <el-table-column width="300" label="任务名称"
                                              show-overflow-tooltip>
                                 <template slot-scope="scope">
-                                   <div v-if="scope.row.opened" style="color: #888888"> {{scope.row.firstSrcName}}</div>
-                                   <div v-else="scope.row.opened" style="color: #000000"> {{scope.row.firstSrcName}}</div>
+                                    <div v-if="scope.row.opened" style="color: #888888"> {{scope.row.firstSrcName}}
+                                    </div>
+                                    <div v-else="scope.row.opened" style="color: #000000"> {{scope.row.firstSrcName}}
+                                    </div>
                                 </template>
                             </el-table-column>
                             <el-table-column width="150" property="startTime" label="下载时间"></el-table-column>
@@ -87,7 +89,7 @@
 </template>
 
 <script>
-    import api from "../../api/index";
+    import api, {check, logout} from "../../api/index";
     import getNowFormatDate from "../../utils/time"
 
     const localStorage = window.localStorage;
@@ -121,12 +123,7 @@
                 let _this = this;
                 this.$confirm('确认退出吗?', '提示', {}).then(() => {
                     _this.$router.push('/login');
-                    api({
-                        action: 'user',
-                        method: 'logout',
-                        user: _this.userInfo.email
-                    }).then(resp => {
-
+                    logout().then(resp => {
                     })
                 }).catch(() => {
                 });
@@ -143,7 +140,7 @@
                             startTime: task.startTime,
                             firstSrcName: task.firstSrcName.substr(0, task.firstSrcName.lastIndexOf(".")),
                             status: task.finishTime.length !== 0,
-                            opened:_this.handleQueryRecord(task.id)
+                            opened: _this.handleQueryRecord(task.id)
                         });
                     });
                     _this.downloadTask.reverse();
@@ -159,7 +156,7 @@
                                 startTime: task.startTime,
                                 firstSrcName: task.firstSrcName.substr(0, task.firstSrcName.lastIndexOf(".")),
                                 status: task.finishTime.length !== 0,
-                                opened:_this.handleQueryRecord(task.id)
+                                opened: _this.handleQueryRecord(task.id)
                             });
                         });
                         _this.downloadTask.reverse();
@@ -181,7 +178,7 @@
                 } else {
                     let record = JSON.parse(todayOpenTask);
                     record[record.length] = taskId;
-                    localStorage.setItem(this.genTodayDownloadTaskKey(),JSON.stringify(record));
+                    localStorage.setItem(this.genTodayDownloadTaskKey(), JSON.stringify(record));
                 }
             },
             handleCloseDownload() {
@@ -199,15 +196,12 @@
         },
         mounted() {
             if (!this.$route.params.checked) {
-                api({
-                    action: "user",
-                    method: "check"
-                }).then(response => {
-                    if (response.result) {
-
-                    } else {
+                check().then(resp => {
+                    if (resp.code === 4001) {
                         this.$router.push("/login");
-                        this.$message.error(response.msg)
+                        this.$message.error("登录信息已过期，请重新登陆！")
+                    } else {
+
                     }
                 })
             }

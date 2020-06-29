@@ -30,7 +30,7 @@
 </template>
 
 <script>
-    import api from "../../api";
+    import api, {check} from "../../api";
     import genSrcPreviewUrl from "../../utils/index"
     import VueLoadImage from 'vue-load-image'
 
@@ -60,11 +60,19 @@
                 if (user) {
                     this.userInfo = JSON.parse(user)
                 }
-                api({
-                    action: "user",
-                    method: "check"
-                }).then(response => {
-                    if (response.result) {
+                check().then(resp => {
+                    if(resp.code === 4001){
+                        this.$router.push({
+                            name: "login",
+                            query: {
+                                ref: btoa(JSON.stringify({
+                                    fromShare: true,
+                                    albumId: albumId
+                                }))
+                            }
+                        });
+                        this.loading = false;
+                    }else{
                         api({
                             action: "album",
                             method: "shareList",
@@ -91,17 +99,6 @@
                             }
                             this.loading = false;
                         })
-                    } else {
-                        this.$router.push({
-                            name: "login",
-                            query: {
-                                ref: btoa(JSON.stringify({
-                                    fromShare: true,
-                                    albumId: albumId
-                                }))
-                            }
-                        });
-                        this.loading = false;
                     }
                 })
             } else {

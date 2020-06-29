@@ -32,6 +32,21 @@
             },
             handleClickRightNav() {
                 this.$router.push("/home")
+            },
+            checkLogin() {
+                let _this = this;
+                setInterval(() => {
+                    if (_this.$route.path !== '/login') {
+                        check().then(resp => {
+                            if (resp.code === 4001) {
+                                _this.$notify({type: 'danger', message: '登录信息已过期，请重新登陆！'});
+                                _this.$router.push("/login");
+                            } else {
+                                _this.refreshSessionFunc(resp.data);
+                            }
+                        })
+                    }
+                }, 2000)
             }
         },
         created() {
@@ -43,19 +58,20 @@
             window.addEventListener("beforeunload", () => {
                 localStorage.setItem("store", JSON.stringify(this.$store.state))
             });
-            if (this.userInfo.session.length === 0 && this.$route.path !== '/login') {
-                this.$router.push("/login")
+
+            if (this.$route.path !== '/login') {        //不在登陆界面
+                if (this.userInfo.session.length === 0) {
+                    this.$router.push("/login");
+                }
+            } else {                                    //登陆界面
+                if (this.userInfo.session.length !== 0) {
+                    this.$router.replace({
+                        name: "/",
+                        params: {checked: true}
+                    });
+                }
             }
-            setInterval(() => {
-                check().then(resp => {
-                    if (resp.code === 4001) {
-                        this.$message.error("登录信息已过期，请重新登陆！")
-                        this.$router.push("/login");
-                    } else {
-                        this.refreshSessionFunc(resp.data);
-                    }
-                })
-            }, 5000)
+            this.checkLogin();
         },
         computed: {
             ...mapGetters([

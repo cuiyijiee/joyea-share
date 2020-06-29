@@ -279,6 +279,7 @@
             },
             handleClickRootDir() {
                 this.handleListLenovoDir("/营销素材展示");
+                this.currentTypeActive = 0;
             },
             handleClickRootMenu(path) {
                 this.handleListLenovoDir("/营销素材展示/" + path);

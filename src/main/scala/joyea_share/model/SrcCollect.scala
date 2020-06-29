@@ -101,7 +101,7 @@ object SrcCollect extends SQLSyntaxSupport[SrcCollect] with ShortenedNames {
     * @param cxt
     * @return
     */
-  def deleteByUserIdAndNeid(userId: Long, neid: Long)(implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[Int] = withSQL {
+  def deleteByUserIdAndNeid(userId: String, neid: Long)(implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[Int] = withSQL {
     deleteFrom(SrcCollect).where.eq(column.userId, userId).and.eq(column.srcNeid, neid)
   }.update().future()
 
@@ -116,7 +116,7 @@ object SrcCollect extends SQLSyntaxSupport[SrcCollect] with ShortenedNames {
     * @param cxt
     * @return
     */
-  def pageFindByUserId(curPage: Int, pageSize: Int, userId: Long)(implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[List[SrcCollect]] = withSQL {
+  def pageFindByUserId(curPage: Int, pageSize: Int, userId: String)(implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[List[SrcCollect]] = withSQL {
     selectFrom(SrcCollect as sc).where.eq(sc.userId, userId).orderBy(sc.createdAt).limit(pageSize).offset((curPage - 1) * pageSize)
   }.map(SrcCollect(sc)).list().future()
 
@@ -128,7 +128,7 @@ object SrcCollect extends SQLSyntaxSupport[SrcCollect] with ShortenedNames {
     * @param cxt
     * @return
     */
-  def countByUserId(userId: Long)(implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[Long] = withSQL {
+  def countByUserId(userId: String)(implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[Long] = withSQL {
     select(sqls.count).from(SrcCollect as sc).where.eq(sc.userId, userId)
   }.map(_.long(1)).single().future().map(_.get)
 

@@ -22,7 +22,6 @@ class LoginAction extends BaseAction[LoginReq] {
           if (value.get.password.equals(pwd)) {
             session("user_name") = value.get.joyeaName
             session("user_id") = value.get.joyeaId
-            session("lenovo_session") = DownloadManager.getAdminToken()
             cyjResponseSuccess(LoginResp(
               userName = value.get.joyeaName,
               session = DownloadManager.getAdminToken()

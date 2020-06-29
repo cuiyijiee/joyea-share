@@ -143,12 +143,15 @@
                                     mime_type: src.mime_type,
                                 })
                             });
+                            let images = imgUrl.filter(item => {
+                                return item.mime_type.startsWith("image")
+                            })
                             this.albumList.push({
                                 id: list.album_id,
                                 name: list.album_name,
                                 shared: list.shared,
                                 list: imgUrl,
-                                cover: imgUrl.length > 0 ? imgUrl[0].url : 'cover.png',
+                                cover: images.length > 0 ? images[0].url : 'cover.png',
                             })
                         })
                     } else {
