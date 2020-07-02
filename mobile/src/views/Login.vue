@@ -52,7 +52,6 @@
                 login(this.loginForm.user, btoa(this.loginForm.pwd)).then(resp => {
                     if (resp.code === 2000) {
                         this.$notify({type: 'success', message: '欢迎回来，' + resp.data.userName + '！'});
-                        localStorage.setItem("u", btoa(JSON.stringify(this.loginForm)));
                         _this.updateUserInfoFunc({
                             session: resp.data['session'], name: resp.data['userName'], email: this.loginForm.user
                         }).then(() => {

@@ -35,3 +35,12 @@ export function check() {
         return res.data;
     })
 }
+
+export function pageListAlbum(curPage,pageSize) {
+    return service.post('api/v1/album/pageList', {
+        curPage:curPage,
+        pageSize:pageSize
+    }).then(res => {
+        return res.data;
+    })
+}

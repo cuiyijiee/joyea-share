@@ -5,6 +5,7 @@ import HomeContainer from "../components/tabbar/HomeContainer";
 import OrderContainer from "../components/tabbar/OrderContainer";
 import MineContainer from "../components/tabbar/MineContainer";
 import SearchResult from "../components/tabbar/SearchContainer";
+import SquareContainer from "../components/tabbar/SquareContainer";
 import UploadIndex from "../views/upload/Index"
 
 import Main from "../views/Main";
@@ -42,6 +43,14 @@ export default new Router({
                     path: 'order',
                     name: '素材车',
                     component: OrderContainer,
+                    meta: {
+                        allowHome: false
+                    }
+                },
+                {
+                    path: 'square',
+                    name: '广场',
+                    component: SquareContainer,
                     meta: {
                         allowHome: false
                     }

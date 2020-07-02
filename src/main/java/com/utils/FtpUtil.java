@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 public class FtpUtil {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private FTPClient ftpClient;
-    private static final String ENCODING = "UTF-8";
+    private static final String ENCODING = "gbk";
     private static final int BUFFER_SIZE = 1024 * 10;
     private static final int TIMEOUT = 60 * 1000;
 

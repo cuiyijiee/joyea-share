@@ -16,103 +16,115 @@ case class DownloadTask(
                          downloadRoleId: String
                        ) extends Log {
 
-  def toJson(): JsonObject = {
+    def toJson(): JsonObject = {
 
-    val fileArr = new JsonArray()
-    downloadFile.forEach(item => {
-      fileArr.add(item.toJson())
-    })
-
-    new JsonObject()
-      .add("id", id)
-      .add("file", fileArr)
-      .add("downloadRoleName", downloadRoleName)
-      .add("downloadRoleId", downloadRoleId)
-      .add("startTime", SUtil.genDateString(startDate))
-      .add("firstSrcName", downloadFile.get(0).fileName)
-      .add("finishTime", if (finishDate == null) "" else SUtil.genDateString(finishDate))
-
-  }
-
-  private var status: DownloadStatus.Value = DownloadStatus.READY
-  private val startDate: java.util.Date = new Date()
-  private var finishDate: java.util.Date = _
-  private var saveFilePath: String = ""
-  private var saveCompressPath: String = ""
-  private var downloadListener: DownloadListener = _
-  private var downloadProgress: Int = 0
-  private var successNum: Int = 0
-  private var failNum: Int = 0
-  //超时时间为2分钟，超过时间则下载失败
-  //private val DOWNLOAD_TIMEOUT = 2 * 60 * 1000
-
-  def execute(sessionId: String, baseSavePath: String, baseCompressSavePath: String, listener: DownloadListener): Unit = {
-    downloadListener = listener
-    saveFilePath = baseSavePath + "/" + id
-    saveCompressPath = baseCompressSavePath + "/" + id
-
-    new File(saveFilePath).mkdirs()
-
-    downloadListener.onStart(id, downloadFile.size())
-    status = DownloadStatus.DOWNLOAD
-    downloadFile.forEach(item => {
-      LenovoUtil.downloadFileV2(sessionId, item.path, item.neid, item.rev, "ent",
-        saveFilePath + "/" + item.index + "--" + item.fileName, new CommonListener[File] {
-          override def onSuccess(obj: File): Unit = {
-            successNum = successNum + 1
-            downloadProgress = downloadProgress + 1
-            log.info(s"下载文件【$item】成功:${obj.getAbsolutePath}")
-            checkFinish()
-          }
-
-          override def onError(error: String): Unit = {
-            failNum = failNum + 1
-            downloadProgress = downloadProgress + 1
-            log.error(s"下载文件【$item】失败:$error")
-            checkFinish()
-          }
+        val fileArr = new JsonArray()
+        downloadFile.forEach(item => {
+            fileArr.add(item.toJson())
         })
-    })
-  }
 
-  def checkFinish(): Unit = {
-    //下载完成
-    downloadListener.onNext(id, downloadProgress, downloadFile.size())
-    if (downloadProgress >= downloadFile.size()) {
-      //线程等待2秒，避免加密软件冲突
-      CommonUtil.writeFile(s"$saveFilePath/请勿外泄.txt", "仅一公司内部资料，请勿外泄！")
-      Thread.sleep(Config.application.getConfig("download").getInt("wait_seconds") * 1000)
+        new JsonObject()
+          .add("id", id)
+          .add("file", fileArr)
+          .add("downloadRoleName", downloadRoleName)
+          .add("downloadRoleId", downloadRoleId)
+          .add("startTime", SUtil.genDateString(startDate))
+          .add("firstSrcName", downloadFile.get(0).fileName)
+          .add("finishTime", if (finishDate == null) "" else SUtil.genDateString(finishDate))
 
-      //先上传文件到ftp服务器进行加密再下载下来
-      val ftpUtil = new FtpUtil(
-        Config.application.getConfig("download").getString("ftp_ip"),
-        Config.application.getConfig("download").getInt("ftp_port"),
-        Config.application.getConfig("download").getString("ftp_name"),
-        Config.application.getConfig("download").getString("ftp_pass")
-      )
-      ftpUtil.login()
-      new File(saveFilePath).listFiles(new FileFilter {
-        override def accept(file: File): Boolean = file.isFile
-      }).foreach(file => {
-        ftpUtil.uploadFileToRemoteDir(file.getAbsolutePath, "/download/" + id )
-        file.delete()
-        ftpUtil.downloadFile("/download/" + id + "/" + file.getName, file.getAbsolutePath)
-      })
-      ftpUtil.logout()
-      ZipUtils.compressZip(Array(saveFilePath), saveCompressPath + ".zip")
-      //CommonUtil.delete(saveFilePath)
-      finishDate = new Date()
-      status = DownloadStatus.FINISH
-      downloadListener.onFinish(taskId = id, successNum, failNum, downloadFile.size())
     }
-  }
 
-  def clear(): Unit = {
+    private var status: DownloadStatus.Value = DownloadStatus.READY
+    private val startDate: java.util.Date = new Date()
+    private var finishDate: java.util.Date = _
+    private var saveFilePath: String = ""
+    private var saveCompressPath: String = ""
+    private var downloadListener: DownloadListener = _
+    private var downloadProgress: Int = 0
+    private var successNum: Int = 0
+    private var failNum: Int = 0
+    //超时时间为2分钟，超过时间则下载失败
+    //private val DOWNLOAD_TIMEOUT = 2 * 60 * 1000
 
-  }
+    def execute(sessionId: String, baseSavePath: String, baseCompressSavePath: String, listener: DownloadListener): Unit = {
+        downloadListener = listener
+        saveFilePath = baseSavePath + "/" + id
+        saveCompressPath = baseCompressSavePath + "/" + id
 
-  def queryStatus(): DownloadStatus.Value = {
-    this.status
-  }
+        new File(saveFilePath).mkdirs()
+
+        downloadListener.onStart(id, downloadFile.size())
+        status = DownloadStatus.DOWNLOAD
+        downloadFile.forEach(item => {
+            LenovoUtil.downloadFileV2(sessionId, item.path, item.neid, item.rev, "ent",
+                saveFilePath + "/" + item.index + "--" + item.fileName, new CommonListener[File] {
+                    override def onSuccess(obj: File): Unit = {
+                        successNum = successNum + 1
+                        downloadProgress = downloadProgress + 1
+                        log.info(s"下载文件【$item】成功:${obj.getAbsolutePath}")
+                        checkFinish()
+                    }
+
+                    override def onError(error: String): Unit = {
+                        failNum = failNum + 1
+                        downloadProgress = downloadProgress + 1
+                        log.error(s"下载文件【$item】失败:$error")
+                        checkFinish()
+                    }
+                })
+        })
+    }
+
+    def checkFinish(): Unit = {
+        //下载完成
+        downloadListener.onNext(id, downloadProgress, downloadFile.size())
+        if (downloadProgress >= downloadFile.size()) {
+            //线程等待2秒，避免加密软件冲突
+            CommonUtil.writeFile(s"$saveFilePath/请勿外泄.txt", "仅一公司内部资料，请勿外泄！")
+            var needEncrypt = true
+            try {
+                needEncrypt = Config.application.getBoolean("download.encrypt")
+            } catch {
+                case e: Exception =>
+                    e.printStackTrace()
+            }
+            if (needEncrypt) {
+                //先上传文件到ftp服务器进行加密再下载下来
+                val ftpUtil = new FtpUtil(
+                    Config.application.getConfig("download").getString("ftp_ip"),
+                    Config.application.getConfig("download").getInt("ftp_port"),
+                    Config.application.getConfig("download").getString("ftp_name"),
+                    Config.application.getConfig("download").getString("ftp_pass")
+                )
+                ftpUtil.login()
+                val fileList = new File(saveFilePath).listFiles(new FileFilter {
+                    override def accept(file: File): Boolean = file.isFile
+                })
+                fileList.foreach(file => {
+                    ftpUtil.uploadFileToRemoteDir(file.getAbsolutePath, "/download/" + id)
+                    file.delete()
+                })
+                Thread.sleep(Config.application.getConfig("download").getInt("wait_seconds") * 1000)
+                fileList.foreach(file => {
+                    ftpUtil.downloadFile("/download/" + id + "/" + file.getName, file.getAbsolutePath)
+                })
+                ftpUtil.logout()
+            }
+
+            ZipUtils.compressZip(Array(saveFilePath), saveCompressPath + ".zip")
+            //CommonUtil.delete(saveFilePath)
+            finishDate = new Date()
+            status = DownloadStatus.FINISH
+            downloadListener.onFinish(taskId = id, successNum, failNum, downloadFile.size())
+        }
+    }
+
+    def clear(): Unit = {
+
+    }
+
+    def queryStatus(): DownloadStatus.Value = {
+        this.status
+    }
 
 }

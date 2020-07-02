@@ -57,7 +57,6 @@
                     message: "确定退出登录？"
                 }).then(() => {
                     logout().then(resp => {
-                        console.log(resp)
                         this.clearUserSessionFunc().then(() => {
                             this.$router.push("/login");
                         })

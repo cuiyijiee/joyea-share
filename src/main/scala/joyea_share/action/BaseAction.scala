@@ -6,31 +6,43 @@ import joyea_share.vo.BaseResp
 import org.json4s.jackson.Serialization
 import xitrum.{Action, Log, SkipCsrfCheck}
 
+import scala.util.{Failure, Success, Try}
+
 abstract class BaseAction[T: Manifest] extends Action with SkipCsrfCheck with Log with BaseJsonFormat {
 
-  override def execute(): Unit = {
-    try {
-      val request = Serialization.read[T](requestContentString)
-      safeExecute(req = request)
-    } catch {
-      case e: Throwable =>
-        e.printStackTrace()
-        cyjResponseError(ErrorCode.unknownError)
+    override def execute(): Unit = {
+        try {
+            val request = Serialization.read[T](requestContentString)
+            safeExecute(req = request)
+        } catch {
+            case e: Throwable =>
+                e.printStackTrace()
+                cyjResponseError(ErrorCode.unknownError)
+        }
     }
-  }
 
-  def safeExecute(req: T): Unit
+    def safeExecute(req: T): Unit
 
-  def cyjResponseSuccess(data: Any): Unit = {
-    respondJsonText(Serialization.write(BaseResp(2000, data)))
-  }
+    def safeResponse[U](serverRespTry: Try[U], result: U => Unit): Unit = {
+        serverRespTry match {
+            case Success(value) =>
+                result(value)
+            case Failure(exception) =>
+                cyjResponseError(ErrorCode.dbExecuteError)
+        }
+    }
 
-  def cyjResponseError(code: Int): Unit = {
-    respondJsonText(Serialization.write(BaseResp(code, null)))
-  }
 
-  def logError(exception: Throwable, reason: String = ""): Unit = {
-    log.error(s"$reason error:", exception)
-  }
+    def cyjResponseSuccess(data: Any): Unit = {
+        respondJsonText(Serialization.write(BaseResp(2000, data)))
+    }
+
+    def cyjResponseError(code: Int): Unit = {
+        respondJsonText(Serialization.write(BaseResp(code, null)))
+    }
+
+    def logError(exception: Throwable, reason: String = ""): Unit = {
+        log.error(s"$reason error:", exception)
+    }
 
 }

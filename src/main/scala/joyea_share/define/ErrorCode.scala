@@ -6,5 +6,7 @@ object ErrorCode {
 
   val userSessionInvalid: Int = 4001
 
+  val dbExecuteError:Int = 4002
+
 
 }

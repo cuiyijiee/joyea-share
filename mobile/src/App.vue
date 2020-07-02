@@ -33,18 +33,23 @@
             handleClickRightNav() {
                 this.$router.push("/home")
             },
+            _checkLogin() {
+                let _this = this;
+                check().then(resp => {
+                    if (resp.code === 4001) {
+                        _this.$notify({type: 'danger', message: '登录信息已过期，请重新登陆！'});
+                        _this.$router.push("/login");
+                    } else {
+                        _this.refreshSessionFunc(resp.data);
+                    }
+                })
+            },
             checkLogin() {
                 let _this = this;
+                this._checkLogin();
                 setInterval(() => {
                     if (_this.$route.path !== '/login') {
-                        check().then(resp => {
-                            if (resp.code === 4001) {
-                                _this.$notify({type: 'danger', message: '登录信息已过期，请重新登陆！'});
-                                _this.$router.push("/login");
-                            } else {
-                                _this.refreshSessionFunc(resp.data);
-                            }
-                        })
+                        _this._checkLogin()
                     }
                 }, 2000)
             }
@@ -54,6 +59,9 @@
             if (localStorage.getItem("store")) {
                 this.$store.replaceState(Object.assign({}, this.$store.state, JSON.parse(localStorage.getItem("store"))))
             }
+            setInterval(() => {
+                localStorage.setItem("store", JSON.stringify(this.$store.state))
+            }, 2000)
             //在页面刷新时将vuex里的信息保存到sessionStorage里
             window.addEventListener("beforeunload", () => {
                 localStorage.setItem("store", JSON.stringify(this.$store.state))

@@ -8,33 +8,33 @@ import com.json.JsonObject
 import scala.concurrent.Future
 
 case class AlbumSrc(
-                       id: Long,
-                       albumId: Long,
-                       srcNeid: Long,
-                       srcHash: String,
-                       srcRev: String,
-                       srcSize: String,
-                       srcPath: String,
-                       srcType: String,
-                       srcDesc: String,
-                       srcFileName: String,
-                       srcBytes: Long,
-                       createdAt: Timestamp
+                     id: Long,
+                     albumId: Long,
+                     srcNeid: Long,
+                     srcHash: String,
+                     srcRev: String,
+                     srcSize: String,
+                     srcPath: String,
+                     srcType: String,
+                     srcDesc: String,
+                     srcFileName: String,
+                     srcBytes: Long,
+                     createdAt: Timestamp
                    ) extends ShortenedNames {
 
     def toJson: JsonObject = new JsonObject()
-        .add("id", this.id)
-        .add("neid", this.srcNeid)
-        .add("album_id", this.albumId)
-        .add("path", this.srcPath)
-        .add("mime_type", this.srcType)
-        .add("rev", this.srcRev)
-        .add("hash", this.srcHash)
-        .add("size", this.srcSize)
-        .add("desc", this.srcDesc)
-        .add("bytes", this.srcBytes)
-        .add("filename", this.srcFileName)
-        .add("created_at", this.createdAt.getTime)
+      .add("id", this.id)
+      .add("neid", this.srcNeid)
+      .add("album_id", this.albumId)
+      .add("path", this.srcPath)
+      .add("mime_type", this.srcType)
+      .add("rev", this.srcRev)
+      .add("hash", this.srcHash)
+      .add("size", this.srcSize)
+      .add("desc", this.srcDesc)
+      .add("bytes", this.srcBytes)
+      .add("filename", this.srcFileName)
+      .add("created_at", this.createdAt.getTime)
 }
 
 object AlbumSrc extends SQLSyntaxSupport[AlbumSrc] with ShortenedNames {
@@ -45,22 +45,7 @@ object AlbumSrc extends SQLSyntaxSupport[AlbumSrc] with ShortenedNames {
 
     def apply(as: SyntaxProvider[AlbumSrc])(rs: WrappedResultSet): AlbumSrc = apply(as.resultName)(rs)
 
-    def apply(as: ResultName[AlbumSrc])(rs: WrappedResultSet): AlbumSrc = {
-        new AlbumSrc(
-            id = rs.get[Long](as.id),
-            albumId = rs.get[Long](as.albumId),
-            srcNeid = rs.get[Long](as.srcNeid),
-            srcPath = rs.get[String](as.srcPath),
-            srcType = rs.get[String](as.srcType),
-            srcHash = rs.get[String](as.srcHash),
-            srcRev = rs.get[String](as.srcRev),
-            srcSize = rs.get[String](as.srcSize),
-            srcDesc = rs.get[String](as.srcDesc),
-            srcFileName = rs.get[String](as.srcFileName),
-            srcBytes = rs.get[Long](as.srcBytes),
-            createdAt = rs.get[Timestamp](as.createdAt)
-        )
-    }
+    def apply(as: ResultName[AlbumSrc])(rs: WrappedResultSet): AlbumSrc = autoConstruct(rs, as)
 
     def create(srcNeid: Long, albumId: Long, srcPath: String, srcType: String, srcHash: String, srcRev: String,
                srcSize: String, srcDesc: String, srcFileName: String, srcBytes: Long, createdAt: Timestamp = new Timestamp(System.currentTimeMillis()))

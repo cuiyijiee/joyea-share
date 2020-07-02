@@ -1,14 +1,15 @@
 <template>
-    <div id="order" >
+    <div id="order">
         <van-empty v-if="orderList.length === 0" description="清单车空空如也"/>
         <div style="margin-bottom: 100px">
-            <van-swipe-cell v-for="item in orderList" :key="item.path" >
+            <van-swipe-cell v-for="item in orderList" :key="item.path">
                 <van-card @click="handleClickOrderItem(item)"
                           :desc="item.joyeaDesc.length > 0 ? item.joyeaDesc :'暂未设置解说词'"
                           :title="item.path.substr(item.path.lastIndexOf('/')+1)"
                           :thumb="item.mime_type.startsWith('image') ? genPreviewUrl(item.neid,item.hash,item.rev,item.mime_type):handleGetDocumentImage(item.mime_type)"/>
                 <template #right>
-                    <van-button square text="删除" type="danger" class="delete-button" @click="handleDeleteOrderList(item)"/>
+                    <van-button square text="删除" type="danger" class="delete-button"
+                                @click="handleDeleteOrderList(item)"/>
                 </template>
             </van-swipe-cell>
         </div>
@@ -29,14 +30,14 @@
         <van-dialog v-model="submitDialogVisible" :title="editMode ? '确认保存编辑后新清单？':'确认提交新清单？'"
                     @cancel="handleCancelSubmit"
                     @confirm="handleSubmitNewAlbum" show-cancel-button>
-            <van-field v-model="newAlbumName" placeholder="请输入清单名"/>
+            <van-field v-model="newAlbumName" label="清单名称" placeholder="请输入清单名"/>
         </van-dialog>
         <van-action-sheet v-model="orderItemEdit.visible" title="编辑">
             <van-field label="文件名" :value="orderItemEdit.item.path.substr(orderItemEdit.item.path.lastIndexOf('/') + 1)"
                        disabled/>
             <van-field
                     v-model="orderItemEdit.item.joyeaDesc" rows="2"
-                    autosize label="解说词" type="textarea"
+                    label="解说词" type="textarea"
                     right-icon="edit"
                     maxlength="50" placeholder="请输入解说词" show-word-limit
             />
@@ -72,7 +73,7 @@
                 'removeFunc',
                 'setOrderEditInfoFunc'
             ]),
-            handleGetDocumentImage(mimeType){
+            handleGetDocumentImage(mimeType) {
                 return getDocumentImage(mimeType)
             },
             handleClickOrderItem(item) {
@@ -117,13 +118,13 @@
                     src: this.orderList
                 }).then(response => {
                     if (response.result) {
-                        this.$notify({type: 'success', message: this.editMode ? '重新编辑成功':'保存成功'});
+                        this.$notify({type: 'success', message: this.editMode ? '重新编辑成功' : '保存成功'});
                         this.$store.dispatch("clearFunc");
                         this.setOrderEditInfoFunc({}).then(() => {
 
                         })
                     } else {
-                        this.$notify({type: 'warning', message: this.editMode ? '重新编辑失败':'保存失败'});
+                        this.$notify({type: 'warning', message: this.editMode ? '重新编辑失败' : '保存失败'});
                     }
                 });
             },

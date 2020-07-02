@@ -10,29 +10,29 @@ import joyea_share.util.SUtil
 import scala.concurrent.Future
 
 case class Album(
-                    albumId: Long,
-                    userId: String,
-                    userName: String,
-                    albumName: String,
-                    albumDesc: Option[String],
-                    shared: Boolean,
-                    createdAt: Timestamp,
-                    referNum: Long = 0,
-                    updatedAt: Option[Timestamp]
+                  albumId: Long,
+                  userId: String,
+                  userName: String,
+                  albumName: String,
+                  albumDesc: Option[String],
+                  shared: Boolean,
+                  createdAt: Timestamp,
+                  referNum: Long = 0,
+                  updatedAt: Option[Timestamp]
                 ) extends ShortenedNames {
 
     def save(): Future[Album] = Album.save(this)
 
     def toJson: JsonObject = new JsonObject()
-        .add("album_id", this.albumId)
-        .add("user_id", this.userId)
-        .add("user_name", this.userName)
-        .add("album_name", this.albumName)
-        .add("album_desc", this.albumDesc.getOrElse(""))
-        .add("shared", this.shared)
-        .add("refer_num", this.referNum)
-        .add("created_at", SUtil.genDateString(this.createdAt, "yy-MM-dd HH:mm"))
-        .add("updated_at", SUtil.genDateString(this.updatedAt.getOrElse(this.createdAt), "yy-MM-dd HH:mm"))
+      .add("album_id", this.albumId)
+      .add("user_id", this.userId)
+      .add("user_name", this.userName)
+      .add("album_name", this.albumName)
+      .add("album_desc", this.albumDesc.getOrElse(""))
+      .add("shared", this.shared)
+      .add("refer_num", this.referNum)
+      .add("created_at", SUtil.genDateString(this.createdAt, "yy-MM-dd HH:mm"))
+      .add("updated_at", SUtil.genDateString(this.updatedAt.getOrElse(this.createdAt), "yy-MM-dd HH:mm"))
 }
 
 
@@ -133,6 +133,11 @@ object Album extends SQLSyntaxSupport[Album] with ShortenedNames {
 
     def searchByName(keyword: String)(implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[List[Album]] = withSQL {
         selectFrom(Album as a).where.like(column.albumName, s"%$keyword%")
+    }.map(Album(a)).list().future()
+
+    def pageListAlbum(curPage: Int, pageSize: Int)
+                     (implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[List[Album]] = withSQL {
+        selectFrom(Album as a).orderBy(column.albumId).desc.limit(pageSize).offset((curPage - 1) * pageSize)
     }.map(Album(a)).list().future()
 
 }
