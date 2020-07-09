@@ -31,11 +31,32 @@
                 active: 0,
             };
         },
-        methods: {},
+        methods: {
+            resumeTab(){
+                let path = this.$route.path
+                switch (path) {
+                    case '/home':
+                        this.active = 0;
+                        break;
+                    case '/order':
+                        this.active = 1;
+                        break
+                    case '/square':
+                        this.active = 2;
+                        break
+                    case '/mine':
+                        this.active = 3;
+                        break
+                }
+            }
+        },
         computed: {
             ...mapState({
                 orderListSize: state => state.orderList.length
             }),
+        },
+        created() {
+            this.resumeTab();
         }
     }
 </script>

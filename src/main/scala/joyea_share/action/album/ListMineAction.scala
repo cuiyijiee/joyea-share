@@ -1,23 +1,21 @@
 package joyea_share.action.album
 
-import java.sql.Timestamp
-
 import joyea_share.action.BaseAction
 import joyea_share.db.MySQLSettings
 import joyea_share.model.{Album, AlbumSrc}
-import joyea_share.vo.req.PageListAlbumReq
+import joyea_share.vo.req.EmptyReq
 import joyea_share.vo.resp.AlbumDetailResp
 import scalikejdbc.async.AsyncDB
 import xitrum.annotation.POST
 
 import scala.concurrent.Await
 
+@POST("api/v1/album/list/mine")
+class ListMineAction extends BaseAction[EmptyReq] {
+    override def safeExecute(req: EmptyReq): Unit = {
+        Album.findByUserId(myUid).onComplete(safeResponse[List[Album]](_, albumList => {
 
-@POST("api/v1/album/pageList")
-class PageListAction extends BaseAction[PageListAlbumReq] {
-    override def safeExecute(req: PageListAlbumReq): Unit = {
-        Album.pageListAlbum(req.curPage, req.pageSize, req.shared).onComplete(safeResponse[List[Album]](_, result => {
-            cyjResponseSuccess(result.map(album => {
+            cyjResponseSuccess(albumList.map(album => {
                 AlbumDetailResp(
                     albumId = album.albumId,
                     userId = album.userId,
@@ -40,7 +38,5 @@ class PageListAction extends BaseAction[PageListAlbumReq] {
         }))
     }
 }
-
-
 
 

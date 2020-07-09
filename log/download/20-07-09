@@ -1,0 +1,61 @@
+[
+  {
+    "id": "96cce788-cc5c-46b3-b99d-e4f207fd3ecd",
+    "file": [
+      {
+        "path": "/营销素材展示/同行信息/001、国际同行/Mespack/2、雀巢（Mespack）/STICKPACK AUGER FILLER雀巢mispak/CATALOGUES/ROCKWELL.pdf",
+        "rev": "178d03347f2d40d68d18411679739f9f",
+        "neid": "1203606219",
+        "fileName": "ROCKWELL.pdf",
+        "pathType": "ent"
+      },
+      {
+        "path": "/一号园IT项目组/英文版-NVIDIA_vGPU_P系列GPU部署手册-基于vSphere 6.5u1和Horizon 7.pdf",
+        "rev": "4958ffb0b8a911e8b1f70017fa00f183",
+        "neid": "748680209",
+        "fileName": "英文版-NVIDIA_vGPU_P系列GPU部署手册-基于vSphere 6.5u1和Horizon 7.pdf",
+        "pathType": "ent"
+      },
+      {
+        "path": "/一号园IT项目组/006文档云/坚果云/【03】坚果云高级使用技巧.pdf",
+        "rev": "99bfd39771e34d138625808bebba81ac",
+        "neid": "372555973",
+        "fileName": "【03】坚果云高级使用技巧.pdf",
+        "pathType": "ent"
+      },
+      {
+        "path": "/营销素材展示/同行信息/002、国内同行/F发泰/002、济川（发泰）/1、12列计量盒整线/3、设备问题/发泰在济川现场的情况20170913/诊断喷胶问题2.jpg.jpg",
+        "rev": "0cb40f6355364ac2b645460e281afc7a",
+        "neid": "1204382223",
+        "fileName": "诊断喷胶问题2.jpg.jpg",
+        "pathType": "ent"
+      },
+      {
+        "path": "/营销素材展示/STICK线/005、细分市场引导素材/001、液体stick引导素材/002、瓶装对比素材/瓶装液体的消费者体验/外观/不防伪.jpg",
+        "rev": "c515d2ed10e846b8a3b84064203d8935",
+        "neid": "2053410156",
+        "fileName": "不防伪.jpg",
+        "pathType": "ent"
+      },
+      {
+        "path": "/信息化需求评级排序及执行反馈/1、素材库/外联开发素材清单/素材库0408/images/清单工作台/u12.jpg",
+        "rev": "3f5abea4e19f4ad2a026a5ea1e3b1d9d",
+        "neid": "1037798805",
+        "fileName": "u12.jpg",
+        "pathType": "ent"
+      },
+      {
+        "path": "/营销素材展示/同行信息/001、国际同行/Mespack/2、雀巢（Mespack）/STICKPACK AUGER FILLER雀巢mispak/STICKPACK-XL_English.doc",
+        "rev": "2833752effb4497eb504eb0277493b80",
+        "neid": "1203606414",
+        "fileName": "STICKPACK-XL_English.doc",
+        "pathType": "ent"
+      }
+    ],
+    "downloadRoleName": "刘剑云",
+    "downloadRoleId": "213",
+    "startTime": "20-07-09 23:56:39",
+    "firstSrcName": "ROCKWELL.pdf",
+    "finishTime": "20-07-09 23:57:58"
+  }
+]

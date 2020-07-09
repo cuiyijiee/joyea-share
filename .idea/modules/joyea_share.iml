@@ -23,6 +23,7 @@
     <orderEntry type="library" name="sbt: com.fasterxml.jackson.core:jackson-annotations:2.9.0:jar" level="project" />
     <orderEntry type="library" name="sbt: com.fasterxml.jackson.core:jackson-core:2.9.9:jar" level="project" />
     <orderEntry type="library" name="sbt: com.fasterxml.jackson.core:jackson-databind:2.9.9.3:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.github.etaty:rediscala_2.12:1.9.0:jar" level="project" />
     <orderEntry type="library" name="sbt: com.github.jasync-sql:jasync-common:1.1.1-kts-9:jar" level="project" />
     <orderEntry type="library" name="sbt: com.github.jasync-sql:jasync-mysql:1.1.1-kts-9:jar" level="project" />
     <orderEntry type="library" name="sbt: com.github.jasync-sql:jasync-pool:1.1.1-kts-9:jar" level="project" />
@@ -118,6 +119,7 @@
     <orderEntry type="library" name="sbt: org.scala-lang:scala-library:2.12.10:jar" level="project" />
     <orderEntry type="library" name="sbt: org.scala-lang:scala-reflect:2.12.10:jar" level="project" />
     <orderEntry type="library" name="sbt: org.scala-lang:scalap:2.12.10:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.scala-stm:scala-stm_2.12:0.9.1:jar" level="project" />
     <orderEntry type="library" name="sbt: org.scalikejdbc:scalikejdbc-async_2.12:0.13.0:jar" level="project" />
     <orderEntry type="library" name="sbt: org.scalikejdbc:scalikejdbc-core_2.12:3.4.2:jar" level="project" />
     <orderEntry type="library" name="sbt: org.scalikejdbc:scalikejdbc-interpolation-macro_2.12:3.4.2:jar" level="project" />

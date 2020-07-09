@@ -1,8 +1,7 @@
 <template>
     <div id="app">
         <van-nav-bar :title="this.$route.name" fixed style="background: #1f1731;color: #ffffff"
-                     :left-arrow="this.$route.meta.allowBack" @click-left="handleClickLeftNav"
-        >
+                     :left-arrow="this.$route.meta.allowBack" @click-left="handleClickLeftNav">
             <template #right>
                 <van-icon v-if="allowHome" @click="handleClickRightNav" name="home-o" size="18"/>
             </template>

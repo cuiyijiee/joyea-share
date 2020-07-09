@@ -1,7 +1,20 @@
 import {ImagePreview} from 'vant';
 import {genSrcPreviewSrc, newGenSrcPreviewSrc} from './JoyeaUtil'
 
+export function convertItem(item) {
+    if (item.srcType) item.mime_type = item.srcType;
+    if (item.srcNeid) item.neid = item.srcNeid;
+    if (item.srcHash) item.hash = item.srcHash;
+    if (item.srcRev) item.rev = item.srcRev;
+    if (item.srcPath) item.path = item.srcPath;
+    return item;
+}
+
 export function GenImageListView(context, itemList, sessionId, clickItem) {
+    itemList.forEach(item => {
+        convertItem(item)
+    });
+    convertItem(clickItem)
     let index = 0;
     let tmp = 0;
     let list = itemList.filter(item => {

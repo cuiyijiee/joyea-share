@@ -90,4 +90,8 @@ object AlbumSrc extends SQLSyntaxSupport[AlbumSrc] with ShortenedNames {
         selectFrom(AlbumSrc as albums).where.eq(albums.srcNeid, srcNeid)
     }.map(AlbumSrc(albums)).list().future()
 
+    def countByNeid(srcNeid:Long)(implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[Long] = withSQL {
+        select(sqls.count).from(AlbumSrc as albums).where.eq(albums.srcNeid, srcNeid)
+    }.map(_.long(1)).single().future().map(_.get)
+
 }

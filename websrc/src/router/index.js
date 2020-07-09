@@ -49,15 +49,15 @@ export default new Router({
                 {path: '/manage/list', component: List, name: 'list', desc: '清单'},
             ]
         },
-        {
-            path: '/',
-            name: '我的收藏',
-            component: Home,
-            icon: 'el-icon-star-off',
-            noChild: true,
-            children: [
-                {path: '/manage/collection', component: Collection, name: 'collection', desc: '收藏'},
-            ]
-        }
+        // {
+        //     path: '/',
+        //     name: '我的收藏',
+        //     component: Home,
+        //     icon: 'el-icon-star-off',
+        //     noChild: true,
+        //     children: [
+        //         {path: '/manage/collection', component: Collection, name: 'collection', desc: '收藏'},
+        //     ]
+        // }
     ]
 })

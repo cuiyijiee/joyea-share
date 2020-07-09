@@ -6,15 +6,16 @@
             <el-button slot="append" icon="el-icon-search" v-on:click="handleSearch"/>
         </el-input>
         <el-row :gutter="20" class="px10_divider">
-            <el-col :span="13" class="bg-purple">
+            <el-col :span="18" class="bg-purple">
                 <el-tabs v-model="searchTabName" type="card">
                     <el-tab-pane label="网盘目录" name="dir">
                         <!--文件路径显示-->
                         <el-row class="contentHead">
                             <el-col :span="18">
                                 <span style=" color:#66b1ff;font-size: 15px;cursor:pointer;"
-                                      @click="handleListLenovoDir('/','ent')">根目录</span>
-                                <span style="display: inline" v-for="(item,index) in dir.currentPath">
+                                      @click="handleListLenovoDir('/营销素材展示','ent')">首页</span>
+                                <span style="display: inline" v-for="(item,index) in dir.currentPath"
+                                      v-if="item !== '营销素材展示'">
                                     /
                                     <span style=" color:#66b1ff;font-size: 15px;cursor:pointer;"
                                           @click="handleClickDirPath(item,index)">{{item}}</span>
@@ -50,38 +51,49 @@
                                     </div>
                                 </template>
                             </el-table-column>
-                            <el-table-column label="解说词" width="70">
+                            <el-table-column label="引用次数" width="100">
                                 <template slot-scope="scope">
-                                    <span>{{scope.row.is_dir ? '-' :scope.row.desc.length}}</span>
+                                    <span>{{scope.row.is_dir ? '-' :scope.row.ref_num}}</span>
                                 </template>
                             </el-table-column>
-                            <el-table-column
-                                    label="素材格式"
-                                    width="100">
+                            <el-table-column label="下载次数" width="100">
                                 <template slot-scope="scope">
-                                    {{scope.row.is_dir ? '-' : scope.row.mime_type}}
+                                    <span>{{scope.row.is_dir ? '-' :scope.row.download_num}}</span>
                                 </template>
                             </el-table-column>
-                            <el-table-column
-                                    label="大小"
-                                    width="100">
-                                <template slot-scope="scope">
-                                    {{scope.row.is_dir ? '-' : scope.row.size}}
-                                </template>
-                            </el-table-column>
+                            <!--                            <el-table-column label="解说词" width="70">-->
+                            <!--                                <template slot-scope="scope">-->
+                            <!--                                    <span>{{scope.row.is_dir ? '-' :scope.row.desc.length}}</span>-->
+                            <!--                                </template>-->
+                            <!--                            </el-table-column>-->
+                            <!--                            <el-table-column-->
+                            <!--                                    label="素材格式"-->
+                            <!--                                    width="100">-->
+                            <!--                                <template slot-scope="scope">-->
+                            <!--                                    {{scope.row.is_dir ? '-' : scope.row.mime_type}}-->
+                            <!--                                </template>-->
+                            <!--                            </el-table-column>-->
+                            <!--                            <el-table-column-->
+                            <!--                                    label="大小"-->
+                            <!--                                    width="100">-->
+                            <!--                                <template slot-scope="scope">-->
+                            <!--                                    {{scope.row.is_dir ? '-' : scope.row.size}}-->
+                            <!--                                </template>-->
+                            <!--                            </el-table-column>-->
                             <el-table-column
                                     label="操作"
                                     width="180">
                                 <template slot-scope="scope">
                                     <span v-if="scope.row.is_dir">-</span>
                                     <span v-else>
-                                        <el-button circle type="primary" @click.stop="handleAdd(scope.$index, scope.row)"
+                                        <el-button circle type="primary"
+                                                   @click.stop="handleAdd(scope.$index, scope.row)"
                                                    icon="el-icon-plus"/>
-<!--                                        <el-button circle type="" icon="el-icon-view"-->
-<!--                                                   @click="handleGoToPreview(scope.row)"/>-->
-                                        <el-button circle :type="scope.row.collect ? 'warning' : ''"
-                                                   @click.stop="handleCollect(scope.$index, scope.row)"
-                                                   icon="el-icon-star-off"/>
+                                        <!--                                        <el-button circle type="" icon="el-icon-view"-->
+                                        <!--                                                   @click="handleGoToPreview(scope.row)"/>-->
+                                        <!--                                        <el-button circle :type="scope.row.collect ? 'warning' : ''"-->
+                                        <!--                                                   @click.stop="handleCollect(scope.$index, scope.row)"-->
+                                        <!--                                                   icon="el-icon-star-off"/>-->
                                     </span>
                                 </template>
                             </el-table-column>
@@ -103,7 +115,7 @@
                                            class="el-icon-tickets"></i>
                                         <i v-else class="el-icon-question"></i>
                                         {{scope.row.path.substr(scope.row.path.lastIndexOf("/")+1)}}</h4>
-                                    {{scope.row.path}}
+                                    <!--                                    {{scope.row.path}}-->
                                     <div v-if="scope.row.tags">
                                         <el-tag style="margin-right: 2px" v-for="tag in scope.row.tags" type="success"
                                                 size="mini">{{tag}}
@@ -111,19 +123,29 @@
                                     </div>
                                 </template>
                             </el-table-column>
-                            <el-table-column label="解说词" width="70">
+                            <!--                            <el-table-column label="解说词" width="70">-->
+                            <!--                                <template slot-scope="scope">-->
+                            <!--                                    <span>{{scope.row.is_dir ? "-" : scope.row.desc.length}}</span>-->
+                            <!--                                </template>-->
+                            <!--                            </el-table-column>-->
+                            <!--                            <el-table-column label="素材格式" width="100">-->
+                            <!--                                <template slot-scope="scope">-->
+                            <!--                                    {{scope.row.is_dir ? "-" : scope.row.mime_type}}-->
+                            <!--                                </template>-->
+                            <!--                            </el-table-column>-->
+                            <!--                            <el-table-column label="大小" width="100">-->
+                            <!--                                <template slot-scope="scope">-->
+                            <!--                                    {{scope.row.is_dir ? "-" : scope.row.size}}-->
+                            <!--                                </template>-->
+                            <!--                            </el-table-column>-->
+                            <el-table-column label="引用次数" width="100">
                                 <template slot-scope="scope">
-                                    <span>{{scope.row.is_dir ? "-" : scope.row.desc.length}}</span>
+                                    <span>{{scope.row.is_dir ? '-' :scope.row.ref_num}}</span>
                                 </template>
                             </el-table-column>
-                            <el-table-column label="素材格式" width="100">
+                            <el-table-column label="下载次数" width="100">
                                 <template slot-scope="scope">
-                                    {{scope.row.is_dir ? "-" : scope.row.mime_type}}
-                                </template>
-                            </el-table-column>
-                            <el-table-column label="大小" width="100">
-                                <template slot-scope="scope">
-                                    {{scope.row.is_dir ? "-" : scope.row.size}}
+                                    <span>{{scope.row.is_dir ? '-' :scope.row.download_num}}</span>
                                 </template>
                             </el-table-column>
                             <!--                    <el-table-column prop="updator" label="是否有解说词" /> -->
@@ -134,14 +156,15 @@
                                                    icon="el-icon-folder-opened"/>
                                     </div>
                                     <div v-else>
-                                        <el-button circle type="primary" @click.stop="handleAdd(scope.$index, scope.row)"
+                                        <el-button circle type="primary"
+                                                   @click.stop="handleAdd(scope.$index, scope.row)"
                                                    icon="el-icon-plus"/>
-<!--                                        <el-button circle type="" icon="el-icon-view"-->
-<!--                                                   v-if="!scope.row.mime_type.startsWith('other')"-->
-<!--                                                   @click="handleGoToPreview(scope.row)"/>-->
-                                        <el-button circle :type="scope.row.collect ? 'warning' : ''"
-                                                   @click.stop="handleCollect(scope.$index, scope.row)"
-                                                   icon="el-icon-star-off"/>
+                                        <!--                                        <el-button circle type="" icon="el-icon-view"-->
+                                        <!--                                                   v-if="!scope.row.mime_type.startsWith('other')"-->
+                                        <!--                                                   @click="handleGoToPreview(scope.row)"/>-->
+                                        <!--                                        <el-button circle :type="scope.row.collect ? 'warning' : ''"-->
+                                        <!--                                                   @click.stop="handleCollect(scope.$index, scope.row)"-->
+                                        <!--                                                   icon="el-icon-star-off"/>-->
                                     </div>
                                 </template>
                             </el-table-column>
@@ -159,6 +182,7 @@
                             <el-table-column prop="user_name" label="创建者" width="150"/>
                             <el-table-column prop="created_at" label="创建时间" width="150"/>
                             <el-table-column prop="refer_num" label="引用数" width="100"/>
+                            <el-table-column prop="download_num" label="下载数" width="100"/>
                             <el-table-column label="操作" width="100">
                                 <template slot-scope="scope">
                                     <el-button type="primary" size="mini" icon="el-icon-view"
@@ -169,7 +193,7 @@
                     </el-tab-pane>
                 </el-tabs>
             </el-col>
-            <el-col :span="11" class="bg-purple">
+            <el-col :span="6" class="bg-purple">
                 <div class="content_div">
                     <div style="width: 100%" class="center_vertical">
                         <h1>清单编辑列表（{{toCreateAlbum.list.length}}）</h1>
@@ -181,33 +205,36 @@
                             <template slot-scope="scope">
                                 <el-tooltip class="item" effect="dark" :content="scope.row.path" placement="top">
                                     <img v-if="scope.row.mime_type.startsWith('video')" src="video.png"
-                                         @click="handleGoToPreview(scope.row)">
-                                    <img v-if="scope.row.mime_type.startsWith('doc')" src="document.png"
-                                         @click="handleGoToPreview(scope.row)">
+                                         @click="handleGoToPreview(scope.row)" class="preview_img">
+                                    <img v-else-if="scope.row.mime_type.startsWith('doc')"
+                                         :src="handleGetDocumentImage(scope.row.mime_type)"
+                                         @click="handleGoToPreview(scope.row)" class="preview_img">
                                     <img v-else-if="scope.row.mime_type.startsWith('image')" class="preview_img"
                                          :onerror="defaultImg"
                                          preview="buildList" :preview-text="scope.row.path"
                                          :src="genPreviewUrl(scope.row.neid,scope.row.hash,scope.row.rev,scope.row.mime_type)">
-                                    <img v-else src="unknown.png" @click="handleGoToPreview(scope.row)">
+                                    <img v-else src="unknown.png" @click="handleGoToPreview(scope.row)"
+                                         class="preview_img">
                                 </el-tooltip>
                             </template>
                         </el-table-column>
-                        <el-table-column label="解说词">
-                            <template slot-scope="scope">
-                                <span v-if="scope.row.isModify">
-                                    <el-input type="textarea" placeholder="请输入内容"
-                                              v-model="toCreateAlbum.modifyRow.joyeaDesc"/>
-                                </span>
-                                <span v-else>{{scope.row.joyeaDesc}}</span>
-                            </template>
-                        </el-table-column>
+                        <!--                        <el-table-column label="解说词">-->
+                        <!--                            <template slot-scope="scope">-->
+                        <!--                                <span v-if="scope.row.isModify">-->
+                        <!--                                    <el-input type="textarea" placeholder="请输入内容"-->
+                        <!--                                              v-model="toCreateAlbum.modifyRow.joyeaDesc"/>-->
+                        <!--                                </span>-->
+                        <!--                                <span v-else>{{scope.row.joyeaDesc}}</span>-->
+                        <!--                            </template>-->
+                        <!--                        </el-table-column>-->
                         <el-table-column label="操作" width="150">
                             <template slot-scope="scope">
-                                <el-button type="primary" @click.stop="handleModify(scope.$index, scope.row,true)"
-                                           size="mini">
-                                    {{scope.row.isModify?'保存':"修改"}}
-                                </el-button>
-                                <el-button v-if="!scope.row.isModify" @click.stop="handleDelete(scope.$index, scope.row)"
+                                <!--                                <el-button type="primary" @click.stop="handleModify(scope.$index, scope.row,true)"-->
+                                <!--                                           size="mini">-->
+                                <!--                                    {{scope.row.isModify?'保存':"修改"}}-->
+                                <!--                                </el-button>-->
+                                <el-button v-if="!scope.row.isModify"
+                                           @click.stop="handleDelete(scope.$index, scope.row)"
                                            size="mini" type="danger" plain>删除
                                 </el-button>
                                 <el-button v-else size="mini" @click.stop="handleModify(scope.$index,scope.row,false)"
@@ -265,11 +292,11 @@
                         </el-tooltip>
                     </template>
                 </el-table-column>
-                <el-table-column label="解说词">
-                    <template slot-scope="scope">
-                        <span>{{scope.row.desc.length === 0 ? "暂未设置解说词" : scope.row.desc}}</span>
-                    </template>
-                </el-table-column>
+                <!--                <el-table-column label="解说词">-->
+                <!--                    <template slot-scope="scope">-->
+                <!--                        <span>{{scope.row.desc.length === 0 ? "暂未设置解说词" : scope.row.desc}}</span>-->
+                <!--                    </template>-->
+                <!--                </el-table-column>-->
             </el-table>
             <div slot="footer" class="dialog-footer">
                 <el-button @click.stop="visible.listDetailDialogVisible = false">取 消</el-button>
@@ -305,11 +332,11 @@
     import genSrcPreviewSrc from "../../../utils"
     import Sortable from 'sortablejs';
     import videojs from 'video.js'
+    import {getDocumentImage} from "../../../utils/JoyeaUtil";
 
     export default {
         name: "index",
-        components: {
-        },
+        components: {},
         data() {
             return {
                 dir: {
@@ -371,6 +398,9 @@
             }
         },
         methods: {
+            handleGetDocumentImage(mimeType) {
+                return getDocumentImage(mimeType)
+            },
             handlePlayVideo(url, title) {
                 this.visible.videoDialogVisible = true;
                 this.toPlayVideo.url = url;
@@ -501,9 +531,9 @@
                             _this.loading.searchList = false;
                             if (response.result) {
                                 _this.searchListResult = [];
-                                if(response.list.length === 0){
-                                    _this.$message.error("没有搜索到与【" + _this.search.key +"】有关的清单！")
-                                }else{
+                                if (response.list.length === 0) {
+                                    _this.$message.error("没有搜索到与【" + _this.search.key + "】有关的清单！")
+                                } else {
                                     response.list.forEach(list => {
                                         _this.searchListResult.push(list)
                                     })
@@ -532,9 +562,9 @@
                                     _this.loadMoreForm.nextOffset = response["next_offset"];
                                 }
                                 _this.searchResult = [];
-                                if(response.content.length === 0){
-                                    _this.$message.error("没有搜索到与【" + _this.search.key +"】有关的文件或文件夹！")
-                                }else{
+                                if (response.content.length === 0) {
+                                    _this.$message.error("没有搜索到与【" + _this.search.key + "】有关的文件或文件夹！")
+                                } else {
                                     response.content.forEach(item => {
                                         item.joyeaDesc = "";
                                         item.isModify = false;
@@ -747,11 +777,11 @@
                 let url = genSrcPreviewSrc(row.neid, row.hash, row.rev, previewType, this.userInfo.session);
                 if (row.mime_type.startsWith("video")) {
                     this.handlePlayVideo(url, row.path.substr(row.path.lastIndexOf("/") + 1),);
-                }else if(row.mime_type.startsWith("image")){
+                } else if (row.mime_type.startsWith("image")) {
                     this.handlePlayImage(url, row.path.substr(row.path.lastIndexOf("/") + 1),);
-                } else if(row.mime_type.startsWith("doc")) {
+                } else if (row.mime_type.startsWith("doc")) {
                     window.open(url);
-                }else{
+                } else {
                     this.$message.error("暂不支持的预览类型！")
                 }
             },
@@ -787,7 +817,6 @@
                     "您已选中【 " + toDownloadList.length + " 】个文件，" + (totalMb > warnMb
                     ? ("待准备文件列表大小为【 " + totalMb.toFixed(2) + "MB 】,文件较大，建议您分批次准备。")
                     : ("待准备文件列表大小为【 " + (totalMb > 1 ? totalMb.toFixed(2) + "MB" : totalKb.toFixed(2) + "KB") + " 】。")) + "准备完成后会在右上角提示您下载!",
-
                     '提示',
                     {
                         confirmButtonText: '准备',
@@ -873,7 +902,7 @@
                 this.searchTabName = "dir";
                 if (row.is_dir) {
                     this.handleListLenovoDir(row.path, 'ent')
-                }else{
+                } else {
                     this.handleGoToPreview(row);
                 }
             },
@@ -888,7 +917,7 @@
             if (user) {
                 this.userInfo = JSON.parse(user)
             }
-            this.handleListLenovoDir("/", "ent");
+            this.handleListLenovoDir("/营销素材展示", "ent");
             let toEditList = this.$route.params.toEditList;
             if (toEditList) {
                 this.toCreateAlbum.idEditMode = true;
@@ -969,11 +998,6 @@
         width: 100%;
     }
 
-    .preview_img {
-        max-height: 50px;
-        height: auto;
-        width: auto;
-    }
 
     .contentHead {
         font-size: 12px;

@@ -13,13 +13,13 @@
             </div>
             <el-row>
                 <el-col :md="8" :xs="24" v-for="(img,fileIndex) in album.list">
-                    <el-card style="padding: 2px;margin: 5px">
-                        <img :src="img.url" style="width: 100%; height: 150px" :preview="album.name"
+                    <el-card style="padding: 2px;margin: 5px;text-align:center;">
+                        <img :src="img.url" style="width:100%;object-fit: contain;" :preview="album.name"
                              :onerror="defaultImg"
-                             :preview-text="'解说词：' + img.desc">
+                             :preview-text="img.desc">
                         <div style="height: 20px;margin-top: 10px">
                             <el-tooltip class="item" effect="dark" :content="img.desc" placement="bottom">
-                                <span class="svg_name"><b>解说词：</b>{{img.desc}}</span>
+                                <span class="svg_name"><b>解说词：</b>{{img.desc.length === 0 ? '暂未设置解说词':img.desc}}</span>
                             </el-tooltip>
                         </div>
                     </el-card>
@@ -61,7 +61,7 @@
                     this.userInfo = JSON.parse(user)
                 }
                 check().then(resp => {
-                    if(resp.code === 4001){
+                    if (resp.code === 4001) {
                         this.$router.push({
                             name: "login",
                             query: {
@@ -72,7 +72,7 @@
                             }
                         });
                         this.loading = false;
-                    }else{
+                    } else {
                         api({
                             action: "album",
                             method: "shareList",

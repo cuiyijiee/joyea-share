@@ -4,7 +4,7 @@
         <div style="margin-bottom: 100px">
             <van-swipe-cell v-for="item in orderList" :key="item.path">
                 <van-card @click="handleClickOrderItem(item)"
-                          :desc="item.joyeaDesc.length > 0 ? item.joyeaDesc :'暂未设置解说词'"
+                          :desc="item.joyeaDesc && item.joyeaDesc.length > 0 ? item.joyeaDesc :'暂未设置解说词'"
                           :title="item.path.substr(item.path.lastIndexOf('/')+1)"
                           :thumb="item.mime_type.startsWith('image') ? genPreviewUrl(item.neid,item.hash,item.rev,item.mime_type):handleGetDocumentImage(item.mime_type)"/>
                 <template #right>

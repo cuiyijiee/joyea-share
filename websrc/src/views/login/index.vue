@@ -18,7 +18,6 @@
     </el-form>
 </template>
 <script>
-    import api from "../../api";
     import {login} from "../../api";
 
     const localStorage = window.localStorage;
@@ -117,13 +116,13 @@
         box-shadow: 0 0 25px #cac6c6;
 
         .title {
-            margin: 0px auto 40px auto;
+            margin: 0 auto 40px auto;
             text-align: center;
             color: #505458;
         }
 
         .remember {
-            margin: 0px 0px 35px 0px;
+            margin: 0 0 35px 0;
         }
     }
 </style>

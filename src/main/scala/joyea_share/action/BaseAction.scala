@@ -8,6 +8,11 @@ import xitrum.{Action, Log, SkipCsrfCheck}
 
 import scala.util.{Failure, Success, Try}
 
+
+class UserNotAuthException extends RuntimeException {
+
+}
+
 abstract class BaseAction[T: Manifest] extends Action with SkipCsrfCheck with Log with BaseJsonFormat {
 
     override def execute(): Unit = {
@@ -15,10 +20,20 @@ abstract class BaseAction[T: Manifest] extends Action with SkipCsrfCheck with Lo
             val request = Serialization.read[T](requestContentString)
             safeExecute(req = request)
         } catch {
+            case e: UserNotAuthException =>
+                cyjResponseError(ErrorCode.userSessionInvalid)
             case e: Throwable =>
                 e.printStackTrace()
                 cyjResponseError(ErrorCode.unknownError)
         }
+    }
+
+    def myUid: String = {
+        val uidOpt = sessiono[String]("user_id")
+        if (uidOpt.isEmpty) {
+            throw new UserNotAuthException()
+        }
+        uidOpt.get
     }
 
     def safeExecute(req: T): Unit

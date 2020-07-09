@@ -1,9 +1,14 @@
 package joyea_share.handler.interfaces
 
 import com.json.JsonObject
-import xitrum.Action
+import xitrum.{Action, Log}
 
-trait IAction {
+import scala.concurrent.ExecutionContext
+
+trait IAction extends Log{
+
+  val ctx: ExecutionContext = ExecutionContext.Implicits.global
+
   val resJson = new JsonObject()
   var context: Action = _
 

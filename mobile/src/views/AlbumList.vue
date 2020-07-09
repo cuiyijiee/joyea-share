@@ -2,32 +2,32 @@
     <div id="album">
         <van-swipe-cell v-for="item in albumList" :key="item.path">
             <van-card
-                    :num="item.list.length"
+                    :num="item.srcList.length"
                     @click="handleShowAlbum(item)"
-                    :title="item.name"
+                    :title="item.albumName"
                     :thumb="item.cover"/>
             <template #right>
                 <van-button square text="编辑" type="primary" class="delete-button" @click="handleEditAlbum(item)"/>
                 <van-button square text="删除" type="danger" class="delete-button" @click="handleDeleteAlbum(item)"/>
             </template>
         </van-swipe-cell>
-        <van-action-sheet v-model="albumVisible" :title="albumItem.name">
+        <van-action-sheet v-model="albumVisible" :title="albumItem.albumName">
             <van-grid border :column-num="3" :gutter="5">
                 <van-grid-item
-                        v-for="item in albumItem.list">
-                    <van-image v-if="item.mime_type.startsWith('image')" class="my_icon my_preview_size"
+                        v-for="item in albumItem.srcList">
+                    <van-image v-if="item.srcType.startsWith('image')" class="my_icon my_preview_size"
                                @click="handlePreview(item)"
-                               :src="genPreviewUrl(item.neid,item.hash,item.rev,item.mime_type)"/>
-                    <van-image v-else-if="item.mime_type.startsWith('video')" class="my_icon my_preview_size"
+                               :src="genPreviewUrl(item.srcNeid,item.srcHash,item.srcRev,item.srcType)"/>
+                    <van-image v-else-if="item.srcType.startsWith('video')" class="my_icon my_preview_size"
                                @click="handlePreview(item)"
                                src="video.png"/>
-                    <van-image v-else-if="item.mime_type.startsWith('doc')" class="my_icon my_preview_size"
-                               :src="handleGetDocumentImage(item.mime_type)"/>
+                    <van-image v-else-if="item.srcType.startsWith('doc')" class="my_icon my_preview_size"
+                               :src="handleGetDocumentImage(item.srcType)"/>
                     <van-image v-else class="my_icon my_preview_size" @click="handlePreview(item)"
                                src="unknown.png"/>
                     <div style="width: 98%">
                         <div style="font-size:10px;-webkit-text-size-adjust: none;word-break:break-all;">
-                            {{item.path.substr(item.path.lastIndexOf('/')+1)}}
+                            {{item.srcPath.substr(item.srcPath.lastIndexOf('/')+1)}}
                         </div>
                         <van-tag round type="success" v-for="tag in item.tags">{{tag.replace(markReg,"")}}</van-tag>
                     </div>
@@ -38,11 +38,10 @@
 </template>
 
 <script>
-    import api from "../api";
+    import api, {listMineAlbum} from "../api";
     import {genSrcPreviewSrc, getDocumentImage} from "../util/JoyeaUtil"
     import {mapGetters, mapActions} from "vuex";
-    import {ImagePreview} from 'vant';
-    import {GenImageListView} from "../util/ImageViewUtil";
+    import {GenImageListView, convertItem} from "../util/ImageViewUtil";
 
     export default {
 
@@ -65,15 +64,15 @@
             handleEditAlbum(item) {
                 this.$dialog.confirm({
                     title: "重新编辑提醒",
-                    message: "即将重新编辑清单【" + item.name + "】?"
+                    message: "即将重新编辑清单【" + item.albumName + "】?"
                 }).then(() => {
                     this.clearFunc().then(() => {
-                        item.list.forEach(src => {
-                            this.addFunc(src)
+                        item.srcList.forEach(src => {
+                            this.addFunc(convertItem(src))
                         });
                         this.setOrderEditInfoFunc({
-                            name: item.name,
-                            id: item.id
+                            name: item.albumName,
+                            id: item.albumId
                         }).then(() => {
                             this.$router.push("/order");
                         })
@@ -83,82 +82,56 @@
             handleDeleteAlbum(item) {
                 this.$dialog.confirm({
                     title: "删除提醒",
-                    message: "即将删除清单【" + item.name + "】?"
+                    message: "即将删除清单【" + item.albumName + "】?"
                 }).then(() => {
                     api({
                         action: "album",
                         method: "delete",
-                        album_id: item.id
+                        album_id: item.albumId
                     }).then(response => {
                         if (response.result) {
                             this.albumList = this.albumList.filter(album => {
-                                return album.id !== item.id;
+                                return album.albumId !== item.albumId;
                             });
                             this.$notify({
                                 type: "success",
-                                message: "你的清单【" + item.name + "】已成功删除！"
+                                message: "你的清单【" + item.albumName + "】已成功删除！"
                             });
                         }
                     })
                 })
             },
             handlePreview(clickItem) {
-                GenImageListView(this, this.albumItem.list, this.userInfo.session, clickItem);
+                GenImageListView(this, this.albumItem.srcList, this.userInfo.session, clickItem);
             },
-            genPreviewUrl(neid, hash, rev, mime_type) {
+            genPreviewUrl(srcNeid, srcHash, srcRev, srcType) {
                 let previewType = 'pic';    // if video is av
-                if (mime_type.startsWith("doc")) {
+                if (srcType.startsWith("doc")) {
                     previewType = 'doc'
-                } else if (mime_type.startsWith("video")) {
+                } else if (srcType.startsWith("video")) {
                     previewType = 'av'
                 }
-                return genSrcPreviewSrc(neid, hash, rev, previewType, this.userInfo.session);
+                return genSrcPreviewSrc(srcNeid, srcHash, srcRev, previewType, this.userInfo.session);
             },
             handleShowAlbum(item) {
                 this.albumItem = item;
                 this.albumVisible = true;
             },
             listAlbum() {
-                api({
-                    action: 'album',
-                    method: 'list'
-                }).then(response => {
-                    if (response.result) {
-                        this.albumList = [];
-                        let previewType = 'pic';    // if video is av
-                        response.data.forEach(list => {
-                            let imgUrl = [];
-                            list.src.forEach(src => {
-                                imgUrl.push({
-                                    url: genSrcPreviewSrc(src.neid, src.hash, src.rev, previewType, this.userInfo.session),
-                                    desc: src.desc,
-                                    joyeaDesc: src.desc,
-                                    path: src.path,
-                                    neid: src.neid,
-                                    hash: src.hash,
-                                    rev: src.rev,
-                                    filename: src.filename,
-                                    bytes: src.bytes,
-                                    size: src.size,
-                                    mime_type: src.mime_type,
-                                })
-                            });
-                            let images = imgUrl.filter(item => {
-                                return item.mime_type.startsWith("image")
-                            })
-                            this.albumList.push({
-                                id: list.album_id,
-                                name: list.album_name,
-                                shared: list.shared,
-                                list: imgUrl,
-                                cover: images.length > 0 ? images[0].url : 'cover.png',
-                            })
+                let previewType = 'pic';    // if video is av
+                listMineAlbum().then(response => {
+                    this.albumList = [];
+                    response.data.forEach(album => {
+                        album.srcList.forEach(src => {
+                            src.url = genSrcPreviewSrc(src.srcNeid, src.srcHash, src.srcRev, previewType, this.userInfo.session)
                         })
-                    } else {
-                        console.log(response.msg);
-                        this.$message.error("加载失败！")
-                    }
-                })
+                        let images = album.srcList.filter(item => {
+                            return item.srcType.startsWith("image")
+                        })
+                        album.cover = images.length > 0 ? images[0].url : 'cover.png';
+                    });
+                    this.albumList = response.data;
+                });
             }
         },
         computed: {

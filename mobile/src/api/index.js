@@ -24,8 +24,7 @@ export function login(user, pwd) {
 }
 
 export function logout() {
-    return service.post('api/v1/user/logout', {
-    }).then(res => {
+    return service.post('api/v1/user/logout', {}).then(res => {
         return res.data;
     })
 }
@@ -36,10 +35,28 @@ export function check() {
     })
 }
 
-export function pageListAlbum(curPage,pageSize) {
+export function pageListAlbum(curPage, pageSize, shared) {
     return service.post('api/v1/album/pageList', {
-        curPage:curPage,
-        pageSize:pageSize
+        curPage: curPage,
+        pageSize: pageSize,
+        shared: shared
+    }).then(res => {
+        return res.data;
+    })
+}
+
+export function listMineAlbum() {
+    return service.post("api/v1/album/list/mine", {}).then(res => {
+        return res.data;
+    })
+}
+
+export function switchShare(albumId, share, shareCoverId, shareDesc) {
+    return service.post("api/v1/album/switch/share", {
+        albumId: albumId,
+        share: share,
+        shareCoverNeid: shareCoverId,
+        shareDesc: shareDesc
     }).then(res => {
         return res.data;
     })

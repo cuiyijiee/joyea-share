@@ -3,3 +3,13 @@ $color-primary: #20a0ff; //#18c79c
 .el-card__header {
   background: #42b983;
 }
+.preview_img {
+  max-height: 100px;
+  width: 150px;
+  object-fit: contain;
+}
+
+.album_img {
+  height: 250px;
+  object-fit: contain;
+}

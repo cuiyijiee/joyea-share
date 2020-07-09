@@ -73,3 +73,13 @@
     white-space: nowrap;
     text-overflow: ellipsis
 }
+
+.float-button {
+    position: fixed;
+    bottom: 90px;
+    right: 50px;
+}
+
+.van-dropdown-menu__bar {
+    box-shadow: 0 2px 12px #ffffff!important;
+}

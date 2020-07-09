@@ -6,13 +6,14 @@ import OrderContainer from "../components/tabbar/OrderContainer";
 import MineContainer from "../components/tabbar/MineContainer";
 import SearchResult from "../components/tabbar/SearchContainer";
 import SquareContainer from "../components/tabbar/SquareContainer";
-import UploadIndex from "../views/upload/Index"
+import UploadIndex from "../views/upload/Index";
 
 import Main from "../views/Main";
 import Login from "../views/Login"
 import AlbumList from "../views/AlbumList";
 
 import AlbumDetail from "../views/AlbumDetail";
+import EditShareAlbum from "../views/EditShareAlbum";
 
 Vue.use(Router);
 
@@ -21,7 +22,7 @@ export default new Router({
     routes: [
         {
             path: '/login',
-            name: '仅一素材库系统',
+            name: '仅一素材库系统登陆',
             component: Login,
         },
         {
@@ -87,6 +88,15 @@ export default new Router({
             path: '/albumDetail',
             name: '清单详情',
             component: AlbumDetail,
+            meta: {
+                allowBack: true,
+                allowHome: true
+            }
+        },
+        {
+            path: '/editShare',
+            name: '编辑分享',
+            component: EditShareAlbum,
             meta: {
                 allowBack: true,
                 allowHome: true

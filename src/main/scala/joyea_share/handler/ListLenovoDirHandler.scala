@@ -7,10 +7,12 @@ import joyea_share.db.MySQLSettings
 import joyea_share.handler.interfaces.{ExecListener, IAction}
 import joyea_share.model.{AlbumSrc, SrcCollect}
 import joyea_share.module.download.DownloadManager
+import joyea_share.service.RedisService
 import joyea_share.util.{CommonListener, LenovoUtil, SessionUtil}
 import scalikejdbc.async.AsyncDB
 
 import scala.concurrent.Await
+import scala.concurrent.duration.Duration
 
 class ListLenovoDirHandler extends IAction {
     override def execute(request: JsonObject, listener: ExecListener): Unit = {
@@ -51,6 +53,10 @@ class ListLenovoDirHandler extends IAction {
 //                        })
                         content.add("desc", descArr)
                         content.add("collect", optionSrc.isDefined)
+                        val downloadNum = Await.result(RedisService.findFileDownloadNum(srcNeid.toString), Duration.Inf)
+                        content.add("download_num", downloadNum)
+                        val refNum = Await.result(AlbumSrc.countByNeid(srcNeid), Duration.Inf)
+                        content.add("ref_num", refNum)
                     })
 
                     LenovoUtil.getExtraMeta(DownloadManager.getAdminToken(), neidList, new CommonListener[JsonObject] {

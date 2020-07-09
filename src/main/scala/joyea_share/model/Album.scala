@@ -16,8 +16,11 @@ case class Album(
                   albumName: String,
                   albumDesc: Option[String],
                   shared: Boolean,
+                  shareCoverNeid: Option[Long],
+                  shareDesc: Option[String],
                   createdAt: Timestamp,
                   referNum: Long = 0,
+                  downloadNum: Long = 0,
                   updatedAt: Option[Timestamp]
                 ) extends ShortenedNames {
 
@@ -30,7 +33,10 @@ case class Album(
       .add("album_name", this.albumName)
       .add("album_desc", this.albumDesc.getOrElse(""))
       .add("shared", this.shared)
+      .add("share_cover_neid", this.shareCoverNeid.getOrElse(-1L))
+      .add("share_desc", this.shareDesc.getOrElse(""))
       .add("refer_num", this.referNum)
+      .add("download_num", this.downloadNum)
       .add("created_at", SUtil.genDateString(this.createdAt, "yy-MM-dd HH:mm"))
       .add("updated_at", SUtil.genDateString(this.updatedAt.getOrElse(this.createdAt), "yy-MM-dd HH:mm"))
 }
@@ -40,23 +46,11 @@ object Album extends SQLSyntaxSupport[Album] with ShortenedNames {
 
     lazy val a: scalikejdbc.QuerySQLSyntaxProvider[scalikejdbc.SQLSyntaxSupport[Album], Album] = Album.syntax("a")
 
-    override def columnNames: Seq[String] = Seq("album_id", "user_id", "user_name", "album_name", "album_desc", "shared", "created_at", "refer_num", "updated_at")
+    override def columnNames: Seq[String] = Seq("album_id", "user_id", "user_name", "album_name", "album_desc", "shared", "share_cover_neid", "share_desc", "created_at", "refer_num", "download_num", "updated_at")
 
     def apply(a: SyntaxProvider[Album])(rs: WrappedResultSet): Album = apply(a.resultName)(rs)
 
-    def apply(a: ResultName[Album])(rs: WrappedResultSet): Album = {
-        new Album(
-            albumId = rs.get[Long](a.albumId),
-            userId = rs.get[String](a.userId),
-            userName = rs.get[String](a.userName),
-            albumName = rs.get[String](a.albumName),
-            albumDesc = rs.get[Option[String]](a.albumDesc),
-            shared = rs.get[Boolean](a.shared),
-            createdAt = rs.get[Timestamp](a.createdAt),
-            referNum = rs.get[Long](a.referNum),
-            updatedAt = rs.get[Option[Timestamp]](a.updatedAt)
-        )
-    }
+    def apply(a: ResultName[Album])(rs: WrappedResultSet): Album = autoConstruct(rs, a)
 
     def save(album: Album, updateAt: Option[Timestamp] = Some(new Timestamp(System.currentTimeMillis())))
             (implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[Album] = withSQL {
@@ -67,6 +61,7 @@ object Album extends SQLSyntaxSupport[Album] with ShortenedNames {
             column.albumDesc -> album.albumDesc,
             column.shared -> album.shared,
             column.referNum -> album.referNum,
+            column.downloadNum -> album.downloadNum,
             column.updatedAt -> updateAt
         ).where.eq(column.albumId, album.albumId)
     }.update().future().map(_ => album)
@@ -100,7 +95,9 @@ object Album extends SQLSyntaxSupport[Album] with ShortenedNames {
                     column.updatedAt -> updatedAt,
                 )
             }.updateAndReturnGeneratedKey().future()
-        } yield new Album(albumId = albumId, userId = userId, userName = userName, albumName = albumName, albumDesc = albumDesc, shared = shared, createdAt = createdAt, updatedAt = updatedAt)
+        } yield new Album(albumId = albumId, userId = userId, userName = userName, albumName = albumName,
+            albumDesc = albumDesc, shared = shared, shareCoverNeid = None, shareDesc = None,
+            createdAt = createdAt, updatedAt = updatedAt)
     }
 
     def delete(albumId: Long)(implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[Int] = withSQL {
@@ -131,13 +128,35 @@ object Album extends SQLSyntaxSupport[Album] with ShortenedNames {
         update(Album).set(sqls"""${Album.column.referNum} = ${Album.column.referNum} - 1""").where.eq(column.albumId, albumId)
     }.update().future()
 
+    def addDownload(albumId: Long)(implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[Boolean] = withSQL {
+        update(Album).set(sqls"""${Album.column.downloadNum} = ${Album.column.downloadNum} + 1""").where.eq(column.albumId, albumId)
+    }.update().future().map(_ >= 1)
+
     def searchByName(keyword: String)(implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[List[Album]] = withSQL {
         selectFrom(Album as a).where.like(column.albumName, s"%$keyword%")
     }.map(Album(a)).list().future()
 
-    def pageListAlbum(curPage: Int, pageSize: Int)
-                     (implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[List[Album]] = withSQL {
-        selectFrom(Album as a).orderBy(column.albumId).desc.limit(pageSize).offset((curPage - 1) * pageSize)
-    }.map(Album(a)).list().future()
+    def pageListAlbum(curPage: Int, pageSize: Int, shared: Option[Boolean])
+                     (implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[List[Album]] = {
+        if (shared.isDefined) {
+            withSQL {
+                selectFrom(Album as a).where.eq(column.shared, shared.get).orderBy(column.albumId).desc.limit(pageSize).offset((curPage - 1) * pageSize)
+            }.map(Album(a)).list().future()
+        } else {
+            withSQL {
+                selectFrom(Album as a).orderBy(column.albumId).desc.limit(pageSize).offset((curPage - 1) * pageSize)
+            }.map(Album(a)).list().future()
+        }
+    }
 
+    def switchShare(coverId: Option[Long], shareDesc: Option[String], share: Boolean, albumId: Long)
+                   (implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[Boolean] = withSQL {
+        update(Album).set(
+            column.shareCoverNeid -> coverId,
+            column.shareDesc -> shareDesc,
+            column.shared -> share
+        ).where.eq(column.albumId, albumId)
+    }.update().future().map(_ => true)
 }
+
+//

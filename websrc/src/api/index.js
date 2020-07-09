@@ -24,14 +24,21 @@ export function login(user, pwd) {
 }
 
 export function logout() {
-    return service.post('api/v1/user/logout', {
-    }).then(res => {
+    return service.post('api/v1/user/logout', {}).then(res => {
         return res.data;
     })
 }
 
 export function check() {
     return service.post('api/v1/user/check', {}).then(res => {
+        return res.data;
+    })
+}
+
+export function recordAlbumDownload(albumId) {
+    return service.post('api/v1/album/download/record', {
+        albumId: albumId
+    }).then(res => {
         return res.data;
     })
 }

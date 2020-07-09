@@ -19,7 +19,8 @@ libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.2.3"
 libraryDependencies += "org.codehaus.janino" % "janino" % "3.0.11"
 libraryDependencies += "commons-net" % "commons-net" % "3.6"
 libraryDependencies += "commons-io" % "commons-io" % "2.7"
-
+// https://mvnrepository.com/artifact/com.github.etaty/rediscala
+libraryDependencies += "com.github.etaty" %% "rediscala" % "1.9.0"
 
 // https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp
 libraryDependencies += "com.squareup.okhttp3" % "okhttp" % "3.14.1"
