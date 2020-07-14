@@ -2,10 +2,22 @@
     <div>
         <el-row class="container">
             <el-col :span="24" class="header">
-                <el-col :span="10" class="logo logo-width">
-                    {{sysName}}
+                <el-col :span="16">
+                    <div class="main_content" @click="jumpToBuild">
+                        <img src="logo.gif"
+                             style="height: 30px;vertical-align: middle"/>
+                        <span class="logo" style="font-size: 20px;margin-left: 10px;vertical-align:bottom">仅一素材库</span>
+                    </div>
                 </el-col>
-                <el-col :span="4" class="userinfo">
+
+                <el-col :span="8" class="userinfo">
+                    <el-button size="small" icon="el-icon-edit" @click="jumpToBuild"
+                               :class="{'is-active':currentPath==='/build'}"> 工作台
+                    </el-button>
+                    <el-button size="small" icon="el-icon-tickets" @click="jumpToList"
+                               :class="{'is-active':currentPath==='/manage/list'}"
+                               style="margin-right: 10px">我的清单
+                    </el-button>
                     <el-popover
                             style="margin-right: 20px"
                             placement="bottom-start"
@@ -37,8 +49,6 @@
                                    :icon="visible ? 'el-icon-loading' :'el-icon-download' "></el-button>
                     </el-popover>
                     <el-dropdown trigger="hover">
-                        <!--                    <span class="el-dropdown-link userinfo-inner"><img-->
-                        <!--                            :src="this.sysUserAvatar"/> {{sysUserName}}</span>-->
                         <span class="el-dropdown-link userinfo-inner">{{userInfo.name}}</span>
                         <el-dropdown-menu slot="dropdown">
                             <el-dropdown-item @click.native="logout">注销登陆</el-dropdown-item>
@@ -47,35 +57,8 @@
                 </el-col>
             </el-col>
             <el-col :span="24" class="main">
-                <aside class="menu-expanded">
-                    <!--导航菜单-->
-                    <el-menu :default-active="$route.path" class="el-menu-vertical-demo" @open="handleOpen"
-                             @close="handleClose" @select="handleSelect"
-                             unique-opened router>
-                        <template v-for="(item,index) in $router.options.routes" v-if="!item.hidden">
-                            <el-submenu :index="index+''" v-if="!item.noChild">
-                                <template slot="title"><i :class="item.icon"></i>{{item.name}}</template>
-                                <el-menu-item v-for="child in item.children" :index="child.path" :key="child.path"
-                                              v-if="!child.hidden">{{child.name}}
-                                </el-menu-item>
-                            </el-submenu>
-                            <el-menu-item v-if="item.noChild && item.children && item.children.length > 0"
-                                          :index="item.children[0].path">
-                                <i :class="item.icon"></i>{{item.name}}
-                            </el-menu-item>
-                        </template>
-                    </el-menu>
-                </aside>
                 <section class="content-container">
                     <div class="grid-content bg-purple-light">
-                        <el-col :span="24" class="breadcrumb-container">
-                            <strong class="title">{{$route.desc}}</strong>
-                            <el-breadcrumb separator="/" class="breadcrumb-inner">
-                                <el-breadcrumb-item v-for="item in $route.matched" :key="item.path">
-                                    {{ item.name }}
-                                </el-breadcrumb-item>
-                            </el-breadcrumb>
-                        </el-col>
                         <el-col :span="24" class="content-wrapper">
                             <transition name="fade" mode="out-in">
                                 <router-view></router-view>
@@ -99,11 +82,11 @@
     export default {
         data() {
             return {
-                sysName: '仅一素材库系统',
                 userInfo: {
                     name: '',
                     email: ''
                 },
+                currentPath: "",
                 downloadTask: []
             }
         },
@@ -113,6 +96,12 @@
             }
         },
         methods: {
+            jumpToBuild() {
+                this.$router.replace("/build");
+            },
+            jumpToList() {
+                this.$router.replace("/manage/list");
+            },
             handleOpen() {
             },
             handleClose() {
@@ -192,9 +181,15 @@
             },
             genTodayDownloadTaskKey() {
                 return "down_open_" + getNowFormatDate();
+            },
+        },
+        watch: {
+            $route(to, from) {
+                this.currentPath = this.$router.currentRoute.fullPath;
             }
         },
         mounted() {
+            this.currentPath = this.$router.currentRoute.fullPath;
             if (!this.$route.params.checked) {
                 check().then(resp => {
                     if (resp.code === 4001) {
@@ -227,12 +222,12 @@
         .header {
             height: 60px;
             line-height: 60px;
-            background: $color-primary;
+            background: #1e162f;
             color: #fff;
 
             .userinfo {
                 text-align: right;
-                padding-right: 35px;
+                padding-right: 150px;
                 float: right;
 
                 .userinfo-inner {
@@ -249,31 +244,22 @@
                 }
             }
 
+            .main_content {
+                margin: 0 150px;
+            }
+
             .logo {
-                //width:150px;
                 height: 60px;
-                font-size: 22px;
-                padding-left: 20px;
-                padding-right: 20px;
                 -webkit-user-select: none;
                 -moz-user-select: none;
                 -ms-user-select: none;
                 user-select: none;
-
-                img {
-                    width: 40px;
-                    float: left;
-                    margin: 10px 10px 10px 18px;
-                }
 
                 .txt {
                     color: #fff;
                 }
             }
 
-            .logo-width {
-                width: 150px;
-            }
 
             .tools {
                 padding: 0px 23px;
@@ -282,6 +268,16 @@
                 line-height: 60px;
                 cursor: pointer;
             }
+        }
+
+        .el-menu-item {
+            color: #8c939d;
+        }
+
+        .is-active {
+            border: 0 !important;
+            background: #eb7708;
+            color: #ffffff;
         }
 
         .main {
@@ -309,15 +305,8 @@
             }
 
             .content-container {
-                // background: #f1f2f7;
                 flex: 1;
-                // position: absolute;
-                // right: 0px;
-                // top: 0px;
-                // bottom: 0px;
-                // left: 150px;
                 overflow-y: scroll;
-                padding: 20px;
 
                 .breadcrumb-container {
                     //margin-bottom: 15px;

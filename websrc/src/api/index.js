@@ -42,3 +42,9 @@ export function recordAlbumDownload(albumId) {
         return res.data;
     })
 }
+
+export function getTopSearchKey() {
+    return service.post('api/v1/search/key/top', {}).then(res => {
+        return res.data;
+    })
+}

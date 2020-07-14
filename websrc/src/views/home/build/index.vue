@@ -1,197 +1,104 @@
 <template>
     <section>
         <!--工具条-->
-        <el-input placeholder="请输入关键字" v-model="search.key" class="input-with-select px10_divider"
-                  @keyup.enter.native="handleSearch">
-            <el-button slot="append" icon="el-icon-search" v-on:click="handleSearch"/>
-        </el-input>
-        <el-row :gutter="20" class="px10_divider">
+        <div style="padding: 10px 150px 0 150px;background: #1e162f;">
+            <el-input placeholder="请输入关键字" v-model="search.key" class="my-input"
+                      @keyup.enter.native="handleSearch">
+                <el-button slot="append" icon="el-icon-search" style="border-radius: 100px;" v-on:click="handleSearch"
+                           class="search-button"/>
+            </el-input>
+            <div style="padding:15px 0;color: #ffffff">热门搜索:
+                <span style="padding: 5px" v-for="key in topSearchKey"
+                      @click="handleClickTopSearchKey(key)"><u>{{key}}</u></span>
+            </div>
+        </div>
+        <div v-if="dir.currentPath.length === 1 && dir.currentPath[0] === '营销素材展示' && toCreateAlbum.list.length === 0"
+             style="height:1080px;padding: 0 150px;background: #d1d1d1;">
+            <div style="padding: 10px 10px 0 10px;height: 100%; "
+                 v-loading="dir.loadingDir || loading.search"
+                 element-loading-background="rgba(209, 209, 209)"
+            >
+                <el-row :gutter="10" justify="center" align="middle">
+                    <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6" v-for="menu in menuPath">
+                        <div class="menu-content" style="border: #000000 3px" @click="handleClickRootMenu(menu)">
+                            <img :src="menu.icon" style=""/>
+                        </div>
+                    </el-col>
+                </el-row>
+            </div>
+        </div>
+        <el-row v-else :gutter="20" style="padding: 10px 35px 0 150px;height:1080px;">
             <el-col :span="18" class="bg-purple">
-                <el-tabs v-model="searchTabName" type="card">
-                    <el-tab-pane label="网盘目录" name="dir">
-                        <!--文件路径显示-->
-                        <el-row class="contentHead">
-                            <el-col :span="18">
-                                <span style=" color:#66b1ff;font-size: 15px;cursor:pointer;"
+                <!--文件路径显示-->
+                <el-row class="contentHead">
+                    <el-col :span="18">
+                                <span style=" color:#000000;font-size: 15px;cursor:pointer;"
                                       @click="handleListLenovoDir('/营销素材展示','ent')">首页</span>
-                                <span style="display: inline" v-for="(item,index) in dir.currentPath"
-                                      v-if="item !== '营销素材展示'">
+                        <span style="display: inline" v-for="(item,index) in dir.currentPath"
+                              v-if="item !== '营销素材展示'">
                                     /
-                                    <span style=" color:#66b1ff;font-size: 15px;cursor:pointer;"
+                                    <span style=" color:#000000;font-size: 15px;cursor:pointer;"
                                           @click="handleClickDirPath(item,index)">{{item}}</span>
                                 </span>
-                            </el-col>
-                            <el-col :span="3" :offset="3">
-                                共{{dir.tableData.length}}个资源
-                            </el-col>
-                        </el-row>
-                        <el-table ref="fileTable"
-                                  v-loading="dir.loadingDir"
-                                  :data="dir.tableData"
-                                  tooltip-effect="dark"
-                                  empty-text="文件夹为空"
-                                  @row-click="handleClickDirItem"
-                                  style="width: 100%">
-                            <el-table-column
-                                    show-overflow-tooltip
-                                    label="文件名">
-                                <template slot-scope="scope">
-                                    <i v-if="scope.row.is_dir" class="el-icon-folder-opened"></i>
-                                    <i v-else-if="scope.row.mime_type.startsWith('video')"
-                                       class="el-icon-video-camera"></i>
-                                    <i v-else-if="scope.row.mime_type.startsWith('image')"
-                                       class="el-icon-picture-outline"></i>
-                                    <i v-else-if="scope.row.mime_type.startsWith('doc')" class="el-icon-tickets"></i>
-                                    <i v-else class="el-icon-question"></i>
-                                    {{' ' + scope.row.path.substr(scope.row.path.lastIndexOf('/')+1)}}
-                                    <div v-if="scope.row.tags">
-                                        <el-tag style="margin-right: 2px" v-for="tag in scope.row.tags" type="success"
-                                                size="mini">{{tag}}
-                                        </el-tag>
-                                    </div>
-                                </template>
-                            </el-table-column>
-                            <el-table-column label="引用次数" width="100">
-                                <template slot-scope="scope">
-                                    <span>{{scope.row.is_dir ? '-' :scope.row.ref_num}}</span>
-                                </template>
-                            </el-table-column>
-                            <el-table-column label="下载次数" width="100">
-                                <template slot-scope="scope">
-                                    <span>{{scope.row.is_dir ? '-' :scope.row.download_num}}</span>
-                                </template>
-                            </el-table-column>
-                            <!--                            <el-table-column label="解说词" width="70">-->
-                            <!--                                <template slot-scope="scope">-->
-                            <!--                                    <span>{{scope.row.is_dir ? '-' :scope.row.desc.length}}</span>-->
-                            <!--                                </template>-->
-                            <!--                            </el-table-column>-->
-                            <!--                            <el-table-column-->
-                            <!--                                    label="素材格式"-->
-                            <!--                                    width="100">-->
-                            <!--                                <template slot-scope="scope">-->
-                            <!--                                    {{scope.row.is_dir ? '-' : scope.row.mime_type}}-->
-                            <!--                                </template>-->
-                            <!--                            </el-table-column>-->
-                            <!--                            <el-table-column-->
-                            <!--                                    label="大小"-->
-                            <!--                                    width="100">-->
-                            <!--                                <template slot-scope="scope">-->
-                            <!--                                    {{scope.row.is_dir ? '-' : scope.row.size}}-->
-                            <!--                                </template>-->
-                            <!--                            </el-table-column>-->
-                            <el-table-column
-                                    label="操作"
-                                    width="180">
-                                <template slot-scope="scope">
-                                    <span v-if="scope.row.is_dir">-</span>
-                                    <span v-else>
-                                        <el-button circle type="primary"
+                    </el-col>
+                    <el-col :span="3" :offset="3">
+                        共{{dir.tableData.length}}个资源
+                    </el-col>
+                </el-row>
+                <el-table ref="fileTable"
+                          v-loading="dir.loadingDir || loading.search"
+                          :data="dir.tableData"
+                          tooltip-effect="dark"
+                          empty-text="文件夹为空"
+                          @row-click="handleClickDirItem"
+                          style="width: 100%;">
+                    <el-table-column
+                            show-overflow-tooltip
+                            label="文件名">
+                        <template slot-scope="scope">
+                            <div style="">
+                                <i v-if="scope.row.is_dir" class="el-icon-folder-opened"></i>
+                                <i v-else-if="scope.row.mime_type.startsWith('video')"
+                                   class="el-icon-video-camera"></i>
+                                <img v-else-if="scope.row.mime_type.startsWith('image')"
+                                     style="width: 60px;height: 60px;line-height: 30px"
+                                     :onerror="defaultImg"
+                                     preview="dir_image_list" :preview-text="scope.row.path"
+                                     :src="genPreviewUrl(scope.row.neid,scope.row.hash,scope.row.rev,scope.row.mime_type)">
+                                <i v-else-if="scope.row.mime_type.startsWith('doc')" class="el-icon-tickets"></i>
+                                <i v-else class="el-icon-question"></i>
+                                <span style="vertical-align:top;color: #333333"> {{' ' + scope.row.path.substr(scope.row.path.lastIndexOf('/')+1)}}</span>
+                                <div v-if="scope.row.tags">
+                                    <el-tag style="margin-right: 2px" v-for="tag in scope.row.tags" type="info"
+                                            size="mini">{{tag.replace(markReg,"")}}
+                                    </el-tag>
+                                </div>
+                            </div>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="引用次数" width="100">
+                        <template slot-scope="scope">
+                            <span>{{scope.row.is_dir ? '-' :scope.row.ref_num}}</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="下载次数" width="100">
+                        <template slot-scope="scope">
+                            <span>{{scope.row.is_dir ? '-' :scope.row.download_num}}</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column
+                            label="操作"
+                            width="180">
+                        <template slot-scope="scope">
+                            <span v-if="scope.row.is_dir">-</span>
+                            <span v-else>
+                                        <el-button circle type=""
                                                    @click.stop="handleAdd(scope.$index, scope.row)"
                                                    icon="el-icon-plus"/>
-                                        <!--                                        <el-button circle type="" icon="el-icon-view"-->
-                                        <!--                                                   @click="handleGoToPreview(scope.row)"/>-->
-                                        <!--                                        <el-button circle :type="scope.row.collect ? 'warning' : ''"-->
-                                        <!--                                                   @click.stop="handleCollect(scope.$index, scope.row)"-->
-                                        <!--                                                   icon="el-icon-star-off"/>-->
                                     </span>
-                                </template>
-                            </el-table-column>
-                        </el-table>
-                    </el-tab-pane>
-                    <el-tab-pane label="网盘搜索结果" name="pan">
-                        <el-table stripe empty-text="暂没有搜索数据" :data="searchResult" style="width: 100%"
-                                  @row-click="handleClickSearch"
-                                  v-loading="loading.search">
-                            <el-table-column label="素材名" show-overflow-tooltip>
-                                <template slot-scope="scope">
-                                    <h4 style="margin: 2px">
-                                        <i v-if="scope.row.is_dir" class="el-icon-folder-opened"></i>
-                                        <i v-else-if="scope.row.mime_type.startsWith('video')"
-                                           class="el-icon-video-camera"></i>
-                                        <i v-else-if="scope.row.mime_type.startsWith('image')"
-                                           class="el-icon-picture-outline"></i>
-                                        <i v-else-if="scope.row.mime_type.startsWith('doc')"
-                                           class="el-icon-tickets"></i>
-                                        <i v-else class="el-icon-question"></i>
-                                        {{scope.row.path.substr(scope.row.path.lastIndexOf("/")+1)}}</h4>
-                                    <!--                                    {{scope.row.path}}-->
-                                    <div v-if="scope.row.tags">
-                                        <el-tag style="margin-right: 2px" v-for="tag in scope.row.tags" type="success"
-                                                size="mini">{{tag}}
-                                        </el-tag>
-                                    </div>
-                                </template>
-                            </el-table-column>
-                            <!--                            <el-table-column label="解说词" width="70">-->
-                            <!--                                <template slot-scope="scope">-->
-                            <!--                                    <span>{{scope.row.is_dir ? "-" : scope.row.desc.length}}</span>-->
-                            <!--                                </template>-->
-                            <!--                            </el-table-column>-->
-                            <!--                            <el-table-column label="素材格式" width="100">-->
-                            <!--                                <template slot-scope="scope">-->
-                            <!--                                    {{scope.row.is_dir ? "-" : scope.row.mime_type}}-->
-                            <!--                                </template>-->
-                            <!--                            </el-table-column>-->
-                            <!--                            <el-table-column label="大小" width="100">-->
-                            <!--                                <template slot-scope="scope">-->
-                            <!--                                    {{scope.row.is_dir ? "-" : scope.row.size}}-->
-                            <!--                                </template>-->
-                            <!--                            </el-table-column>-->
-                            <el-table-column label="引用次数" width="100">
-                                <template slot-scope="scope">
-                                    <span>{{scope.row.is_dir ? '-' :scope.row.ref_num}}</span>
-                                </template>
-                            </el-table-column>
-                            <el-table-column label="下载次数" width="100">
-                                <template slot-scope="scope">
-                                    <span>{{scope.row.is_dir ? '-' :scope.row.download_num}}</span>
-                                </template>
-                            </el-table-column>
-                            <!--                    <el-table-column prop="updator" label="是否有解说词" /> -->
-                            <el-table-column label="操作" width="180">
-                                <template slot-scope="scope">
-                                    <div v-if="scope.row.is_dir">
-                                        <el-button circle type="primary" @click.stop="handleClickDirItem(scope.row)"
-                                                   icon="el-icon-folder-opened"/>
-                                    </div>
-                                    <div v-else>
-                                        <el-button circle type="primary"
-                                                   @click.stop="handleAdd(scope.$index, scope.row)"
-                                                   icon="el-icon-plus"/>
-                                        <!--                                        <el-button circle type="" icon="el-icon-view"-->
-                                        <!--                                                   v-if="!scope.row.mime_type.startsWith('other')"-->
-                                        <!--                                                   @click="handleGoToPreview(scope.row)"/>-->
-                                        <!--                                        <el-button circle :type="scope.row.collect ? 'warning' : ''"-->
-                                        <!--                                                   @click.stop="handleCollect(scope.$index, scope.row)"-->
-                                        <!--                                                   icon="el-icon-star-off"/>-->
-                                    </div>
-                                </template>
-                            </el-table-column>
-                        </el-table>
-                        <el-button class="load_more_bt" :class="{no_display:!search.hasNext}"
-                                   :loading="loading.searchMore"
-                                   @click.stop="handleLoadMore">加载更多
-                        </el-button>
-                    </el-tab-pane>
-                    <el-tab-pane label="清单搜索结果" name="list">
-                        <el-table stripe empty-text="暂没有搜索数据" :data="searchListResult" style="width: 100%"
-                                  v-loading="loading.searchList">
-                            <el-table-column prop="album_id" label="清单ID" width="100"/>
-                            <el-table-column prop="album_name" show-overflow-tooltip label="清单名称"/>
-                            <el-table-column prop="user_name" label="创建者" width="150"/>
-                            <el-table-column prop="created_at" label="创建时间" width="150"/>
-                            <el-table-column prop="refer_num" label="引用数" width="100"/>
-                            <el-table-column prop="download_num" label="下载数" width="100"/>
-                            <el-table-column label="操作" width="100">
-                                <template slot-scope="scope">
-                                    <el-button type="primary" size="mini" icon="el-icon-view"
-                                               @click.stop="handleSeeListDetail(scope.row)"></el-button>
-                                </template>
-                            </el-table-column>
-                        </el-table>
-                    </el-tab-pane>
-                </el-tabs>
+                        </template>
+                    </el-table-column>
+                </el-table>
             </el-col>
             <el-col :span="6" class="bg-purple">
                 <div class="content_div">
@@ -203,7 +110,9 @@
                               :data="toCreateAlbum.list" style="width: 100%">
                         <el-table-column label="预览">
                             <template slot-scope="scope">
-                                <el-tooltip class="item" effect="dark" :content="scope.row.path" placement="top">
+                                <el-tooltip class="item" effect="dark"
+                                            :content="scope.row.path.substr(scope.row.path.lastIndexOf('/')+1)"
+                                            placement="top">
                                     <img v-if="scope.row.mime_type.startsWith('video')" src="video.png"
                                          @click="handleGoToPreview(scope.row)" class="preview_img">
                                     <img v-else-if="scope.row.mime_type.startsWith('doc')"
@@ -211,52 +120,39 @@
                                          @click="handleGoToPreview(scope.row)" class="preview_img">
                                     <img v-else-if="scope.row.mime_type.startsWith('image')" class="preview_img"
                                          :onerror="defaultImg"
-                                         preview="buildList" :preview-text="scope.row.path"
+                                         preview="build_image_list" :preview-text="scope.row.path"
                                          :src="genPreviewUrl(scope.row.neid,scope.row.hash,scope.row.rev,scope.row.mime_type)">
                                     <img v-else src="unknown.png" @click="handleGoToPreview(scope.row)"
                                          class="preview_img">
                                 </el-tooltip>
                             </template>
                         </el-table-column>
-                        <!--                        <el-table-column label="解说词">-->
-                        <!--                            <template slot-scope="scope">-->
-                        <!--                                <span v-if="scope.row.isModify">-->
-                        <!--                                    <el-input type="textarea" placeholder="请输入内容"-->
-                        <!--                                              v-model="toCreateAlbum.modifyRow.joyeaDesc"/>-->
-                        <!--                                </span>-->
-                        <!--                                <span v-else>{{scope.row.joyeaDesc}}</span>-->
-                        <!--                            </template>-->
-                        <!--                        </el-table-column>-->
                         <el-table-column label="操作" width="150">
                             <template slot-scope="scope">
-                                <!--                                <el-button type="primary" @click.stop="handleModify(scope.$index, scope.row,true)"-->
-                                <!--                                           size="mini">-->
-                                <!--                                    {{scope.row.isModify?'保存':"修改"}}-->
-                                <!--                                </el-button>-->
                                 <el-button v-if="!scope.row.isModify"
                                            @click.stop="handleDelete(scope.$index, scope.row)"
-                                           size="mini" type="danger" plain>删除
+                                           size="mini" type="" plain>删除
                                 </el-button>
                                 <el-button v-else size="mini" @click.stop="handleModify(scope.$index,scope.row,false)"
-                                           type="danger" plain>取消
+                                           type="" plain>取消
                                 </el-button>
                             </template>
                         </el-table-column>
                     </el-table>
                     <el-row class="load_more_bt" :class="{no_display:toCreateAlbum.list.length === 0}" :gutter="5">
                         <el-col :span="8">
-                            <el-button type="primary" @click.stop="handleSaveList" class="load_more_bt"
+                            <el-button type="info" @click.stop="handleSaveList" class="load_more_bt"
                                        icon="el-icon-folder-add" :loading="loading.saveList">保存清单
                             </el-button>
                         </el-col>
                         <el-col :span="8">
-                            <el-button type="success" @click.stop="handleDownloadSrc(true)" class="load_more_bt"
+                            <el-button type="info" @click.stop="handleDownloadSrc(true)" class="load_more_bt"
                                        v-loading.fullscreen.lock="loading.fullscreenLoading"
                                        icon="el-icon-suitcase">下载准备
                             </el-button>
                         </el-col>
                         <el-col :span="8">
-                            <el-button type="danger" @click.stop="handleClearList" class="load_more_bt"
+                            <el-button type="info" @click.stop="handleClearList" class="load_more_bt"
                                        icon="el-icon-delete">清空
                             </el-button>
                         </el-col>
@@ -292,11 +188,6 @@
                         </el-tooltip>
                     </template>
                 </el-table-column>
-                <!--                <el-table-column label="解说词">-->
-                <!--                    <template slot-scope="scope">-->
-                <!--                        <span>{{scope.row.desc.length === 0 ? "暂未设置解说词" : scope.row.desc}}</span>-->
-                <!--                    </template>-->
-                <!--                </el-table-column>-->
             </el-table>
             <div slot="footer" class="dialog-footer">
                 <el-button @click.stop="visible.listDetailDialogVisible = false">取 消</el-button>
@@ -324,11 +215,69 @@
                 </div>
             </el-image>
         </el-dialog>
+        <el-dialog :title="'【' + search.key + '】的搜索结果'" :visible.sync="visible.searchDialogVisible" @close="">
+            <el-table stripe empty-text="暂没有搜索数据" :data="searchResult" style="width: 100%"
+                      @row-click="handleClickSearch" height="500"
+                      v-loading="loading.search">
+                <el-table-column label="素材名" show-overflow-tooltip>
+                    <template slot-scope="scope">
+                        <div @click="handleGoToPreview(scope.row)">
+                            <h4 style="margin: 2px">
+                                <i v-if="scope.row.is_dir" class="el-icon-folder-opened"></i>
+                                <i v-else-if="scope.row.mime_type.startsWith('video')"
+                                   class="el-icon-video-camera"></i>
+                                <img v-else-if="scope.row.mime_type.startsWith('image')" class="preview_img"
+                                     :onerror="defaultImg" style="height: 60px;width: 60px"
+                                     preview="search_image_list" :preview-text="scope.row.path"
+                                     :src="genPreviewUrl(scope.row.neid,scope.row.hash,scope.row.rev,scope.row.mime_type)">
+                                <i v-else-if="scope.row.mime_type.startsWith('doc')"
+                                   class="el-icon-tickets"></i>
+                                <i v-else class="el-icon-question"></i>
+                                {{scope.row.path.substr(scope.row.path.lastIndexOf("/")+1)}}</h4>
+                            <!--                                    {{scope.row.path}}-->
+                            <div v-if="scope.row.tags">
+                                <el-tag style="margin-right: 2px" v-for="tag in scope.row.tags" type="info"
+                                        size="mini">{{tag.replace(markReg,"")}}
+                                </el-tag>
+                            </div>
+                        </div>
+                    </template>
+                </el-table-column>
+                <el-table-column label="引用次数" width="100">
+                    <template slot-scope="scope">
+                        <span>{{scope.row.is_dir ? '-' :scope.row.ref_num}}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="下载次数" width="100">
+                    <template slot-scope="scope">
+                        <span>{{scope.row.is_dir ? '-' :scope.row.download_num}}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="操作" width="80">
+                    <template slot-scope="scope">
+                        <div v-if="scope.row.is_dir">
+                            <el-button circle type="primary" @click.stop="handleClickDirItem(scope.row)"
+                                       icon="el-icon-folder-opened"/>
+                        </div>
+                        <div v-else>
+                            <el-button circle type=""
+                                       @click.stop="handleAdd(scope.$index, scope.row)"
+                                       icon="el-icon-plus"/>
+                        </div>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <el-button class="load_more_bt" :class="{no_display:!search.hasNext}"
+                       :loading="loading.searchMore"
+                       style="margin-top: 30px"
+                       @click.stop="handleLoadMore">加载更多
+            </el-button>
+        </el-dialog>
     </section>
 </template>
 
 <script>
-    import api from "../../../api";
+    import api, {getTopSearchKey} from "../../../api";
     import genSrcPreviewSrc from "../../../utils"
     import Sortable from 'sortablejs';
     import videojs from 'video.js'
@@ -344,6 +293,7 @@
                     tableData: [],
                     loadingDir: false
                 },
+                markReg: /<mark>|<\/mark>/g,
                 searchTabName: "dir", // dir ,pan ,list
                 search: {
                     type: '',
@@ -359,12 +309,36 @@
                     fullscreenLoading: false,
                     listDetailLoading: false,
                 },
+                menuPath: [
+                    {
+                        name: "STICK线", path: "STICK线", icon: "menu-icon/11.png"
+                    },
+                    {
+                        name: "听装线", path: "听装线", icon: "menu-icon/12.png"
+                    },
+                    {
+                        name: "软双铝线", path: "软双铝线", icon: "menu-icon/13.png"
+                    },
+                    {
+                        name: "制粒线", path: "制粒线", icon: "menu-icon/14.png"
+                    },
+                    {
+                        name: "泡罩线", path: "泡罩线", icon: "menu-icon/15.png"
+                    },
+                    {
+                        name: "公司介绍", path: "公司介绍", icon: "menu-icon/16.png"
+                    },
+                    {
+                        name: "同行信息", path: "同行信息", icon: "menu-icon/17.png"
+                    }
+                ],
                 searchResult: [],
                 searchListResult: [],
                 selectListId: 0,
                 selectListName: 0,
                 selectListItem: [],
                 listDetail: [],
+                topSearchKey: [],
                 toCreateAlbum: {
                     idEditMode: false, //是否是编辑模式
                     editListId: -1,
@@ -383,7 +357,8 @@
                 visible: {
                     listDetailDialogVisible: false,
                     videoDialogVisible: false,
-                    imageDialogVisible: false
+                    imageDialogVisible: false,
+                    searchDialogVisible: false
                 },
                 defaultImg: 'this.src="' + require('@assets/error.png') + '"', //默认图地址
                 player: null,
@@ -398,6 +373,12 @@
             }
         },
         methods: {
+            handleClickRootMenu(menu) {
+                this.handleListLenovoDir("/营销素材展示/" + menu.path, "ent")
+            },
+            handleClickTopSearchKey(key) {
+                this.handleSearch(key);
+            },
             handleGetDocumentImage(mimeType) {
                 return getDocumentImage(mimeType)
             },
@@ -517,8 +498,11 @@
                     this.loading.listDetailLoading = false;
                 })
             },
-            handleSearch() {
+            handleSearch(searchKey) {
                 let _this = this;
+                if (searchKey !== undefined && typeof (searchKey) == 'string') {
+                    _this.search.key = searchKey;
+                }
                 if (_this.search.key.trim().length === 0) {
                     _this.$message.warning("请输入搜索的关键字！")
                 } else {
@@ -526,7 +510,7 @@
                         _this.loading.searchList = true;
                         api({
                             action: "searchList",
-                            searchKey: _this.search.key
+                            searchKey: _searchKey
                         }).then(response => {
                             _this.loading.searchList = false;
                             if (response.result) {
@@ -565,6 +549,7 @@
                                 if (response.content.length === 0) {
                                     _this.$message.error("没有搜索到与【" + _this.search.key + "】有关的文件或文件夹！")
                                 } else {
+                                    _this.visible.searchDialogVisible = true;
                                     response.content.forEach(item => {
                                         item.joyeaDesc = "";
                                         item.isModify = false;
@@ -707,8 +692,6 @@
             },
             handleDelete(index, row) {
                 this.toCreateAlbum.list.splice(index, 1);
-
-
             },
             genPreviewUrl(neid, hash, rev, mime_type) {
                 let previewType = 'pic';    // if video is av
@@ -778,7 +761,7 @@
                 if (row.mime_type.startsWith("video")) {
                     this.handlePlayVideo(url, row.path.substr(row.path.lastIndexOf("/") + 1),);
                 } else if (row.mime_type.startsWith("image")) {
-                    this.handlePlayImage(url, row.path.substr(row.path.lastIndexOf("/") + 1),);
+                    //this.handlePlayImage(url, row.path.substr(row.path.lastIndexOf("/") + 1),);
                 } else if (row.mime_type.startsWith("doc")) {
                     window.open(url);
                 } else {
@@ -909,8 +892,14 @@
             handleClickSearch(row, column, event) {
                 if (row.is_dir) {
                     this.handleClickDirItem(row);
+                    this.visible.searchDialogVisible = false;
                 }
             },
+            handleGetTopSearchKey() {
+                getTopSearchKey().then(resp => {
+                    this.topSearchKey = resp.data;
+                })
+            }
         },
         mounted() {
             let user = localStorage.getItem('userInfo');
@@ -930,6 +919,7 @@
                     this.toCreateAlbum.list.push(src);
                 });
             }
+            this.handleGetTopSearchKey();
             const table = document.querySelector('#toSortTable .el-table__body-wrapper tbody');
             const self = this;
             Sortable.create(table, {
@@ -945,7 +935,7 @@
 <style lang="scss" scoped>
 
     .px10_divider {
-        margin-top: 10px;
+        padding: 10px;
     }
 
     .input-with-select .el-input-group__prepend {
@@ -1005,4 +995,37 @@
         margin: 10px auto;
     }
 
+    .box-card {
+        width: 220px;
+        height: 220px;
+    }
+
+    .menu-content {
+        margin: 20px auto;
+        height: 225px;
+        width: 225px;
+        background-image: linear-gradient(to bottom right, #ffffff, #c7c7c7);
+        text-align: center;
+        box-shadow: 4px 4px 2px #888888;
+    }
+
+    .search-button {
+        background: #eb7708 !important;
+        color: #ffffff !important;
+    }
+
+    /deep/ .el-input-group__append {
+        background: #ffffff;
+        border-bottom-right-radius: 100px !important;
+        border-top-right-radius: 100px !important;
+    }
+
+    /deep/ .search-button--default {
+        border-bottom-right-radius: 100px !important;
+        border-top-right-radius: 100px !important;
+    }
+
+    .el-icon-folder-opened {
+        color: #fec04a;
+    }
 </style>

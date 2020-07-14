@@ -9,6 +9,7 @@
             </template>
         </van-search>
         <div>
+            <span style="font-size: 10px;color: #444444">热门搜索:</span>
             <van-tag v-for="item in topSearchKey" style="margin: 5px 2px" @click="handleClickTopKey(item)">{{item}}
             </van-tag>
         </div>
@@ -323,6 +324,7 @@
                 }).then(response => {
                     toast.clear();
                     if (response.result) {
+                        this.currentTypeActive = 0;
                         this.dir.tableData = [];
                         if (response.data.content) {
                             response.data.content.forEach(item => {

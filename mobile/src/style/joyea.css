@@ -11,7 +11,7 @@
     height: 100px;
 }
 
-.my_preview_size{
+.my_preview_size {
     width: 60px;
     height: 60px;
 }
@@ -81,5 +81,10 @@
 }
 
 .van-dropdown-menu__bar {
-    box-shadow: 0 2px 12px #ffffff!important;
+    box-shadow: 0 2px 12px #ffffff !important;
+}
+
+.van-tag {
+    line-height: 15px;
+    font-size: 10px;
 }

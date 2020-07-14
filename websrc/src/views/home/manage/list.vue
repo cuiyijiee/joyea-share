@@ -1,7 +1,6 @@
 <template>
-
-    <h1 style="color: #303133;" v-if="albumList.length === 0">您暂时没有创建的清单！</h1>
-    <section v-else>
+    <h1 style="color: #303133;padding: 10px" v-if="albumList.length === 0">您暂时没有创建的清单！</h1>
+    <section v-else style="padding: 10px">
         <!--工具条-->
         <el-input placeholder="输入清单名称查找" v-model="search.key" class="input-with-select px10_divider"
                   style="display: none">
@@ -31,7 +30,7 @@
                 </div>
                 <el-row>
                     <el-col :md="8" :xs="24" v-for="(img,fileIndex) in album.list">
-                        <el-card style="padding: 2px;margin: 5px;text-align:center;">
+                        <el-card style="padding: 2px;margin: 5px;text-align:center;height: 273px;">
                             <img v-if="img.mime_type.startsWith('video')" src="video.png"
                                  @click="handleGoToPreview(img)" class="album_img">
                             <img v-else-if="img.mime_type.startsWith('doc')"
@@ -358,6 +357,10 @@
 </script>
 
 <style scoped lang="scss">
+
+    .album_img {
+        height: 200px;
+    }
 
     .px10_divider {
         margin-top: 10px;
