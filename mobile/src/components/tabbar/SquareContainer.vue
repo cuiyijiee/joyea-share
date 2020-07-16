@@ -22,7 +22,7 @@
                                     :desc="item.shareDesc ? item.shareDesc : '暂未设置简介'"
                                     :thumb="item.cover">
                                 <template #tags>
-                                    <van-tag plain type="danger">{{item.userName}}</van-tag>
+                                    <div style="color: #8c939d;line-height: 20px">上传者:{{item.userName}}</div>
                                 </template>
                                 <template #footer>
                                     <van-button size="mini" @click="handleCollect(item)">收藏</van-button>
@@ -195,5 +195,9 @@
         position: fixed;
         bottom: 90px;
         right: 50px;
+    }
+
+    .van-card__content .van-tag::after {
+        border-color: #ffffff;
     }
 </style>

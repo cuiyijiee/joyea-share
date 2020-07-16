@@ -35,6 +35,7 @@ export default new Router({
             component: Home,
             icon: 'el-icon-edit',
             noChild: true,
+            redirect: '/build',
             children: [
                 {path: '/build', component: Build, name: 'build', desc: '制作清单',}
             ]

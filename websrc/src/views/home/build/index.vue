@@ -4,7 +4,7 @@
         <div style="padding: 10px 150px 0 150px;background: #1e162f;">
             <el-input placeholder="请输入关键字" v-model="search.key" class="my-input"
                       @keyup.enter.native="handleSearch">
-                <el-button slot="append" icon="el-icon-search" style="border-radius: 100px;" v-on:click="handleSearch"
+                <el-button slot="append" icon="el-icon-search" style="border-radius: 100px;margin: 0px -20px !important;" v-on:click="handleSearch"
                            class="search-button"/>
             </el-input>
             <div style="padding:15px 0;color: #ffffff">热门搜索:
@@ -27,7 +27,7 @@
                 </el-row>
             </div>
         </div>
-        <el-row v-else :gutter="20" style="padding: 10px 35px 0 150px;height:1080px;">
+        <el-row v-else :gutter="20" style="padding: 10px 150px 0 150px;height:1080px;">
             <el-col :span="18" class="bg-purple">
                 <!--文件路径显示-->
                 <el-row class="contentHead">
@@ -253,7 +253,7 @@
                         <span>{{scope.row.is_dir ? '-' :scope.row.download_num}}</span>
                     </template>
                 </el-table-column>
-                <el-table-column label="操作" width="80">
+                <el-table-column label="操作" width="180">
                     <template slot-scope="scope">
                         <div v-if="scope.row.is_dir">
                             <el-button circle type="primary" @click.stop="handleClickDirItem(scope.row)"
@@ -882,6 +882,7 @@
                 });
             },
             handleClickDirItem(row, column, event) {
+                this.visible.searchDialogVisible = false;
                 this.searchTabName = "dir";
                 if (row.is_dir) {
                     this.handleListLenovoDir(row.path, 'ent')
@@ -892,7 +893,6 @@
             handleClickSearch(row, column, event) {
                 if (row.is_dir) {
                     this.handleClickDirItem(row);
-                    this.visible.searchDialogVisible = false;
                 }
             },
             handleGetTopSearchKey() {

@@ -14,7 +14,7 @@
                 z-index="4">
             <van-tabbar-item icon="home-o" to="/home">工作台</van-tabbar-item>
             <van-tabbar-item icon="shopping-cart-o" :badge="orderListSize" to="/order">素材车</van-tabbar-item>
-            <van-tabbar-item icon="gem-o" to="/square">广场</van-tabbar-item>
+            <van-tabbar-item icon="gem-o" to="/square" v-if="userInfo.email === '717'">广场</van-tabbar-item>
             <van-tabbar-item icon="manager-o" to="/mine">我的</van-tabbar-item>
         </van-tabbar>
     </div>
@@ -22,7 +22,7 @@
 
 <script>
 
-    import {mapState} from 'vuex'
+    import {mapGetters, mapState} from 'vuex'
 
     export default {
         name: "Main.vue",
@@ -54,6 +54,9 @@
             ...mapState({
                 orderListSize: state => state.orderList.length
             }),
+            ...mapGetters([
+                'userInfo'
+            ]),
         },
         created() {
             this.resumeTab();

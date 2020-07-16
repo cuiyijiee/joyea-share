@@ -95,5 +95,6 @@
     #app {
         overflow: hidden;
         margin-top: 40px;
+        font-family: 'Noto Sans SC', Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB, Microsoft YaHei, SimSun, sans-serif;
     }
 </style>

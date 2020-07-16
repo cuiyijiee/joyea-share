@@ -1,17 +1,18 @@
 <template>
-    <h1 style="color: #303133;padding: 10px" v-if="albumList.length === 0">您暂时没有创建的清单！</h1>
-    <section v-else style="padding: 10px">
-        <!--工具条-->
-        <el-input placeholder="输入清单名称查找" v-model="search.key" class="input-with-select px10_divider"
-                  style="display: none">
-            <el-button slot="append" icon="el-icon-search" v-on:click="handleSearch"></el-button>
-        </el-input>
+    <div style="padding: 10px 150px 0 150px;">
+        <h1 style="color: #303133;padding: 10px" v-if="albumList.length === 0">您暂时没有创建的清单！</h1>
+        <section v-else style="padding: 10px">
+            <!--工具条-->
+            <el-input placeholder="输入清单名称查找" v-model="search.key" class="input-with-select px10_divider"
+                      style="display: none">
+                <el-button slot="append" icon="el-icon-search" v-on:click="handleSearch"></el-button>
+            </el-input>
 
-        <div class="px10_divider">
-            <el-card v-for="(album,index) in albumList" style="margin-bottom: 10px">
-                <div slot="header" class="clearfix">
-                    <span style="color: #fff;font-weight:bold;">{{album.name}}</span>
-                    <span style="float: right">
+            <div class="px10_divider">
+                <el-card v-for="(album,index) in albumList" style="margin-bottom: 10px">
+                    <div slot="header" class="clearfix">
+                        <span style="color: #fff;font-weight:bold;">{{album.name}}</span>
+                        <span style="float: right">
                          <el-popover
                                  placement="bottom"
                                  title="分享链接"
@@ -27,45 +28,46 @@
                         <el-button icon="el-icon-download" circle size="mini" @click="handleDownloadSrc(true,album)"/>
                         <el-button icon="el-icon-edit" circle size="mini" @click="handleEdit(index)"/>
                     </span>
-                </div>
-                <el-row>
-                    <el-col :md="8" :xs="24" v-for="(img,fileIndex) in album.list">
-                        <el-card style="padding: 2px;margin: 5px;text-align:center;height: 273px;">
-                            <img v-if="img.mime_type.startsWith('video')" src="video.png"
-                                 @click="handleGoToPreview(img)" class="album_img">
-                            <img v-else-if="img.mime_type.startsWith('doc')"
-                                 :src="handleGetDocumentImage(img.mime_type)"
-                                 @click="handleGoToPreview(img)" class="album_img">
-                            <img v-else-if="img.mime_type.startsWith('image')" :src="img.url"
-                                 class="album_img" :onerror="defaultImg" :preview="album.name"
-                                 :preview-text="'解说词：' + (img.desc.length === 0 ? '暂未设置解说词' :img.desc)">
-                            <img v-else src="unknown.png" @click="handleGoToPreview(img)" class="album_img">
-                            <div style="height: 20px;margin-top: 10px">
-                                <el-tooltip class="item" effect="dark"
-                                            :content="img.desc.length === 0 ? '暂未设置解说词' : img.desc" placement="bottom">
-                                    <!--                                    <span class="svg_name">{{img.desc.length > 30 ?-->
-                                    <!--                                        img.desc.substr(0,30) + "..." : (img.desc.length === 0 ? '暂未设置解说词' : img.desc)}}</span>-->
-                                    <span class="svg_name">{{getFilenameByPath(img.path)}}</span>
-                                </el-tooltip>
-                            </div>
-                        </el-card>
-                    </el-col>
-                </el-row>
-            </el-card>
-        </div>
-        <el-dialog :title="toPlayVideo.title" :visible.sync="visible.videoDialogVisible" @close="handleCloseVideo"
-                   @opened="playVideo()">
-            <video id="myVideo" class="video-js vjs-big-play-centered vjs-fluid" oncontextmenu="return false">
-                <p class="vjs-no-js">
-                    To view this video please enable JavaScript, and consider upgrading to a
-                    web browser that
-                    <a href="https://videojs.com/html5-video-support/" target="_blank">
-                        supports HTML5 video
-                    </a>
-                </p>
-            </video>
-        </el-dialog>
-    </section>
+                    </div>
+                    <el-row>
+                        <el-col :md="8" :xs="24" v-for="(img,fileIndex) in album.list">
+                            <el-card style="padding: 2px;margin: 5px;text-align:center;height: 273px;">
+                                <img v-if="img.mime_type.startsWith('video')" src="video.png"
+                                     @click="handleGoToPreview(img)" class="album_img">
+                                <img v-else-if="img.mime_type.startsWith('doc')"
+                                     :src="handleGetDocumentImage(img.mime_type)"
+                                     @click="handleGoToPreview(img)" class="album_img">
+                                <img v-else-if="img.mime_type.startsWith('image')" :src="img.url"
+                                     class="album_img" :onerror="defaultImg" :preview="album.name"
+                                     :preview-text="'解说词：' + (img.desc.length === 0 ? '暂未设置解说词' :img.desc)">
+                                <img v-else src="unknown.png" @click="handleGoToPreview(img)" class="album_img">
+                                <div style="height: 20px;margin-top: 10px">
+                                    <el-tooltip class="item" effect="dark"
+                                                :content="img.desc.length === 0 ? '暂未设置解说词' : img.desc" placement="bottom">
+                                        <!--                                    <span class="svg_name">{{img.desc.length > 30 ?-->
+                                        <!--                                        img.desc.substr(0,30) + "..." : (img.desc.length === 0 ? '暂未设置解说词' : img.desc)}}</span>-->
+                                        <span class="svg_name">{{getFilenameByPath(img.path)}}</span>
+                                    </el-tooltip>
+                                </div>
+                            </el-card>
+                        </el-col>
+                    </el-row>
+                </el-card>
+            </div>
+            <el-dialog :title="toPlayVideo.title" :visible.sync="visible.videoDialogVisible" @close="handleCloseVideo"
+                       @opened="playVideo()">
+                <video id="myVideo" class="video-js vjs-big-play-centered vjs-fluid" oncontextmenu="return false">
+                    <p class="vjs-no-js">
+                        To view this video please enable JavaScript, and consider upgrading to a
+                        web browser that
+                        <a href="https://videojs.com/html5-video-support/" target="_blank">
+                            supports HTML5 video
+                        </a>
+                    </p>
+                </video>
+            </el-dialog>
+        </section>
+    </div>
 </template>
 
 <script>
