@@ -19,6 +19,7 @@
 </template>
 <script>
     import {login} from "../../api";
+    import {mapActions} from "vuex"
 
     const localStorage = window.localStorage;
 
@@ -43,6 +44,9 @@
             };
         },
         methods: {
+            ...mapActions('userInfo',[
+                'updateUserInfoFunc'
+            ]),
             handleLogin(ev) {
                 let _this = this;
                 this.$refs.loginForm.validate((valid) => {
@@ -57,30 +61,31 @@
                                 } else {
                                     localStorage.removeItem("u")
                                 }
-                                localStorage.setItem("userInfo", JSON.stringify({
+                                _this.updateUserInfoFunc({
                                     session: resp.data['session'],
                                     name: resp.data['userName'],
-                                    email: _this.loginForm.user
-                                }));
-                                if (_this.$route.query.ref) {
-                                    let refInfo = JSON.parse(atob(_this.$route.query.ref));
-                                    if (refInfo.fromShare) {
-                                        _this.$router.push({
-                                            name: "share",
-                                            query: {albumId: refInfo.albumId}
-                                        })
+                                    email: this.loginForm.user
+                                }).then(() => {
+                                    if (_this.$route.query.ref) {
+                                        let refInfo = JSON.parse(atob(_this.$route.query.ref));
+                                        if (refInfo.fromShare) {
+                                            _this.$router.push({
+                                                name: "share",
+                                                query: {albumId: refInfo.albumId}
+                                            })
+                                        } else {
+                                            _this.$router.push({
+                                                name: "build",
+                                                params: {checked: true}
+                                            })
+                                        }
                                     } else {
                                         _this.$router.push({
                                             name: "build",
                                             params: {checked: true}
                                         })
                                     }
-                                } else {
-                                    _this.$router.push({
-                                        name: "build",
-                                        params: {checked: true}
-                                    })
-                                }
+                                })
                             } else {
                                 _this.$message.error("登陆失败，请检查用户名密码！");
                             }

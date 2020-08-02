@@ -30,6 +30,7 @@
                 <van-row style="background-color: #fff;padding: 8px 0">
                     <van-col span="3">
                         <van-icon class="my_icon" name="arrow-left"
+                                  style="padding: 5px 10px 5px 10px"
                                   v-if="dir.currentPath.length !== 0"
                                   @click="handleClickBackDir" size="20"/>
                     </van-col>
@@ -40,6 +41,7 @@
                     </van-col>
                     <van-col span="3">
                         <van-icon class="my_icon" name="wap-home-o" @click="handleClickRootDir"
+                                  style="padding: 5px 10px 5px 10px"
                                   v-if="dir.currentPath.length !== 0" size="20"/>
                     </van-col>
                 </van-row>
@@ -57,8 +59,8 @@
                                     <img v-else-if="item.mime_type.startsWith('image')" class="my_icon my_icon_size"
                                          @click="handleGotoPreviewImage(dir.tableData,item)"
                                          :src="genPreviewUrl(item.neid,item.hash,item.rev,item.mime_type)"/>
-                                    <van-icon size="30" v-else-if="item.mime_type.startsWith('doc')" class="my_icon"
-                                              name="orders-o"/>
+                                    <van-image style="width: 40px" v-else-if="item.mime_type.startsWith('doc')"
+                                               :src="handleGetDocumentImage(item.mime_type)"/>
                                     <van-icon size="30" v-else class="my_icon" name="info-o"/>
                                 </van-col>
                                 <van-col span="16" @click="handleClickItem(item)">
@@ -220,10 +222,13 @@
                         name: "泡罩线", path: "泡罩线", icon: "menu-icon/5.png"
                     },
                     {
+                        name: "其他生产线", path: "其他生产线", icon: "menu-icon/8.png"
+                    },
+                    {
                         name: "公司介绍", path: "公司介绍", icon: "menu-icon/6.png"
                     },
                     {
-                        name: "同行信息", path: "同行信息", icon: "menu-icon/7.png"
+                        name: "友商信息", path: "友商信息", icon: "menu-icon/7.png"
                     }
                 ]
             }
@@ -251,13 +256,12 @@
                 this.$router.push({path: "/search", query: {searchKey: this.searchKey}});
             },
             handlePreview(item) {
-                handleGoToPreview(item, this.userInfo.session)
+                handleGoToPreview(this, item, this.userInfo.session)
             },
             handleClickAddItem(item) {
                 if (!this.$store.getters.exist(item['neid'])) {
                     this.$store.dispatch("addFunc", item).then(() => {
                         this.$notify({type: 'success', message: '加入素材车成功！'});
-
                     }).catch(exception => {
                         this.$dialog.alert({
                             message: '加入素材车失败：' + exception

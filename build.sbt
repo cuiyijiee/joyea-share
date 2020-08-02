@@ -12,6 +12,8 @@ javacOptions ++= Seq("-source", "1.8", "-target", "1.8")
 
 libraryDependencies += "tv.cntt" %% "xitrum" % "3.29.0"
 
+libraryDependencies += "org.json4s" %% "json4s-ext" % "3.6.7"
+
 // Xitrum uses SLF4J, an implementation of SLF4J is needed
 libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.2.3"
 

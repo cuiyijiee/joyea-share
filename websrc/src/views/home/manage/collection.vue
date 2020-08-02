@@ -36,12 +36,12 @@
 
     import api from "../../../api";
     import genSrcPreviewUrl from "../../../utils/index"
+    import {mapGetters} from "vuex";
 
     export default {
         name: "collection",
         data() {
             return {
-                userInfo: {},
                 curPage: 1,
                 pageSize: 15,
                 total: 0,
@@ -98,11 +98,12 @@
                 });
             }
         },
+        computed:{
+            ...mapGetters({
+                'userInfo': 'userInfo/userInfo'
+            })
+        },
         mounted() {
-            let user = localStorage.getItem('userInfo');
-            if (user) {
-                this.userInfo = JSON.parse(user)
-            }
             this.pageFind(this.curPage);
         }
     }

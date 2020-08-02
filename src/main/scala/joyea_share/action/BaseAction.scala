@@ -15,49 +15,59 @@ class UserNotAuthException extends RuntimeException {
 
 abstract class BaseAction[T: Manifest] extends Action with SkipCsrfCheck with Log with BaseJsonFormat {
 
-    override def execute(): Unit = {
-        try {
-            val request = Serialization.read[T](requestContentString)
-            safeExecute(req = request)
-        } catch {
-            case e: UserNotAuthException =>
-                cyjResponseError(ErrorCode.userSessionInvalid)
-            case e: Throwable =>
-                e.printStackTrace()
-                cyjResponseError(ErrorCode.unknownError)
-        }
+  override def execute(): Unit = {
+    try {
+      log.error("request: " + requestContentString)
+      val request = Serialization.read[T](requestContentString)
+      safeExecute(req = request)
+    } catch {
+      case e: UserNotAuthException =>
+        cyjResponseError(ErrorCode.userSessionInvalid)
+      case e: Throwable =>
+        e.printStackTrace()
+        cyjResponseError(ErrorCode.unknownError)
     }
+  }
 
-    def myUid: String = {
-        val uidOpt = sessiono[String]("user_id")
-        if (uidOpt.isEmpty) {
-            throw new UserNotAuthException()
-        }
-        uidOpt.get
+  def myUid: String = {
+    val uidOpt = sessiono[String]("user_id")
+    if (uidOpt.isEmpty) {
+      throw new UserNotAuthException()
     }
+    uidOpt.get
+  }
 
-    def safeExecute(req: T): Unit
-
-    def safeResponse[U](serverRespTry: Try[U], result: U => Unit): Unit = {
-        serverRespTry match {
-            case Success(value) =>
-                result(value)
-            case Failure(exception) =>
-                cyjResponseError(ErrorCode.dbExecuteError)
-        }
+  def myName: String = {
+    val nameOpt = sessiono[String]("user_name")
+    if (nameOpt.isEmpty) {
+      throw new UserNotAuthException()
     }
+    nameOpt.get
+  }
 
+  def safeExecute(req: T): Unit
 
-    def cyjResponseSuccess(data: Any): Unit = {
-        respondJsonText(Serialization.write(BaseResp(2000, data)))
+  def safeResponse[U](serverRespTry: Try[U], result: U => Unit): Unit = {
+    serverRespTry match {
+      case Success(value) =>
+        result(value)
+      case Failure(exception) =>
+        log.error("query database error:",exception)
+        cyjResponseError(ErrorCode.dbExecuteError)
     }
+  }
 
-    def cyjResponseError(code: Int): Unit = {
-        respondJsonText(Serialization.write(BaseResp(code, null)))
-    }
 
-    def logError(exception: Throwable, reason: String = ""): Unit = {
-        log.error(s"$reason error:", exception)
-    }
+  def cyjResponseSuccess(data: Any): Unit = {
+    respondJsonText(Serialization.write(BaseResp(2000, data)))
+  }
+
+  def cyjResponseError(code: Int): Unit = {
+    respondJsonText(Serialization.write(BaseResp(code, null)))
+  }
+
+  def logError(exception: Throwable, reason: String = ""): Unit = {
+    log.error(s"$reason error:", exception)
+  }
 
 }

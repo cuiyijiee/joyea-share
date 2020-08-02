@@ -2,11 +2,15 @@
     <div id="album">
         <van-swipe-cell v-for="item in albumList" :key="item.path">
             <van-card
+                    style="margin: 2px 0 2px 0"
                     :num="item.srcList.length"
                     @click="handleShowAlbum(item)"
                     :title="item.albumName"
                     :thumb="item.cover"/>
             <template #right>
+                <van-button square :text="item.shared ? '取消分享' : '分享'"
+                            :type="item.shared ? 'warning' : 'info'" class="delete-button"
+                            @click="handleShareAlbum(item)"/>
                 <van-button square text="编辑" type="primary" class="delete-button" @click="handleEditAlbum(item)"/>
                 <van-button square text="删除" type="danger" class="delete-button" @click="handleDeleteAlbum(item)"/>
             </template>
@@ -14,14 +18,15 @@
         <van-action-sheet v-model="albumVisible" :title="albumItem.albumName">
             <van-grid border :column-num="3" :gutter="5">
                 <van-grid-item
-                        v-for="item in albumItem.srcList">
+                        v-for="item in albumItem.srcList" @click="handleGotoPreview(item)">
                     <van-image v-if="item.srcType.startsWith('image')" class="my_icon my_preview_size"
                                @click="handlePreview(item)"
                                :src="genPreviewUrl(item.srcNeid,item.srcHash,item.srcRev,item.srcType)"/>
                     <van-image v-else-if="item.srcType.startsWith('video')" class="my_icon my_preview_size"
-                               @click="handlePreview(item)"
+                               @click="handlePreviewVideo(item)"
                                src="video.png"/>
                     <van-image v-else-if="item.srcType.startsWith('doc')" class="my_icon my_preview_size"
+                               @click="handlePreviewVideo(item)"
                                :src="handleGetDocumentImage(item.srcType)"/>
                     <van-image v-else class="my_icon my_preview_size" @click="handlePreview(item)"
                                src="unknown.png"/>
@@ -39,9 +44,10 @@
 
 <script>
     import api, {listMineAlbum} from "../api";
-    import {genSrcPreviewSrc, getDocumentImage} from "../util/JoyeaUtil"
+    import {genSrcPreviewSrc, getDocumentImage, handleGoToPreview} from "../util/JoyeaUtil"
     import {mapGetters, mapActions} from "vuex";
     import {GenImageListView, convertItem} from "../util/ImageViewUtil";
+    import {switchShare} from "../api";
 
     export default {
 
@@ -61,6 +67,25 @@
             ...mapActions([
                 'clearFunc', 'addFunc', 'setOrderEditInfoFunc'
             ]),
+            handleShareAlbum(album) {
+                if (album.shared) {
+                    switchShare(album.albumId, false).then(resp => {
+                        if (resp.data) {
+                            this.$notify({
+                                type: "success",
+                                message: "取消分享成功！"
+                            })
+                            album.shared = false;
+                        }
+                    })
+                } else {
+                    let route = {
+                        name: '编辑分享',
+                        params: {albumId: album.albumId}
+                    };
+                    this.$router.replace(route);
+                }
+            },
             handleEditAlbum(item) {
                 this.$dialog.confirm({
                     title: "重新编辑提醒",
@@ -100,6 +125,16 @@
                         }
                     })
                 })
+            },
+            handleGotoPreview(item) {
+                if (item.mime_type.startsWith("image")) {
+                } else {
+                    this.handlePreview(item)
+                }
+            },
+            handlePreviewVideo(clickItem) {
+                handleGoToPreview(this, clickItem, this.userInfo.session);
+                event.stopPropagation();
             },
             handlePreview(clickItem) {
                 GenImageListView(this, this.albumItem.srcList, this.userInfo.session, clickItem);

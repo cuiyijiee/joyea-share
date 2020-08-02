@@ -2,7 +2,7 @@
     <div>
         <el-row class="container">
             <el-col :span="24" class="header">
-                <el-col :span="16">
+                <el-col :span="12">
                     <div class="main_content" @click="jumpToBuild">
                         <img src="logo.gif"
                              style="height: 30px;vertical-align: middle"/>
@@ -10,7 +10,7 @@
                     </div>
                 </el-col>
 
-                <el-col :span="8" class="userinfo">
+                <el-col :span="12" class="userinfo">
                     <el-button size="small" icon="el-icon-edit" @click="jumpToBuild"
                                :class="{'is-active':currentPath==='/build'}"> 工作台
                     </el-button>
@@ -78,14 +78,11 @@
     const localStorage = window.localStorage;
     let timer = 0;
     import store from '@/store'
+    import {mapActions, mapGetters} from "vuex";
 
     export default {
         data() {
             return {
-                userInfo: {
-                    name: '',
-                    email: ''
-                },
                 currentPath: "",
                 downloadTask: []
             }
@@ -93,11 +90,19 @@
         computed: {
             visible() {
                 return store.getters.barVisible;
-            }
+            },
+            ...mapGetters({
+                'userInfo': 'userInfo/userInfo'
+            })
         },
         methods: {
+            ...mapActions('userInfo', [
+                'clearUserSessionFunc'
+            ]),
             jumpToBuild() {
-                this.$router.replace("/build");
+                if (this.currentPath !== '/build') {
+                    this.$router.replace("/build");
+                }
             },
             jumpToList() {
                 this.$router.replace("/manage/list");
@@ -111,8 +116,10 @@
             logout: function () {
                 let _this = this;
                 this.$confirm('确认退出吗?', '提示', {}).then(() => {
-                    _this.$router.push('/login');
                     logout().then(resp => {
+                        _this.clearUserSessionFunc().then(() => {
+                            _this.$router.push('/login');
+                        })
                     })
                 }).catch(() => {
                 });
@@ -200,12 +207,9 @@
                     }
                 })
             }
-            let user = localStorage.getItem('userInfo');
-            if (user) {
-                this.userInfo = JSON.parse(user)
-            } else {
-                this.$router.push("/login")
-            }
+            document.oncontextmenu = function (event) {
+                event.preventDefault();
+            };
         }
     }
 </script>

@@ -35,12 +35,20 @@ export function check() {
     })
 }
 
-export function pageListAlbum(curPage, pageSize, shared) {
-    return service.post('api/v1/album/pageList', {
+export function pageListAlbum(curPage, pageSize, shared, sortType,
+                              hangyeTagId, xianbieTagId, jixingTagId, jieduanTagId, shichangTagId) {
+    let requestForm = {
         curPage: curPage,
         pageSize: pageSize,
-        shared: shared
-    }).then(res => {
+        shared: shared,
+        sortType: sortType,
+        hangyeTagId: hangyeTagId,
+        xianbieTagId: xianbieTagId,
+        jixingTagId: jixingTagId,
+        jieduanTagId: jieduanTagId,
+        shichangTagId: shichangTagId,
+    };
+    return service.post('api/v1/album/pageList', requestForm).then(res => {
         return res.data;
     })
 }
@@ -51,12 +59,27 @@ export function listMineAlbum() {
     })
 }
 
-export function switchShare(albumId, share, shareCoverId, shareDesc) {
+export function switchShare(albumId, share, albumName, shareCoverId, shareLocalCoverId, shareDesc, hangyeTagId, xianbieTagId, jixingTagId, jieduanTagId, shichangTagId) {
     return service.post("api/v1/album/switch/share", {
         albumId: albumId,
         share: share,
-        shareCoverNeid: shareCoverId,
-        shareDesc: shareDesc
+        albumName: albumName,
+        coverId: shareCoverId,
+        localCoverId: shareLocalCoverId,
+        shareDesc: shareDesc,
+        hangyeTagId: hangyeTagId,
+        xianbieTagId: xianbieTagId,
+        jixingTagId: jixingTagId,
+        jieduanTagId: jieduanTagId,
+        shichangTagId: shichangTagId
+    }).then(res => {
+        return res.data;
+    })
+}
+
+export function copyAlbum(albumId) {
+    return service.post("api/v1/album/copy", {
+        albumId: albumId
     }).then(res => {
         return res.data;
     })

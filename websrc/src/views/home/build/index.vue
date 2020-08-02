@@ -4,7 +4,8 @@
         <div style="padding: 10px 150px 0 150px;background: #1e162f;">
             <el-input placeholder="请输入关键字" v-model="search.key" class="my-input"
                       @keyup.enter.native="handleSearch">
-                <el-button slot="append" icon="el-icon-search" style="border-radius: 100px;margin: 0px -20px !important;" v-on:click="handleSearch"
+                <el-button slot="append" icon="el-icon-search"
+                           style="border-radius: 100px;margin: 0px -20px !important;" v-on:click="handleSearch"
                            class="search-button"/>
             </el-input>
             <div style="padding:15px 0;color: #ffffff">热门搜索:
@@ -282,6 +283,8 @@
     import Sortable from 'sortablejs';
     import videojs from 'video.js'
     import {getDocumentImage} from "../../../utils/JoyeaUtil";
+    import {mapGetters} from "vuex";
+    import {joyeaMenuPath} from "../../../utils/JoyeaUtil";
 
     export default {
         name: "index",
@@ -300,7 +303,6 @@
                     key: '',
                     hasNext: false
                 },
-                userInfo: {},
                 loading: {
                     search: false,
                     searchMore: false,
@@ -309,29 +311,7 @@
                     fullscreenLoading: false,
                     listDetailLoading: false,
                 },
-                menuPath: [
-                    {
-                        name: "STICK线", path: "STICK线", icon: "menu-icon/11.png"
-                    },
-                    {
-                        name: "听装线", path: "听装线", icon: "menu-icon/12.png"
-                    },
-                    {
-                        name: "软双铝线", path: "软双铝线", icon: "menu-icon/13.png"
-                    },
-                    {
-                        name: "制粒线", path: "制粒线", icon: "menu-icon/14.png"
-                    },
-                    {
-                        name: "泡罩线", path: "泡罩线", icon: "menu-icon/15.png"
-                    },
-                    {
-                        name: "公司介绍", path: "公司介绍", icon: "menu-icon/16.png"
-                    },
-                    {
-                        name: "同行信息", path: "同行信息", icon: "menu-icon/17.png"
-                    }
-                ],
+                menuPath: joyeaMenuPath,
                 searchResult: [],
                 searchListResult: [],
                 selectListId: 0,
@@ -371,6 +351,11 @@
                     url: ''
                 }
             }
+        },
+        computed: {
+            ...mapGetters({
+                'userInfo': 'userInfo/userInfo'
+            })
         },
         methods: {
             handleClickRootMenu(menu) {
@@ -827,7 +812,7 @@
                                 if (response.done) {
                                     _this.$notify.success({
                                         title: "任务下载提示",
-                                        message: "您有一个任务【" + taskId + "】任务下载成功！"
+                                        message: "您有一个下载任务【" + taskId + "】已准备好！"
                                     });
                                     clearInterval(timer);
                                     _this.$store.dispatch('downloadStatus/setVisible', false);
@@ -902,10 +887,6 @@
             }
         },
         mounted() {
-            let user = localStorage.getItem('userInfo');
-            if (user) {
-                this.userInfo = JSON.parse(user)
-            }
             this.handleListLenovoDir("/营销素材展示", "ent");
             let toEditList = this.$route.params.toEditList;
             if (toEditList) {

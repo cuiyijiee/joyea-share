@@ -76,13 +76,13 @@
     import {getDocumentImage} from "../../../utils/JoyeaUtil";
     import genSrcPreviewUrl from "../../../utils";
     import videojs from "video.js";
+    import {mapGetters} from "vuex";
 
     export default {
         name: "list",
         data() {
             return {
                 domain: window.location.protocol + '//' + window.location.host,
-                userInfo: {},
                 search: {
                     key: ''
                 },
@@ -97,6 +97,11 @@
                 albumList: [],
                 defaultImg: 'this.src="' + require('@assets/error.png') + '"' //默认图地址
             }
+        },
+        computed:{
+            ...mapGetters({
+                'userInfo': 'userInfo/userInfo'
+            })
         },
         methods: {
             getFilenameByPath(path) {
@@ -349,10 +354,6 @@
             }
         },
         mounted() {
-            let user = localStorage.getItem('userInfo');
-            if (user) {
-                this.userInfo = JSON.parse(user)
-            }
             this.listAlbum();
         }
     }

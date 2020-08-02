@@ -15,30 +15,43 @@ import scala.concurrent.Await
 
 @POST("api/v1/album/pageList")
 class PageListAction extends BaseAction[PageListAlbumReq] {
-    override def safeExecute(req: PageListAlbumReq): Unit = {
-        Album.pageListAlbum(req.curPage, req.pageSize, req.shared).onComplete(safeResponse[List[Album]](_, result => {
-            cyjResponseSuccess(result.map(album => {
-                AlbumDetailResp(
-                    albumId = album.albumId,
-                    userId = album.userId,
-                    userName = album.userName,
-                    albumName = album.albumName,
-                    albumDesc = album.albumDesc,
-                    shared = album.shared,
-                    shareCoverNeid = album.shareCoverNeid,
-                    shareDesc = album.shareDesc,
-                    createdAt = album.createdAt,
-                    referNum = album.referNum,
-                    updatedAt = album.updatedAt,
-                    srcList = Await.result(AsyncDB.withPool {
-                        implicit tx => {
-                            AlbumSrc.findByAlbumId(album.albumId)
-                        }
-                    }, MySQLSettings.MYSQL_READ_TIMEOUT),
-                )
-            }))
-        }))
-    }
+  override def safeExecute(req: PageListAlbumReq): Unit = {
+    Album.pageListAlbum(req.curPage, req.pageSize, req.shared, req.sortType,
+      hangyeTagId = req.hangyeTagId,
+      xianbieTagId = req.xianbieTagId,
+      jixingTagId = req.jixingTagId,
+      jieduanTagId = req.jieduanTagId,
+      shichangTagId = req.shichangTagId
+    ).onComplete(safeResponse[List[Album]](_, result => {
+      cyjResponseSuccess(result.map(album => {
+        AlbumDetailResp(
+          albumId = album.albumId,
+          userId = album.userId,
+          userName = album.userName,
+          albumName = album.albumName,
+          albumDesc = album.albumDesc,
+          shared = album.shared,
+          shareCoverNeid = album.shareCoverNeid,
+          shareLocalCoverId = album.shareLocalCoverId,
+          shareDesc = album.shareDesc,
+          createdAt = album.createdAt,
+          referNum = album.referNum,
+          likeNum = album.likeNum,
+          updatedAt = album.updatedAt,
+          hangyeTagId = album.hangyeTagId,
+          xianbieTagId = album.xianbieTagId,
+          jixingTagId = album.jixingTagId,
+          jieduanTagId = album.jieduanTagId,
+          shichangTagId = album.shichangTagId,
+          srcList = Await.result(AsyncDB.withPool {
+            implicit tx => {
+              AlbumSrc.findByAlbumId(album.albumId)
+            }
+          }, MySQLSettings.MYSQL_READ_TIMEOUT),
+        )
+      }))
+    }))
+  }
 }
 
 

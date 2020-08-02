@@ -24,6 +24,7 @@ class ListMineAction extends BaseAction[EmptyReq] {
                     albumDesc = album.albumDesc,
                     shared = album.shared,
                     shareCoverNeid = album.shareCoverNeid,
+                    shareLocalCoverId = album.shareLocalCoverId,
                     shareDesc = album.shareDesc,
                     createdAt = album.createdAt,
                     referNum = album.referNum,

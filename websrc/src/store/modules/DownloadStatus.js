@@ -2,6 +2,10 @@ const state = {
     barVisible: false,
 };
 
+const getters = {
+    barVisible: state => state.downloadStatus.barVisible
+}
+
 const mutations = {
     SET_VISIBLE: (state, visible) => {
         console.log(visible);

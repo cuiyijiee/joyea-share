@@ -1,6 +1,6 @@
 <template>
     <div id="app">
-        <van-nav-bar :title="this.$route.name" fixed style="background: #1f1731;color: #ffffff"
+        <van-nav-bar :title="this.$route.name" fixed style="background: #1f1731;color: #ffffff;z-index: 1000"
                      :left-arrow="this.$route.meta.allowBack" @click-left="handleClickLeftNav">
             <template #right>
                 <van-icon v-if="allowHome" @click="handleClickRightNav" name="home-o" size="18"/>
@@ -79,6 +79,9 @@
                 }
             }
             this.checkLogin();
+            document.oncontextmenu = function (event) {
+                event.preventDefault();
+            };
         },
         computed: {
             ...mapGetters([

@@ -10,7 +10,7 @@
                         finished-text="没有更多了"
                         @load="handleSearch">
                     <van-cell v-for="item in searchResultList" :key="item.path">
-                        <van-row>
+                        <van-row @click="handleClickItem(item)">
                             <van-col span="4">
                                 <van-icon size="30" v-if="item['is_dir']" class="my_icon" name="credit-pay"/>
                                 <van-icon size="30" v-else-if="item.mime_type.startsWith('video')" class="my_icon"
@@ -18,10 +18,11 @@
                                 <img v-else-if="item.mime_type.startsWith('image')" class="my_icon my_icon_size"
                                      @click="handleGotoPreviewImage(searchResultList,item)"
                                      :src="genPreviewUrl(item.neid,item.hash,item.rev,item.mime_type)"/>
-                                <van-icon size="30" v-else-if="item.mime_type.startsWith('doc')" class="my_icon" name="orders-o"/>
+                                <van-icon size="30" v-else-if="item.mime_type.startsWith('doc')" class="my_icon"
+                                          name="orders-o"/>
                                 <van-icon size="30" v-else class="my_icon" name="info-o"/>
                             </van-col>
-                            <van-col span="16" @click="handleClickItem(item)">
+                            <van-col span="16">
                                 {{item.path.substr(item.path.lastIndexOf('/')+1)}}
                                 <van-tag mark style="margin-right: 2px" v-for="tag in item.tags">
                                     {{tag.replace(markReg,"")}}
@@ -89,7 +90,7 @@
                         @load="handleSearch">
                     <van-cell v-for="item in searchResultList" v-if="!item.is_dir && item.mime_type.startsWith('video')"
                               :key="item.path">
-                        <van-row>
+                        <van-row @click="handlePreview(item)">
                             <van-col span="4">
                                 <van-icon class="my_icon" name="video-o"/>
                             </van-col>
@@ -116,11 +117,11 @@
                         @load="handleSearch">
                     <van-cell v-for="item in searchResultList" v-if="!item.is_dir && item.mime_type.startsWith('doc')"
                               :key="item.path">
-                        <van-row>
+                        <van-row @click="handlePreview(item)">
                             <van-col span="4">
-                                <van-image  style="width: 40px" :src="handleGetDocumentImage(item.mime_type)"/>
+                                <van-image style="width: 40px" :src="handleGetDocumentImage(item.mime_type)"/>
                             </van-col>
-                            <van-col span="16" @click="handlePreview(item)">
+                            <van-col span="16">
                                 {{item.path.substr(item.path.lastIndexOf('/')+1)}}
                                 <van-tag mark style="margin-right: 2px" v-for="tag in item.tags">
                                     {{tag.replace(markReg,"")}}
@@ -169,7 +170,7 @@
             }
         },
         methods: {
-            handleGetDocumentImage(mimeType){
+            handleGetDocumentImage(mimeType) {
                 return getDocumentImage(mimeType)
             },
             handleGotoPreviewImage(itemList, clickItem) {
@@ -186,13 +187,12 @@
                 }
             },
             handlePreview(item) {
-                handleGoToPreview(item, this.userInfo.session)
+                handleGoToPreview(this, item, this.userInfo.session)
             },
             handleClickAddItem(item) {
                 if (!this.$store.getters.exist(item['neid'])) {
                     this.$store.dispatch("addFunc", item).then(() => {
                         this.$notify({type: 'success', message: '加入素材车成功！'});
-
                     }).catch(exception => {
                         this.$dialog.alert({
                             message: '加入素材车失败：' + exception
@@ -212,20 +212,6 @@
                     previewType = 'av'
                 }
                 return genSrcPreviewSrc(neid, hash, rev, previewType, this.userInfo.session);
-            },
-            handleGoToPreview(row) {
-                let previewType = 'pic';    // if video is av
-                if (row.mime_type.startsWith("doc")) {
-                    previewType = 'doc'
-                } else if (row.mime_type.startsWith("video")) {
-                    previewType = 'av'
-                }
-                let url = genSrcPreviewSrc(row.neid, row.hash, row.rev, previewType, this.userInfo.session);
-                if (row.mime_type.startsWith("doc")) {
-                    window.open(url);
-                } else if (row.mime_type.startsWith("video")) {
-                    window.open(url);
-                }
             },
             handleSearch() {
                 this.searchLoading = true;

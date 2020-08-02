@@ -24,7 +24,8 @@ export function GenImageListView(context, itemList, sessionId, clickItem) {
             index = tmp;
         }
         tmp++;
-        return newGenSrcPreviewSrc(item.path, item.neid, sessionId);
+        //return newGenSrcPreviewSrc(item.path, item.neid, sessionId);
+        return genSrcPreviewSrc( item.neid, item.hash, item.rev, "pic", sessionId); //neid, hash, rev, previewType, sessionId
     });
     if (list.length === 0) {
         context.$notify({

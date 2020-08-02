@@ -40,6 +40,13 @@ const store = new Vuex.Store({
         cleanSession(state) {
             state.userInfo.session = ""
         },
+        updateUserInfo(state, userInfo) {
+            state.userInfo = {
+                session: userInfo.session,
+                name: userInfo.name,
+                email: userInfo.email
+            }
+        },
         remove(state, neid) {
             state.orderList = state.orderList.filter(item => {
                 return item["neid"] !== neid
@@ -47,13 +54,6 @@ const store = new Vuex.Store({
         },
         clear(state) {
             state.orderList = []
-        },
-        updateUserInfo(state, userInfo) {
-            state.userInfo = {
-                session: userInfo.session,
-                name: userInfo.name,
-                email: userInfo.email
-            }
         },
         setEditInfo(state, albumInfo) {
             state.orderEditInfo = albumInfo;
@@ -75,12 +75,12 @@ const store = new Vuex.Store({
         updateUserInfoFunc(state, userInfo) {
             state.commit("updateUserInfo", userInfo)
         },
+        refreshSessionFunc(state, token) {
+            state.commit("refreshSession", token)
+        },
         setOrderEditInfoFunc(state, albumInfo) {
             state.commit("setEditInfo", albumInfo)
         },
-        refreshSessionFunc(state, token) {
-            state.commit("refreshSession", token)
-        }
     }
 });
 

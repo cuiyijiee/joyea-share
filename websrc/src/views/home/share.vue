@@ -33,6 +33,7 @@
     import api, {check} from "../../api";
     import genSrcPreviewUrl from "../../utils/index"
     import VueLoadImage from 'vue-load-image'
+    import {mapGetters} from "vuex";
 
     export default {
         name: "share",
@@ -41,7 +42,6 @@
         },
         data() {
             return {
-                userInfo: {},
                 loading: false,
                 album: {
                     name: "",
@@ -50,16 +50,17 @@
                 defaultImg: 'this.src="' + require('@assets/error.png') + '"' //默认图地址
             }
         },
+        computed:{
+            ...mapGetters({
+                'userInfo': 'userInfo/userInfo'
+            })
+        },
         methods: {},
         mounted() {
             this.loading = true;
             let _this = this;
             let albumId = this.$route.query.albumId;
             if (albumId) {
-                let user = localStorage.getItem('userInfo');
-                if (user) {
-                    this.userInfo = JSON.parse(user)
-                }
                 check().then(resp => {
                     if (resp.code === 4001) {
                         this.$router.push({

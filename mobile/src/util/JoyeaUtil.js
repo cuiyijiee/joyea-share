@@ -1,3 +1,5 @@
+import {convertItem} from "./ImageViewUtil";
+
 export function genSrcPreviewSrc(neid, hash, rev, previewType, sessionId) {
     return 'https://console.box.lenovo.com/v2/preview_router?type=' + previewType + '&root=databox&path=&path_type=ent&from=&neid='
         + neid + '&hash=' + hash + '&rev=' + rev + "&X-LENOVO-SESS-ID=" + sessionId + "&xxoo=" + new Date().getTime();
@@ -8,7 +10,9 @@ export function newGenSrcPreviewSrc(path, neid, sessionId) {
         '?neid=' + neid + '&rev=&_=' + new Date().getTime() + "&X-LENOVO-SESS-ID=" + sessionId;
 }
 
-export function handleGoToPreview(row, session) {
+export function handleGoToPreview(context, row, session) {
+    row = convertItem(row)
+    let fileName = row.path.substr(row.path.lastIndexOf('/') + 1)
     let previewType = 'pic';    // if video is av
     if (row.mime_type.startsWith("doc")) {
         previewType = 'doc'
@@ -16,8 +20,16 @@ export function handleGoToPreview(row, session) {
         previewType = 'av'
     }
     let url = genSrcPreviewSrc(row.neid, row.hash, row.rev, previewType, session);
-    if (row.mime_type.startsWith("doc") || row.mime_type.startsWith("video")) {
-        window.open(url);
+    //let url = newGenSrcPreviewSrc(row.path, row.neid, session);
+    if (row.mime_type.startsWith("video")) {
+        callNextPlusPreview(fileName, url)
+    } else if (row.mime_type.startsWith("doc") && !row.mime_type.endsWith("pdf")) {
+        if (row.mime_type.endsWith("pdf")) {
+            //callNextPlusPreview(fileName, url)
+        } else {
+            //callNextPlusPreview(fileName, url)
+            window.open(url)
+        }
     } else if (row.mime_type.startsWith("image")) {
 
     }
