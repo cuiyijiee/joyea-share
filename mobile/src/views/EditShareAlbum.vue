@@ -22,42 +22,31 @@
         <div v-else-if="active===1">
 
             <van-divider content-position="left">选择封面</van-divider>
-            <van-empty v-if="this.editAlbum.srcList.filter(item => item.srcType.startsWith('image')).length === 0"
-                       class="custom-image"
-                       image="https://img.yzcdn.cn/vant/custom-empty-image.png" description="该清单中暂没有图片可做封面"/>
+            <van-empty
+                    v-if="this.editAlbum.srcList.filter(item => {return item.local || item.srcType.startsWith('image');}).length === 0"
+                    class="custom-image"
+                    image="https://img.yzcdn.cn/vant/custom-empty-image.png" description="该清单中暂没有图片可做封面"/>
             <van-grid :column-num="3">
                 <van-grid-item
-                        v-for="item in this.editAlbum.srcList.filter(item => item.srcType.startsWith('image'))"
+                        v-for="(item,index) in this.editAlbum.srcList.filter(item => {return item.local || item.srcType.startsWith('image');})"
                         :key="item.id" style="padding: 10px" @click="handleSelectCover(item)">
-                    <div>
-                        <img style="width: 100%;"
+                    <div v-show="!(index >= 6 && onlySixPic)">
+                        <img style="width: 100%;max-height: 500px" v-if="item.local" :src="item.url">
+                        <img style="width: 100%;max-height: 500px" v-else
                              :src="genPreviewUrl(item.srcNeid,item.srcHash,item.srcRev,item.srcType)">
-                        <!--                        <van-image-->
-                        <!--                                :src="genPreviewUrl(item.srcNeid,item.srcHash,item.srcRev,item.srcType)"/>-->
                         <div style="position: absolute;right: 5px;bottom: 5px"
-                             v-if="item.srcNeid === selectedCoverNeid">
+                             v-if="item.local && item.value === selectedLocalCoverId">
+                            <van-icon name="success" color="red"/>
+                        </div>
+                        <div style="position: absolute;right: 5px;bottom: 5px"
+                             v-else-if="item.srcNeid === selectedCoverNeid">
                             <van-icon name="success" color="red"/>
                         </div>
                     </div>
                 </van-grid-item>
             </van-grid>
-
-            <van-divider content-position="left">默认封面</van-divider>
-
-            <van-grid :column-num="3">
-                <van-grid-item v-for="item in albumCoverOption"
-                               :key="item.value" style="padding: 10px" @click="handleSelectLocalCover(item)">
-                    <div>
-                        <van-image
-                                :src="item.url"/>
-                        <div style="position: absolute;right: 5px;bottom: 5px"
-                             v-if="item.value === selectedLocalCoverId">
-                            <van-icon name="success" color="red"/>
-                        </div>
-                    </div>
-                </van-grid-item>
-            </van-grid>
-
+            <van-button type="primary" block v-show="onlySixPic && this.editAlbum.srcList.filter(item => {return item.local || item.srcType.startsWith('image');}).length > 6"
+                        @click="onlySixPic = false">显示全部封面</van-button>
 
             <van-divider content-position="left">修改信息</van-divider>
 
@@ -132,12 +121,15 @@
                 selectedJieduanId: -1,
                 selectedShichangId: -1,
 
+                onlySixPic: true,
+
                 hangyeOption: hangyeOption,
                 xianbieOption: xianbieOption,
                 jixingOption: jixingOption,
                 jieduanOption: jieduanOption,
                 shichangOption: shichangOption,
 
+                prepareCover: [],
 
                 active: 0,
                 myAlbumList: [],
@@ -172,12 +164,13 @@
                 })
             },
             handleSelectCover(item) {
-                this.selectedLocalCoverId = 0;
-                this.selectedCoverNeid = item.srcNeid;
-            },
-            handleSelectLocalCover(item) {
-                this.selectedCoverNeid = "";
-                this.selectedLocalCoverId = item.value;
+                if (item.local) {
+                    this.selectedCoverNeid = "";
+                    this.selectedLocalCoverId = item.value;
+                } else {
+                    this.selectedLocalCoverId = 0;
+                    this.selectedCoverNeid = item.srcNeid;
+                }
             },
             handleCompleteStepTwo() {
                 if (this.selectedCoverNeid === "" && this.selectedLocalCoverId === 0) {
@@ -208,7 +201,16 @@
                     if (!toHandleAlbum.shareDesc) {
                         toHandleAlbum.shareDesc = "";
                     }
+
+                    this.albumCoverOption.forEach(item => {
+                        item.local = true;
+                        toHandleAlbum.srcList.push(item);
+                    })
+
+                    console.log(toHandleAlbum);
+
                     this.editAlbum = toHandleAlbum;
+
                     this.selectedCoverNeid = "";
                     this.active = 1;
                 }
@@ -224,7 +226,7 @@
                 }
                 switchShare(
                     this.editAlbum.albumId, true, this.editAlbum.albumName,
-                    this.selectedCoverNeid, this.editAlbum.shareDesc,
+                    this.selectedCoverNeid, this.selectedLocalCoverId, this.editAlbum.shareDesc,
                     this.selectedHangyeId,
                     this.selectedXianbieId,
                     this.selectedJixingId,
@@ -235,7 +237,7 @@
                         if (resp.data) {
                             this.$notify({
                                 type: "success",
-                                message: "取消分享成功！"
+                                message: "分享成功！"
                             });
                             this.$router.back();
                         }

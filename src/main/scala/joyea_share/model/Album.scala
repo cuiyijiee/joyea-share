@@ -19,7 +19,7 @@ case class Album(
                   albumDesc: Option[String],
                   shared: Boolean,
                   shareCoverNeid: Option[Long],
-                  shareLocalCoverId:Option[String],
+                  shareLocalCoverId: Option[String],
                   shareDesc: Option[String],
                   referNum: Long = 0,
                   downloadNum: Long = 0,
@@ -31,6 +31,7 @@ case class Album(
                   jixingTagId: Int = -1,
                   jieduanTagId: Int = -1,
                   shichangTagId: Int = -1,
+                  copyFrom: Option[Long] = None
                 ) extends ShortenedNames {
 
   def save(): Future[Album] = Album.save(this)
@@ -53,6 +54,7 @@ case class Album(
     .add("jixing_tag_id", this.jixingTagId)
     .add("jieduan_tag_id", this.jieduanTagId)
     .add("shichang_tag_id", this.shichangTagId)
+    .add("copy_from", this.copyFrom.getOrElse(-1L))
     .add("created_at", SUtil.genDateString(this.createdAt, "yy-MM-dd HH:mm"))
     .add("updated_at", SUtil.genDateString(this.updatedAt.getOrElse(this.createdAt), "yy-MM-dd HH:mm"))
 }
@@ -68,9 +70,10 @@ object Album extends SQLSyntaxSupport[Album] with ShortenedNames {
   //                  jieduanTagId:Int = -1,
   //                  shichangId:Int = -1,
   override def columnNames: Seq[String] = Seq("album_id", "user_id", "user_name", "album_name", "album_desc", "shared",
-    "share_cover_neid","share_local_cover_id",
+    "share_cover_neid", "share_local_cover_id",
     "share_desc", "created_at", "refer_num", "download_num", "like_num", "updated_at",
-    "hangye_tag_id", "xianbie_tag_id", "jixing_tag_id", "jieduan_tag_id", "shichang_tag_id"
+    "hangye_tag_id", "xianbie_tag_id", "jixing_tag_id", "jieduan_tag_id", "shichang_tag_id",
+    "copy_from"
   )
 
   def apply(a: SyntaxProvider[Album])(rs: WrappedResultSet): Album = apply(a.resultName)(rs)
@@ -116,7 +119,7 @@ object Album extends SQLSyntaxSupport[Album] with ShortenedNames {
   def create(userId: String, userName: String, albumName: String, albumDesc: Option[String],
              shared: Boolean = false, referNum: Long = 0, downloadNum: Int = 0, likeNum: Int = 0,
              hangyeTagId: Int = -1, xianbieTagId: Int = -1, jixingTagId: Int = -1, jieduanTagId: Int = -1, shichangTagId: Int = -1,
-             createdAt: Timestamp = new Timestamp(System.currentTimeMillis()), updatedAt: Option[Timestamp] = None)
+             createdAt: Timestamp = new Timestamp(System.currentTimeMillis()), updatedAt: Option[Timestamp] = None, copyFrom: Option[Long] = None)
             (implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[Album] = {
     for {
       albumId <- withSQL {
@@ -136,10 +139,11 @@ object Album extends SQLSyntaxSupport[Album] with ShortenedNames {
           column.shichangTagId -> shichangTagId,
           column.createdAt -> createdAt,
           column.updatedAt -> updatedAt,
+          column.copyFrom -> copyFrom,
         )
       }.updateAndReturnGeneratedKey().future()
     } yield new Album(albumId = albumId, userId = userId, userName = userName, albumName = albumName,
-      albumDesc = albumDesc, shared = shared, shareCoverNeid = None,shareLocalCoverId = None, shareDesc = None,
+      albumDesc = albumDesc, shared = shared, shareCoverNeid = None, shareLocalCoverId = None, shareDesc = None,
       createdAt = createdAt, updatedAt = updatedAt,
       hangyeTagId = hangyeTagId, xianbieTagId = xianbieTagId, jixingTagId = jixingTagId, jieduanTagId = jieduanTagId, shichangTagId = shichangTagId
     )
@@ -222,28 +226,38 @@ object Album extends SQLSyntaxSupport[Album] with ShortenedNames {
     }
   }
 
-  def switchShare(albumName: String, coverId: Option[Long], localCoverId:Option[String],shareDesc: Option[String], share: Boolean, albumId: Long,
+  def switchShare(albumName: String, coverId: Option[Long], localCoverId: Option[String], shareDesc: Option[String], share: Boolean, albumId: Long,
                   hangyeTagId: Int = -1, xianbieTagId: Int = -1, jixingTagId: Int = -1, jieduanTagId: Int = -1, shichangTagId: Int = -1)
                  (implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[Boolean] = withSQL {
-    if(share){
+    if (share) {
       update(Album).set(
-      column.albumName -> albumName,
-      column.shareCoverNeid -> coverId,
-      column.shareLocalCoverId -> localCoverId,
-      column.shareDesc -> shareDesc,
-      column.shared -> share,
-      column.hangyeTagId -> hangyeTagId,
-      column.xianbieTagId -> xianbieTagId,
-      column.jixingTagId -> jixingTagId,
-      column.jieduanTagId -> jieduanTagId,
-      column.shichangTagId -> shichangTagId,
-    ).where.eq(column.albumId, albumId)
-    }else{
+        column.albumName -> albumName,
+        column.shareCoverNeid -> coverId,
+        column.shareLocalCoverId -> localCoverId,
+        column.shareDesc -> shareDesc,
+        column.shared -> share,
+        column.hangyeTagId -> hangyeTagId,
+        column.xianbieTagId -> xianbieTagId,
+        column.jixingTagId -> jixingTagId,
+        column.jieduanTagId -> jieduanTagId,
+        column.shichangTagId -> shichangTagId,
+      ).where.eq(column.albumId, albumId)
+    } else {
       update(Album).set(
         column.shared -> share,
       ).where.eq(column.albumId, albumId)
     }
   }.update().future().map(_ => true)
+
+
+  def findAllCopied(userId: String)
+                   (implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[List[Album]] = {
+      withSQL{
+        selectFrom(Album as a)
+          .where.eq(column.userId, userId).and.append(sqls.isNotNull(column.copyFrom))
+      }.map(Album(a)).list().future()
+  }
+
 }
 
 //

@@ -48,7 +48,7 @@ export let shichangOption = [
     {text: '中药饮片超微粉', value: 6},
     {text: '中药膏方', value: 7},
     {text: '中药口服液', value: 8},
-    {text: '西药口服', value: 9},
+    {text: '西药口服液', value: 9},
     {text: '软双铝', value: 10},
     {text: '益生菌', value: 11},
     {text: '蛋白粉', value: 12},

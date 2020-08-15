@@ -11,7 +11,9 @@ class CopyAlbum extends BaseAction[CopyAlbumReq] {
       if (albumOpt.isDefined) {
         val album = albumOpt.get
         Album.create(myUid, myName, album.albumName, albumDesc = album.albumDesc, shared = false, referNum = 0, downloadNum = 0, likeNum = 0,
-          hangyeTagId = album.hangyeTagId, xianbieTagId = album.xianbieTagId, jixingTagId = album.jixingTagId, jieduanTagId = album.jieduanTagId, shichangTagId = album.shichangTagId)
+          hangyeTagId = album.hangyeTagId, xianbieTagId = album.xianbieTagId, jixingTagId = album.jixingTagId, jieduanTagId = album.jieduanTagId, shichangTagId = album.shichangTagId,
+          copyFrom = Some(album.albumId)
+        )
           .onComplete(safeResponse[Album](_, newAlbum => {
             AlbumSrc.findByAlbumId(album.albumId).onComplete(safeResponse[List[AlbumSrc]](_, srcList => {
               srcList.foreach(src => {

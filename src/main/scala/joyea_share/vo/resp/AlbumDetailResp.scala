@@ -23,5 +23,6 @@ case class AlbumDetailResp(
                             jieduanTagId: Int = -1,
                             shichangTagId: Int = -1,
                             updatedAt: Option[Timestamp],
-                            srcList: List[AlbumSrc]
+                            srcList: List[AlbumSrc],
+                            isCopied: Boolean = false
                           )

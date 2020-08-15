@@ -58,7 +58,9 @@
                                     {{shichangOption.find(option => {return option.value === item.shichangTagId}).text}}
                                 </van-tag>
                             </span>
-                                <van-button size="mini" @click="handleCollect(item)">收藏 {{item.likeNum}}</van-button>
+                                <van-button plain size="mini" @click="handleCollect(item)">{{(item.isCopied ? "已收藏 " :
+                                    "收藏 ") +item.likeNum}}
+                                </van-button>
                             </div>
                         </template>
                     </van-card>
@@ -141,19 +143,37 @@
             },
             handleCollect(item) {
                 event.stopPropagation();
+                console.log("123")
                 if (item.userId === this.userInfo.email) {
                     this.$notify({
                         type: "danger",
                         message: "不能收藏自己的清单!"
                     })
                 } else {
-                    copyAlbum(item.albumId).then(resp => {
-                        this.$notify({
-                            type: "success",
-                            message: "收藏成功!"
-                        });
-                        item.likeNum++;
-                    })
+                    if (item.isCopied) {
+                        this.$dialog.confirm({
+                            message: '您已收藏此清单，是否继续收藏？',
+                        }).then(() => {
+                            copyAlbum(item.albumId).then(resp => {
+                                this.$notify({
+                                    type: "success",
+                                    message: "收藏成功!"
+                                });
+                                item.likeNum++;
+                                item.isCopied = true;
+                            })
+                        }).catch(() => {
+                        })
+                    } else {
+                        copyAlbum(item.albumId).then(resp => {
+                            this.$notify({
+                                type: "success",
+                                message: "收藏成功!"
+                            });
+                            item.likeNum++;
+                            item.isCopied = true;
+                        })
+                    }
                 }
             },
             handleRefreshAlbum() {
@@ -216,7 +236,7 @@
                             let localCoverItem = this.albumCoverOption.find(item => album.shareLocalCoverId === item.value + "");
                             if (localCoverItem) {
                                 album.cover = localCoverItem.url;
-                            }else {
+                            } else {
                                 let images = album.srcList.filter(item => {
                                     return item.srcType.startsWith("image") && item.srcNeid === album.shareCoverNeid;
                                 })

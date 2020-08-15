@@ -17,15 +17,17 @@
         <van-submit-bar style="margin-bottom: 50px" :button-text="getOrderEditInfo.name ? '重新保存':'提交清单'"
                         :safe-area-inset-bottom="false"
                         @submit="handleSaveList">
-            <div style="padding:0 20px" v-if="editMode">
+            <div style="padding:0 20px;position: absolute;left: 0" v-if="editMode">
                 <div>
-                    正在编辑:{{getOrderEditInfo.name}}
+                    正在编辑:{{getOrderEditInfo.name.length < 10 ? getOrderEditInfo.name :
+                    getOrderEditInfo.name.substr(0,10) + "..."}}
                 </div>
                 <div>
                     <van-button type="primary" @click="handleExitEditMode" size="small">退出编辑</van-button>
                 </div>
             </div>
-            <div style="margin-right: 5px">{{"合计：" + this.$store.getters.getStateOrderList.length + "个"}}</div>
+            <div style="margin-right: 5px">{{"合计：" + this.$store.getters.getStateOrderList.length + "个"}}
+            </div>
         </van-submit-bar>
         <van-dialog v-model="submitDialogVisible" :title="editMode ? '确认保存编辑后新清单？':'确认提交新清单？'"
                     @cancel="handleCancelSubmit"
