@@ -48,3 +48,21 @@ export function getTopSearchKey() {
         return res.data;
     })
 }
+
+export function findUploadRecord(curPage, pageSize) {
+    return service.post('api/v1/upload/get', {
+        curPage, pageSize
+    }).then(res => {
+        return res.data;
+    })
+}
+
+export function uploadRecordManage(recordId, allow, refuseReason) {
+    return service.post('api/v1/upload/manage', {
+        recordId,
+        allow: allow,
+        refuseReason: refuseReason
+    }).then(res => {
+        return res.data;
+    })
+}

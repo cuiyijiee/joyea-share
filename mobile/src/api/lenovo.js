@@ -15,9 +15,9 @@ export function authUpload(size, session) {
     })
 }
 
-export function realUpload(realUploadDomain, file, session,) {
-    let uploadUrl = realUploadDomain + "/v2/files/databox/营销素材展示/素材库上传临时文件夹/" + file.name +
-        "?X-LENOVO-SESS-ID=" + session + "&path_type=ent&bytes=" + file.size + "&filename=" + file.name;
+export function realUpload(realUploadDomain, file,realFileName, session,) {
+    let uploadUrl = realUploadDomain + "/v2/files/databox/营销素材展示/素材库上传临时文件夹/" + realFileName +
+        "?X-LENOVO-SESS-ID=" + session + "&path_type=ent&bytes=" + file.size + "&filename=" + realFileName + "$overwrite=true";
 
     let formData = new FormData();
     formData.append('file', file)
@@ -27,7 +27,6 @@ export function realUpload(realUploadDomain, file, session,) {
         headers: {'Content-Type': 'multipart/form-data'},
         onUploadProgress: progressEvent => {
             let completed = (progressEvent.loaded / progressEvent.total * 100 | 0) + "%";
-
         }
     };
 

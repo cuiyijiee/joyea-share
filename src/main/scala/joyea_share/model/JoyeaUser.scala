@@ -14,6 +14,7 @@ case class JoyeaUser(
                       password: String,
                       position: String, //职务
                       department: String, //部门
+                      isAdmin: Boolean = false,
                       updateAt: Timestamp
                     )
 
@@ -21,13 +22,15 @@ object JoyeaUser extends SQLSyntaxSupport[JoyeaUser] with ShortenedNames {
 
   lazy val ju: scalikejdbc.QuerySQLSyntaxProvider[scalikejdbc.SQLSyntaxSupport[JoyeaUser], JoyeaUser] = JoyeaUser.syntax("ju")
 
-  override def columnNames: Seq[String] = Seq("id", "joyea_id", "joyea_name", "password", "position", "department", "update_at")
+  override def columnNames: Seq[String] = Seq("id", "joyea_id", "joyea_name", "password", "position", "department", "update_at", "is_admin")
 
   def apply(ju: SyntaxProvider[JoyeaUser])(rs: WrappedResultSet): JoyeaUser = apply(ju.resultName)(rs)
 
   def apply(rn: ResultName[JoyeaUser])(rs: WrappedResultSet): JoyeaUser = autoConstruct(rs, rn)
 
-  def create(joyeaId: String, joyeaName: String,password:String, position: String, department: String, updateAt: Timestamp = new Timestamp(System.currentTimeMillis()))
+  def create(joyeaId: String, joyeaName: String, password: String, position: String,
+             isAdmin: Boolean = false,
+             department: String, updateAt: Timestamp = new Timestamp(System.currentTimeMillis()))
             (implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[JoyeaUser] = {
     for (userId <- withSQL {
       insert.into(JoyeaUser).namedValues(
@@ -37,9 +40,10 @@ object JoyeaUser extends SQLSyntaxSupport[JoyeaUser] with ShortenedNames {
         column.position -> position,
         column.department -> department,
         column.updateAt -> updateAt,
+        column.isAdmin -> isAdmin,
       )
     }.updateAndReturnGeneratedKey().future()
-         ) yield new JoyeaUser(id = userId, joyeaId = joyeaId, joyeaName = joyeaName,password = password, position = position, department = department, updateAt = updateAt)
+         ) yield new JoyeaUser(id = userId, joyeaId = joyeaId, joyeaName = joyeaName, password = password,isAdmin = isAdmin, position = position, department = department, updateAt = updateAt)
   }
 
   def findByJoyeaId(joyeaId: String)(implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[Option[JoyeaUser]] = {

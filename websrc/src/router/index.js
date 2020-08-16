@@ -3,11 +3,10 @@ import Router from 'vue-router'
 import Home from '../views/home/index'
 import Login from '../views/login/index'
 
-//import Manage from '../views/home/manage'
 import Build from '../views/home/build'
-import Collection from '../views/home/manage/collection'
 import List from '../views/home/manage/list'
 import Share from '../views/home/share'
+import UploadManage from "../views/home/UploadManage";
 
 Vue.use(Router);
 
@@ -48,6 +47,16 @@ export default new Router({
             noChild: true,
             children: [
                 {path: '/manage/list', component: List, name: 'list', desc: '清单'},
+            ]
+        },
+        {
+            path: '/',
+            name: '素材审核',
+            component: Home,
+            icon: 'el-icon-paperclip',
+            noChild: true,
+            children: [
+                {path: '/upload/manage', component: UploadManage, name: 'uploadManage', desc: '素材审核'},
             ]
         },
         // {

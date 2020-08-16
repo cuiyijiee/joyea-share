@@ -10,6 +10,8 @@ import './style/joyea.css'
 import router from './router'
 import store from "./store";
 
+import {genFileName} from './util/JoyeaUtil'
+
 Vue.config.productionTip = false;
 
 
@@ -17,6 +19,10 @@ import VConsole from 'vconsole'
 if (process.env.NODE_ENV !== 'production') {
     new VConsole()
 }
+
+
+
+Vue.prototype.$fileName = genFileName;
 
 Vue.use(Vant);
 Vue.use(VueRouter);

@@ -24,7 +24,8 @@ class LoginAction extends BaseAction[LoginReq] {
             session("user_id") = value.get.joyeaId
             cyjResponseSuccess(LoginResp(
               userName = value.get.joyeaName,
-              session = DownloadManager.getAdminToken()
+              session = DownloadManager.getAdminToken(),
+              isAdmin = value.get.isAdmin
             ))
           } else {
             cyjResponseError(ErrorCode.unknownError)

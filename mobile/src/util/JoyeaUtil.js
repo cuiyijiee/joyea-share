@@ -48,3 +48,11 @@ export function getDocumentImage(mimeType) {
     }
     return result;
 }
+
+export function genFileName(fullPath){
+    return fullPath.substr(fullPath.lastIndexOf('/')+1);
+}
+
+export function filterDirList(fileList){
+    return fileList.filter(item => item['is_dir'] );
+}

@@ -14,6 +14,8 @@ import AlbumList from "../views/AlbumList";
 
 import AlbumDetail from "../views/AlbumDetail";
 import EditShareAlbum from "../views/EditShareAlbum";
+import LenovoDirSelector from "@/components/LenovoDirSelector";
+import MyUpload from "@/views/MyUpload";
 
 Vue.use(Router);
 
@@ -106,6 +108,24 @@ export default new Router({
             path: '/upload/index',
             name: '素材上传',
             component: UploadIndex,
+            meta: {
+                allowBack: true,
+                allowHome: true
+            }
+        },
+        {
+            path: '/select/dir',
+            name: '目录选择',
+            component: LenovoDirSelector,
+            meta: {
+                allowBack: true,
+                allowHome: true
+            }
+        },
+        {
+            path: '/upload/mime',
+            name: '我的上传',
+            component: MyUpload,
             meta: {
                 allowBack: true,
                 allowHome: true
