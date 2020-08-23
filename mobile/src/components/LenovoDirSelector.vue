@@ -3,8 +3,8 @@
     <div>
         <span>
           <span style=" color:#b3d8ff;font-size: 15px;cursor:pointer;"
-                @click="handleListLenovoDir('/营销素材展示','ent')">首页</span>
-          <span style="display: inline" v-for="(item,index) in dir.currentPath" v-if="item !== '营销素材展示'">/
+                @click="handleListLenovoDir('/装调素材','ent')">首页</span>
+          <span style="display: inline" v-for="(item,index) in dir.currentPath" v-if="item !== '装调素材'">/
             <span style=" color:#b3d8ff;font-size: 15px;cursor:pointer;"
                   @click="handleClickDirPath(item,index)">{{ item }}</span>
           </span>
@@ -15,7 +15,7 @@
       <van-list>
         <van-cell v-for="item in filterDirList(dir.tableData)"
                   @click="handleClickItem(item)"
-                  v-if="item.path !== '/营销素材展示/素材库上传临时文件夹'"
+                  v-if="item.path !== '/装调素材/素材库上传临时文件夹'"
                   :key="item.path" :title="genFileName(item.path)"/>
         <van-empty image="error" v-if="filterDirList(dir.tableData).length === 0" description="没有可选目录啦!"/>
       </van-list>
@@ -106,7 +106,7 @@ export default {
     },
   },
   created() {
-    this.handleListLenovoDir("/营销素材展示", "ent");
+    this.handleListLenovoDir("/装调素材", "ent");
   }
 }
 </script>

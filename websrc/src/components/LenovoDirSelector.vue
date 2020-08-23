@@ -4,8 +4,8 @@
       <div>
         <span>
           <span style=" color:#1f1731;font-size: 15px;cursor:pointer;"
-                @click="handleListLenovoDir('/营销素材展示','ent')">首页</span>
-          <span style="display: inline" v-for="(item,index) in dir.currentPath" v-if="item !== '营销素材展示'">/
+                @click="handleListLenovoDir('/装调素材','ent')">首页</span>
+          <span style="display: inline" v-for="(item,index) in dir.currentPath" v-if="item !== '装调素材'">/
             <span style=" color:#1f1731;font-size: 15px;cursor:pointer;"
                   @click="handleClickDirPath(item,index)">{{ item }}</span>
           </span>
@@ -108,7 +108,7 @@ export default {
     },
   },
   created() {
-    this.handleListLenovoDir("/营销素材展示", "ent");
+    this.handleListLenovoDir("/装调素材", "ent");
   }
 }
 </script>

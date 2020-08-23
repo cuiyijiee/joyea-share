@@ -12,7 +12,7 @@
           <div style="padding: 14px;">
             <span></span>
             <div>
-              <div>上传到路径: {{ record.uploadPath.replace("/营销素材展示","首页") }}</div>
+              <div>上传到路径: {{ record.uploadPath.replace("/装调素材","首页") }}</div>
               <div>文件名:{{ record.srcName }}</div>
               <div>上传者:{{ record.uploaderName }}</div>
               <time class="time">{{ record.createdAt }}</time>

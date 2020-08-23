@@ -5,6 +5,7 @@ import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.event.AnalysisEventListener;
 import com.alibaba.excel.metadata.CellExtra;
 import com.alibaba.excel.read.listener.ReadListener;
+import joyea_share.model.JoyeaUser;
 import scala.util.parsing.json.JSON;
 
 import java.io.File;
@@ -14,10 +15,10 @@ import java.util.Map;
 
 public class Test {
     public static void main(String[] args) {
-        File file = new File("/Users/cuiyijie/Desktop/员工名单.xlsx");
+        File file = new File("/Users/cuiyijie/Desktop/123.xlsx");
         List<Map<Integer,String>> list = EasyExcel.read(file).sheet(0).doReadSync();
         list.forEach(entry -> {
-            System.out.println(entry);
+            System.out.println(entry.get(0) + "-" + entry.get(1) + "-" + entry.get(2) + "-" + entry.get(3));
         });
     }
 
