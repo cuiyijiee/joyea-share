@@ -37,12 +37,12 @@
         <van-action-sheet v-model="orderItemEdit.visible" title="编辑">
             <van-field label="文件名" :value="orderItemEdit.item.path.substr(orderItemEdit.item.path.lastIndexOf('/') + 1)"
                        disabled/>
-            <van-field
-                    v-model="orderItemEdit.item.joyeaDesc" rows="2"
-                    label="解说词" type="textarea"
-                    right-icon="edit"
-                    maxlength="50" placeholder="请输入解说词" show-word-limit
-            />
+<!--            <van-field-->
+<!--                    v-model="orderItemEdit.item.joyeaDesc" rows="2"-->
+<!--                    label="解说词" type="textarea"-->
+<!--                    right-icon="edit"-->
+<!--                    maxlength="50" placeholder="请输入解说词" show-word-limit-->
+<!--            />-->
             <van-button type="warning" round block @click="handleFinishEdit(item)">确认修改</van-button>
         </van-action-sheet>
     </div>

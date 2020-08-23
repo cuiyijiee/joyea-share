@@ -85,25 +85,23 @@ export function copyAlbum(albumId) {
     })
 }
 
-export function addUploadRecord(uid, srcName,srcNeid, srcType, srcHash, srcRev, uploadPath,uploadPathNeid, tags) {
+export function addUploadRecord(uid, tempSrcName, srcNeid, srcType, srcHash, srcRev,srcDesc, tags) {
     return service.post("/api/v1/upload/add", {
+        tempSrcName: tempSrcName,
         uploader: uid,
-        srcName:srcName,
         srcNeid: srcNeid,
         srcType: srcType,
         srcHash: srcHash,
         srcRev: srcRev,
-        uploadPath: uploadPath,
-        uploadPathNeid:uploadPathNeid,
+        srcDesc:srcDesc,
         tags: tags
     }).then(res => {
         return res.data
     })
 }
 
-export function getMyUploadRecord(){
-    return service.post("api/v1/upload/mime", {
-    }).then(res => {
+export function getMyUploadRecord() {
+    return service.post("api/v1/upload/mime", {}).then(res => {
         return res.data;
     })
 }

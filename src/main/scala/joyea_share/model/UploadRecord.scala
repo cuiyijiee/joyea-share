@@ -16,6 +16,7 @@ case class UploadRecord(
                          srcType: String,
                          srcHash: String,
                          srcName: String,
+                         srcDesc:String,
 
                          uploadPath: String,
                          uploadPathNeid: Long,
@@ -33,7 +34,7 @@ object UploadRecord extends SQLSyntaxSupport[UploadRecord] with ShortenedNames {
 
   lazy val ur: scalikejdbc.QuerySQLSyntaxProvider[scalikejdbc.SQLSyntaxSupport[UploadRecord], UploadRecord] = UploadRecord.syntax("ur")
 
-  override def columnNames: Seq[String] = Seq("id", "uploader", "src_name", "src_neid", "src_rev", "src_hash", "src_type", "upload_path", "upload_path_neid", "created_at", "checked", "checked_at", "tags", "refuse_reason")
+  override def columnNames: Seq[String] = Seq("id", "uploader", "src_name", "src_neid", "src_rev", "src_hash","src_desc", "src_type", "upload_path", "upload_path_neid", "created_at", "checked", "checked_at", "tags", "refuse_reason")
 
   def apply(sc: SyntaxProvider[UploadRecord])(rs: WrappedResultSet): UploadRecord = apply(sc.resultName)(rs)
 
@@ -64,7 +65,7 @@ object UploadRecord extends SQLSyntaxSupport[UploadRecord] with ShortenedNames {
     }.map(UploadRecord(ur)).single().future()
   }
 
-  def create(uploader: String, srcName: String, srcNeid: Long, srcRev: String, srcType: String, srcHash: String,
+  def create(uploader: String, srcName: String, srcNeid: Long, srcRev: String, srcType: String, srcHash: String,srcDesc:String,
              uploadPath: String, uploadPathNeid: Long, createdAt: Timestamp = new Timestamp(System.currentTimeMillis()),
              refuseReason: Option[String] = None,
              checked: Boolean = false, checkedAt: Option[Timestamp] = None, tags: Seq[String]): Future[UploadRecord] = {
@@ -77,6 +78,7 @@ object UploadRecord extends SQLSyntaxSupport[UploadRecord] with ShortenedNames {
           column.uploader -> uploader,
           column.srcName -> srcName,
           column.srcNeid -> srcNeid,
+          column.srcDesc -> srcDesc,
           column.srcRev -> srcRev,
           column.srcType -> srcType,
           column.srcHash -> srcHash,
@@ -90,7 +92,7 @@ object UploadRecord extends SQLSyntaxSupport[UploadRecord] with ShortenedNames {
         )
       }.updateAndReturnGeneratedKey().future()
     } yield new UploadRecord(id = id, uploader = uploader, uploadPath = uploadPath, uploadPathNeid = uploadPathNeid,
-      srcName = srcName, srcHash = srcHash,
+      srcName = srcName, srcHash = srcHash,srcDesc = srcDesc,
       srcRev = srcRev, srcType = srcType, srcNeid = srcNeid, createdAt = createdAt, checked = checked,
       checkedAt = checkedAt, tags = saveTags, refuseReason = refuseReason)
   }

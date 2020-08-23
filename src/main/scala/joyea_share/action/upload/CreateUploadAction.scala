@@ -8,7 +8,7 @@ import xitrum.annotation.POST
 class CreateUploadAction extends BaseAction[CreateUploadReq] {
   override def safeExecute(req: CreateUploadReq): Unit = {
     UploadRecord.create(uploader = req.uploader,
-      srcName = req.srcName, srcNeid = req.srcNeid,
+      srcName = req.srcName, srcNeid = req.srcNeid,srcDesc = req.srcDesc,
       srcType = req.srcType, srcRev = req.srcRev, srcHash = req.srcHash,
       uploadPath = req.uploadPath, uploadPathNeid = req.uploadPathNeid, tags = req.tags)
       .onComplete(safeResponse[UploadRecord](_, resp => {
@@ -24,6 +24,7 @@ case class CreateUploadReq(
                             srcType: String,
                             srcRev: String,
                             srcHash: String,
+                            srcDesc: String,
                             uploadPath: String,
                             uploadPathNeid: Long,
                             tags: Seq[String]
