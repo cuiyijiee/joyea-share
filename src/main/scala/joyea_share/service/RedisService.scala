@@ -15,6 +15,11 @@ object RedisService extends RedisSetting with Log {
   val FileRefRankKey: String = "file_ref_rank"
   val FileDownloadRankKey: String = "file_download_rank"
   val AlbumRefRankKey: String = "album_download_rank"
+  val UploadRankKey:String = "upload_rank"
+
+  def recordUpload(uploadJoyeaId:String):Future[Double] = {
+    redis.zincrby(UploadRankKey, 1, uploadJoyeaId)
+  }
 
   def recordSearch(searchKey: String): Future[Double] = {
     redis.zincrby(SearchRankKey, 1, searchKey)

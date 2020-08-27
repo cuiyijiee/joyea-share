@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-dialog :visible="visible" title="请选择目录" @close="handleClickClose"  :modal-append-to-body="true">
+    <el-dialog :visible="visible" title="请选择目录" @close="handleClickClose" @opened="handleDialogOpened"  :modal-append-to-body="true">
       <div>
         <span>
           <span style=" color:#1f1731;font-size: 15px;cursor:pointer;"
@@ -72,11 +72,6 @@ export default {
     },
     handleListLenovoDir(path, pathType) {
       this.dir.loadingDir = true;
-      // const toast = Toast.loading({
-      //   duration: 0, // 持续展示 toast
-      //   forbidClick: true,
-      //   message: '拼命加载中...',
-      // });
       api({
         action: 'listLenovoDir',
         path: path.replace("+", "%2B"),
@@ -106,9 +101,12 @@ export default {
         this.dir.loadingDir = false;
       });
     },
+    handleDialogOpened(){
+      this.handleListLenovoDir("/营销素材展示", "ent");
+    }
   },
   created() {
-    this.handleListLenovoDir("/营销素材展示", "ent");
+
   }
 }
 </script>

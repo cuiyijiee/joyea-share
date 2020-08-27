@@ -15,11 +15,14 @@ case class UploadRecord(
                          srcRev: String,
                          srcType: String,
                          srcHash: String,
-                         srcName: String,
-                         srcDesc:String,
+                         srcDesc: String,
 
-                         uploadPath: String,
-                         uploadPathNeid: Long,
+                         tempSrcName: String,
+
+                         srcName: Option[String],
+
+                         uploadPath: Option[String],
+                         uploadPathNeid: Option[Long],
                          createdAt: Timestamp,
                          checked: Boolean,
                          checkedAt: Option[Timestamp],
@@ -34,7 +37,7 @@ object UploadRecord extends SQLSyntaxSupport[UploadRecord] with ShortenedNames {
 
   lazy val ur: scalikejdbc.QuerySQLSyntaxProvider[scalikejdbc.SQLSyntaxSupport[UploadRecord], UploadRecord] = UploadRecord.syntax("ur")
 
-  override def columnNames: Seq[String] = Seq("id", "uploader", "src_name", "src_neid", "src_rev", "src_hash","src_desc", "src_type", "upload_path", "upload_path_neid", "created_at", "checked", "checked_at", "tags", "refuse_reason")
+  override def columnNames: Seq[String] = Seq("id", "uploader", "temp_src_name", "src_name", "src_neid", "src_rev", "src_hash", "src_desc", "src_type", "upload_path", "upload_path_neid", "created_at", "checked", "checked_at", "tags", "refuse_reason")
 
   def apply(sc: SyntaxProvider[UploadRecord])(rs: WrappedResultSet): UploadRecord = apply(sc.resultName)(rs)
 
@@ -44,10 +47,15 @@ object UploadRecord extends SQLSyntaxSupport[UploadRecord] with ShortenedNames {
     tags.mkString("~~")
   }
 
-  def checkRecord(recordId: Long, allow: Boolean, refuseReason: Option[String] = None, checkedAt: Timestamp = new Timestamp(System.currentTimeMillis())): Future[Boolean] = withSQL {
+  def checkRecord(recordId: Long, allow: Boolean,
+                  uploadPath: Option[String], uploadPathNeid: Option[Long], srcName: Option[String],
+                  refuseReason: Option[String] = None, checkedAt: Timestamp = new Timestamp(System.currentTimeMillis())): Future[Boolean] = withSQL {
     if (allow) {
       update(UploadRecord).set(
         column.checked -> allow,
+        column.uploadPath -> uploadPath,
+        column.uploadPathNeid -> uploadPathNeid,
+        column.srcName -> srcName,
         column.checkedAt -> checkedAt
       ).where.eq(column.id, recordId)
     } else {
@@ -65,8 +73,9 @@ object UploadRecord extends SQLSyntaxSupport[UploadRecord] with ShortenedNames {
     }.map(UploadRecord(ur)).single().future()
   }
 
-  def create(uploader: String, srcName: String, srcNeid: Long, srcRev: String, srcType: String, srcHash: String,srcDesc:String,
-             uploadPath: String, uploadPathNeid: Long, createdAt: Timestamp = new Timestamp(System.currentTimeMillis()),
+  def create(uploader: String, srcNeid: Long, srcRev: String, srcType: String, srcHash: String, srcDesc: String,
+             createdAt: Timestamp = new Timestamp(System.currentTimeMillis()),
+             tempSrcName: String,
              refuseReason: Option[String] = None,
              checked: Boolean = false, checkedAt: Option[Timestamp] = None, tags: Seq[String]): Future[UploadRecord] = {
 
@@ -76,25 +85,23 @@ object UploadRecord extends SQLSyntaxSupport[UploadRecord] with ShortenedNames {
       id <- withSQL {
         insert.into(UploadRecord).namedValues(
           column.uploader -> uploader,
-          column.srcName -> srcName,
           column.srcNeid -> srcNeid,
           column.srcDesc -> srcDesc,
           column.srcRev -> srcRev,
           column.srcType -> srcType,
           column.srcHash -> srcHash,
-          column.uploadPath -> uploadPath,
-          column.uploadPathNeid -> uploadPathNeid,
           column.createdAt -> createdAt,
           column.checked -> checked,
           column.checkedAt -> checkedAt,
           column.tags -> saveTags,
+          column.tempSrcName -> tempSrcName,
           column.refuseReason -> refuseReason
         )
       }.updateAndReturnGeneratedKey().future()
-    } yield new UploadRecord(id = id, uploader = uploader, uploadPath = uploadPath, uploadPathNeid = uploadPathNeid,
-      srcName = srcName, srcHash = srcHash,srcDesc = srcDesc,
+    } yield new UploadRecord(id = id, uploader = uploader, srcHash = srcHash, srcDesc = srcDesc,
       srcRev = srcRev, srcType = srcType, srcNeid = srcNeid, createdAt = createdAt, checked = checked,
-      checkedAt = checkedAt, tags = saveTags, refuseReason = refuseReason)
+      checkedAt = checkedAt, tags = saveTags, refuseReason = refuseReason, tempSrcName = tempSrcName,
+      srcName = None, uploadPathNeid = None, uploadPath = None)
   }
 
   def findAllByUid(uid: String): Future[List[UploadRecord]] = withSQL {

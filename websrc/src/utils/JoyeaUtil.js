@@ -1,6 +1,8 @@
 export function getDocumentImage(mimeType) {
     let result = "document.png"
-    if (mimeType.endsWith("pdf")) {
+    if (mimeType.startsWith("video")) {
+        result = "video.png"
+    } else if (mimeType.endsWith("pdf")) {
         result = "pdf.png"
     } else if (mimeType.endsWith("ppt") || mimeType.endsWith("pptx")) {
         result = "ppt.png"
@@ -38,3 +40,31 @@ export let joyeaMenuPath = [
         name: "友商信息", path: "友商信息", icon: "menu-icon/17.png"
     }
 ]
+
+export function extname(filename) {
+    if (!filename || typeof filename != 'string') {
+        return false
+    }
+    let a = filename.split('').reverse().join('');
+    return a.substring(0, a.search(/\./)).split('').reverse().join('')
+}
+
+export function genFileName(fileName) {
+    return fileName.substring(fileName.lastIndexOf("/") + 1);
+}
+
+export function filterDirList(dir) {
+    console.log(dir)
+    return dir.filter(item => {
+        return item.is_dir;
+    })
+}
+
+export function convertItem(item) {
+    if (item.srcType) item.mime_type = item.srcType;
+    if (item.srcNeid) item.neid = item.srcNeid;
+    if (item.srcHash) item.hash = item.srcHash;
+    if (item.srcRev) item.rev = item.srcRev;
+    if (item.srcPath) item.path = item.srcPath;
+    return item;
+}

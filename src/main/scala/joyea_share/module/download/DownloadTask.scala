@@ -71,50 +71,47 @@ case class DownloadTask(
           }
 
           override def onError(error: String): Unit = {
-            failNum = failNum + 1
-            downloadProgress = downloadProgress + 1
-            log.error(s"下载文件【$item】失败:$error")
-            checkFinish()
+            try {
+              failNum = failNum + 1
+              downloadProgress = downloadProgress + 1
+              log.error(s"下载文件【$item】失败:$error")
+              checkFinish()
+            } catch {
+              case e: Exception =>
+                log.error(s"download file exist error:${error}")
+            }
           }
         })
     })
   }
 
-  def checkFinish(): Unit = {
+  def checkFinish(): Unit = this.synchronized {
     //下载完成
     downloadListener.onNext(id, downloadProgress, downloadFile.size())
     if (downloadProgress >= downloadFile.size()) {
       //线程等待2秒，避免加密软件冲突
       CommonUtil.writeFile(s"$saveFilePath/请勿外泄.txt", "仅一公司内部资料，请勿外泄！")
-      var needEncrypt = true
-      try {
-        needEncrypt = Config.application.getBoolean("download.encrypt")
-      } catch {
-        case e: Exception =>
-          e.printStackTrace()
-      }
-      if (needEncrypt) {
-        //先上传文件到ftp服务器进行加密再下载下来
-        val ftpUtil = new FtpUtil(
-          Config.application.getConfig("download").getString("ftp_ip"),
-          Config.application.getConfig("download").getInt("ftp_port"),
-          Config.application.getConfig("download").getString("ftp_name"),
-          Config.application.getConfig("download").getString("ftp_pass")
-        )
-        ftpUtil.login()
-        val fileList = new File(saveFilePath).listFiles(new FileFilter {
-          override def accept(file: File): Boolean = file.isFile
-        })
-        fileList.foreach(file => {
-          ftpUtil.uploadFileToRemoteDir(file.getAbsolutePath, "/download/" + id)
-          file.delete()
-        })
-        Thread.sleep(Config.application.getConfig("download").getInt("wait_seconds") * 1000)
-        fileList.foreach(file => {
-          ftpUtil.downloadFile("/download/" + id + "/" + file.getName, file.getAbsolutePath)
-        })
-        ftpUtil.logout()
-      }
+
+      //先上传文件到ftp服务器进行加密再下载下来
+      val ftpUtil = new FtpUtil(
+        Config.application.getConfig("download").getString("ftp_ip"),
+        Config.application.getConfig("download").getInt("ftp_port"),
+        Config.application.getConfig("download").getString("ftp_name"),
+        Config.application.getConfig("download").getString("ftp_pass")
+      )
+      ftpUtil.login()
+      val fileList = new File(saveFilePath).listFiles(new FileFilter {
+        override def accept(file: File): Boolean = file.isFile
+      })
+      fileList.foreach(file => {
+        ftpUtil.uploadFileToRemoteDir(file.getAbsolutePath, "/download/" + id)
+        file.delete()
+      })
+      val maxWaitSeconds = Config.application.getConfig("download").getInt("max_wait_seconds") * 1000
+      fileList.foreach(file => {
+        ftpUtil.downloadFile("/download/" + id + "/" + file.getName, file.getAbsolutePath, true, maxWaitSeconds)
+      })
+      ftpUtil.logout()
 
       ZipUtils.compressZip(Array(saveFilePath), saveCompressPath + ".zip")
       //CommonUtil.delete(saveFilePath)

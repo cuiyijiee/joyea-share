@@ -1,11 +1,12 @@
 <template>
   <div>
     <div style="margin: 10px;color: #1f1731;">请选择要上传的文件(最多可选9个文件)</div>
-    <van-uploader v-model="filePreviewList" multiple accept="*" max-count="9" :after-read="afterRead">
+    <van-uploader v-model="filePreviewList" multiple accept="*" max-count="9" :after-read="afterRead" :preview-full-image="false">
     </van-uploader>
     <van-cell-group>
-      <van-field v-for="(file,index) in filePreviewList" v-model="file.desc" :label="'文件 ' + (index + 1) + ' 的说明:'"
-                 placeholder="请输入说明"/>
+      <van-field v-for="(file,index) in filePreviewList" v-model="file.desc" :label="'文件 ' + (index + 1) + ' 说明:'"
+                 :key=file.name
+                 :placeholder='fileDescPlaceholder'/>
     </van-cell-group>
     <van-button type="info" round block style="margin-top: 100px" @click="handleClickUpload">开始上传</van-button>
   </div>
@@ -24,6 +25,7 @@ export default {
   components: {LenovoDirSelector},
   data() {
     return {
+      fileDescPlaceholder:"请输入素材内容、素材使用场景、素材使用说明等。",
       pathSelectorVisible: false,
       uploadPath: "",
       uploadPathNeid: "",
@@ -56,6 +58,13 @@ export default {
       })
     },
     handleClickUpload() {
+
+      for (let index = 0; index < this.filePreviewList.length; index++) {
+        if (!this.filePreviewList[index].desc || this.filePreviewList[index].desc.trim().length===0) {
+          this.$notify({type: 'warning', message: '请填写文件[ ' + (index + 1) + ' ]文件说明！'});
+          return;
+        }
+      }
       const toast = Toast.loading({
         duration: 0, // 持续展示 toast
         forbidClick: true,
