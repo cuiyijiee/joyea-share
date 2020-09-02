@@ -188,17 +188,74 @@ public class FtpUtil {
         return result;
     }
 
+    public boolean checkFileEncrypted(String remoteFilePath) {
+        File remoteFile = new File(remoteFilePath);
+        InputStream fileInputStream = null;
+        try {
+            ftpClient.changeWorkingDirectory(remoteFile.getParent());
+            fileInputStream = ftpClient.retrieveFileStream(remoteFilePath);
+            if (fileInputStream == null) {
+                logger.error("remote file input is null:" + remoteFilePath);
+            }
+            byte[] toReadBuf = new byte[32];
+            int len = fileInputStream.read(toReadBuf, 0, 32);
+            for (int index = 0; index < toReadBuf.length; index++) {
+                toReadBuf[index] = (byte) (toReadBuf[index] & 0xff);
+            }
+            if (len < 28) {
+                return false;
+            } else {
+                logger.error("get remote file:" + toReadBuf[0] + "-" + toReadBuf[1] + "-" + toReadBuf[2] + "-" + toReadBuf[3] + "-");
+                if (((byte) 0x7d == toReadBuf[1])
+                        && ((byte) 0x1c == toReadBuf[2])
+                        && ((byte) 0x84 == toReadBuf[0] || (byte) 0x87 == toReadBuf[0] || (byte) 0x88 == toReadBuf[0])) {
+                    return true;
+                }
+            }
+        } catch (Exception e) {
+            logger.error("download file check encrypted error: ", e);
+        } finally {
+            if (fileInputStream != null) {
+                try {
+                    fileInputStream.close();
+                    ftpClient.completePendingCommand();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return false;
+    }
+
     /**
      * download single file
      */
-    public boolean downloadFile(String remoteFilePath, String localFilePath) {
+    public boolean downloadFile(String remoteFilePath, String localFilePath, Boolean needCheckEncrypted, int maxWaitSeconds) {
+        boolean encrypted = false;
+        int checkNum = 30;
+        if (needCheckEncrypted) {
+            do {
+                encrypted = checkFileEncrypted(remoteFilePath);
+                logger.error("remote file is encrypted:" + encrypted);
+                if (!encrypted) {
+                    try {
+                        Thread.sleep(1000);
+                        checkNum++;
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                if (checkNum > maxWaitSeconds) {
+                    break;
+                }
+            } while (!encrypted);
+        }
         BufferedOutputStream bos = null;
         try {
             File localFile = new File(localFilePath);
             File remoteFile = new File(remoteFilePath);
             ftpClient.changeWorkingDirectory(remoteFile.getParent());
             bos = new BufferedOutputStream(new FileOutputStream(localFile));
-
             if (ftpClient.retrieveFile(remoteFile.getName(), bos)) {
                 logger.info(remoteFile.getName() + " successfully downloaded to the " + localFilePath);
                 System.out.println(localFile.lastModified());
@@ -256,12 +313,20 @@ public class FtpUtil {
     /**
      * 从FTP服务器删除文件
      *
-     * @param remoteFile
+     * @param remoteFilePath
      * @return
      * @throws Exception
      */
-    public boolean delete(String remoteFile) throws Exception {
-        return ftpClient.deleteFile(remoteFile);
+    public void deleteDir(String remoteFilePath) throws Exception {
+        try {
+            ftpClient.changeWorkingDirectory(remoteFilePath);
+            FTPFile[] files = ftpClient.listFiles();
+            for (FTPFile file : files) {
+                ftpClient.deleteFile(file.getName());
+            }
+        } catch (Exception e) {
+            logger.error("delete ftp file error: ", e);
+        }
     }
 
     /**
@@ -302,23 +367,25 @@ public class FtpUtil {
     }
 
     public static void main(String[] args) throws IOException {
-        FtpUtil ftp = new FtpUtil(
-                "10.211.55.3",
-                "cuje",
-                "cc112211"
-        );
-        ftp.login();
-        File[] files = new File("/Users/cuje/Desktop/test").listFiles(new FileFilter() {
-            @Override
-            public boolean accept(File file) {
-                return file.isFile();
-            }
-        });
-        for (File file : files) {
-            ftp.uploadFileToRemoteDir(file.getAbsolutePath(), "/test");
-            file.delete();
-            ftp.downloadFile("/test/" + file.getName(),"/Users/cuje/Desktop/test/" + file.getName());
-        }
-        ftp.logout();
+//        FtpUtil ftp = new FtpUtil(
+//                "10.211.55.3",
+//                "cuje",
+//                "cc112211"
+//        );
+//        ftp.login();
+//        File[] files = new File("/Users/cuje/Desktop/test").listFiles(new FileFilter() {
+//            @Override
+//            public boolean accept(File file) {
+//                return file.isFile();
+//            }
+//        });
+//        for (File file : files) {
+//            ftp.uploadFileToRemoteDir(file.getAbsolutePath(), "/test");
+//            file.delete();
+//            ftp.downloadFile("/test/" + file.getName(), "/Users/cuje/Desktop/test/" + file.getName());
+//        }
+//        ftp.logout();
     }
+
+
 }

@@ -12,7 +12,7 @@ import org.http4s.client.{Client, JavaNetClientBuilder}
 import org.slf4s.LoggerFactory
 import xitrum.Log
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future, Promise}
 
 object LenovoUtil extends Log {
 
@@ -204,20 +204,20 @@ object LenovoUtil extends Log {
       }
 
       override def onResponse(call: Call, response: Response): Unit = {
-        log.info(s"$path size is ${response.body().contentLength()}")
-        if (response.code() != 200) {
-          log.error(s"请求失败：$requestUrl,失败代码：${response.code()},失败信息：${response.body().string()}")
-          listener.onError(s"请求失败：$requestUrl,失败代码：${response.code()},失败信息：${response.body().string()}")
-        } else {
-          try {
+        try {
+          log.info(s"$path size is ${response.body().contentLength()}")
+          if (response.code() != 200) {
+            log.error(s"请求失败1：$requestUrl,失败代码：${response.code()},失败信息：${response.body().string()}")
+            throw new Exception(s"下载失败，服务器返回错误代码:${response.code()}")
+          } else {
             val downloadFile = new File(downloadFilePath)
             CommonUtil.writeFile(downloadFile, response.body().byteStream())
             listener.onSuccess(downloadFile)
-          } catch {
-            case e: Exception =>
-              listener.onError("请求失败！")
-              log.error("下载失败：" + SUtil.convertExceptionToStr(e))
           }
+        } catch {
+          case e: Exception =>
+            listener.onError("请求失败！")
+            log.error("下载失败：" + SUtil.convertExceptionToStr(e))
         }
       }
     })
@@ -259,6 +259,37 @@ object LenovoUtil extends Log {
         listener.onSuccess(resultJson)
       }
     })
+  }
+
+  def renameFile(fileNeid: Long, fileName: String, session: String): Future[Boolean] = {
+    val promise = Promise[Boolean]
+    val infoJson = new JsonObject()
+    infoJson.add("fileName", fileName)
+    infoJson.add("op_info", new JsonObject().add("neid", fileNeid))
+
+    val formBodyBuilder = new FormBody.Builder()
+    formBodyBuilder.add("op", "rename")
+    formBodyBuilder.add("info", infoJson.toString())
+
+    val request = HttpUtil.obtainBaseRequest().url(s"$BASE_URL/fileops/manage?X-LENOVO-SESS-ID=${session}").post(formBodyBuilder.build()).build()
+    HttpUtil.obtainHttpClient().newCall(request).enqueue(new Callback {
+      override def onFailure(call: Call, e: IOException): Unit = {
+        promise.failure(e)
+      }
+
+      override def onResponse(call: Call, response: Response): Unit = {
+        try {
+          val respStr = response.body().string()
+          log.error(s"rename file resp: $respStr")
+          promise.success(true)
+        } catch {
+          case e: Exception =>
+            promise.failure(e)
+        }
+      }
+    })
+
+    promise.future
   }
 
   def moveFile(toMoveFileNeid: Long, toDirPath: Long, session: String, listener: CommonListener[Boolean]): Unit = {

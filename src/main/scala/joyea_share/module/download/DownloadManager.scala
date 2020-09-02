@@ -2,6 +2,7 @@ package joyea_share.module.download
 
 import java.io.{File, FileFilter}
 import java.util
+import java.util.{Calendar, Date, Timer, TimerTask}
 import java.util.concurrent.{ExecutorService, Executors, TimeUnit}
 
 import com.json.{JsonArray, WriterConfig}
@@ -29,6 +30,15 @@ object DownloadManager extends Log {
   //用来存放所有的任务，每天清除一次
   private val downloadTaskMap: java.util.Map[String, DownloadTask] = new util.HashMap[String, DownloadTask]()
 
+  private val PERIOD_DAY = 24 * 60 * 60 * 1000
+
+  def addDay(date: Date, num: Int): Date = {
+    val startDT = Calendar.getInstance()
+    startDT.setTime(date)
+    startDT.add(Calendar.DAY_OF_MONTH, num)
+    startDT.getTime
+  }
+
   def init(): Unit = {
     initBaseSaveFilePath()
     baseRecordJsonDir.mkdirs()
@@ -36,6 +46,24 @@ object DownloadManager extends Log {
     getAdminTokenExecutor.scheduleWithFixedDelay(() => {
       genNewSession()
     }, 0, 30, TimeUnit.MINUTES)
+
+    val deleteDownloadFileTimer = new Timer()
+    val calendar = Calendar.getInstance()
+    calendar.set(Calendar.HOUR_OF_DAY, 2) //凌晨1点
+    calendar.set(Calendar.MINUTE, 0)
+    calendar.set(Calendar.SECOND, 0)
+    var date = calendar.getTime() //第一次执行定时任务的时间
+    //如果第一次执行定时任务的时间 小于当前的时间
+    //此时要在 第一次执行定时任务的时间加一天，以便此任务在下个时间点执行。如果不加一天，任务会立即执行。
+    if (date.before(new Date())) {
+      date = this.addDay(date, 1);
+    }
+    deleteDownloadFileTimer.schedule(new TimerTask {
+      override def run(): Unit = {
+        val yesterdayDownloadDir = new File(s"${baseRecordJsonDir.getAbsolutePath}/${SUtil.genYesterdayDateString(formatString = "yy-MM-dd")}")
+        CommonUtil.delete(yesterdayDownloadDir)
+      }
+    }, date, PERIOD_DAY)
 
     //整点刷新配置
     getAdminTokenExecutor.scheduleWithFixedDelay(() => {

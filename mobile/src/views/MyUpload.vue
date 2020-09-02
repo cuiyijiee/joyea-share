@@ -2,15 +2,21 @@
   <div>
     <van-card
         v-for="item in recordList"
-        :desc="item.uploadPath"
-        :title="item.srcName"
-        :thumb="getPreviewUrl(item)"
+        @click="handleGotoPan(item)"
     >
+      <template #thumb>
+        <van-image width="80" height="80" v-if="item.srcType.startsWith('image')" :src="getPreviewUrl(item)"/>
+        <van-image v-else width="80" height="80" :src="getDocumentImage(item.srcType)"></van-image>
+      </template>
       <template #tags>
         <van-tag type="primary" v-if="!item.checkedAt">待审核</van-tag>
         <van-tag type="success" v-if="item.checkedAt && item.checked">通过</van-tag>
         <van-tag type="danger" v-if="item.checkedAt && !item.checked">未通过</van-tag>
-        <div v-if="item.checkedAt && !item.checked">审核意见:{{item.refuseReason}}</div>
+        <div v-if="item.checkedAt && item.checked">
+          管理员移至:{{ item.uploadPath.replace("/营销素材展示", "首页") + "/" + item.srcName }}
+        </div>
+        <div v-if="item.checkedAt && !item.checked">审核意见:{{ item.refuseReason }}</div>
+        <div>上传时间:{{ item.createdAt }}</div>
       </template>
     </van-card>
   </div>
@@ -19,7 +25,7 @@
 <script>
 
 import {getMyUploadRecord} from "@/api";
-import {genSrcPreviewSrc} from "@/util/JoyeaUtil";
+import {genSrcPreviewSrc, getDocumentImage} from "@/util/JoyeaUtil";
 import {mapGetters} from "vuex";
 
 export default {
@@ -31,6 +37,12 @@ export default {
     }
   },
   methods: {
+    getDocumentImage,
+    handleGotoPan(item) {
+      if (item.checkedAt && item.checked) {
+
+      }
+    },
     getMyUploadRecord() {
       getMyUploadRecord().then(resp => {
         console.log(resp)

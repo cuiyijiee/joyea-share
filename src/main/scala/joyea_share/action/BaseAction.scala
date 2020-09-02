@@ -59,10 +59,12 @@ abstract class BaseAction[T: Manifest] extends Action with SkipCsrfCheck with Lo
 
 
   def cyjResponseSuccess(data: Any): Unit = {
+    log.error("response success: " + data)
     respondJsonText(Serialization.write(BaseResp(2000, data)))
   }
 
   def cyjResponseError(code: Int): Unit = {
+    log.error("response error: " + code)
     respondJsonText(Serialization.write(BaseResp(code, null)))
   }
 
