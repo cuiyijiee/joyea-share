@@ -111,6 +111,7 @@ case class DownloadTask(
       fileList.foreach(file => {
         ftpUtil.downloadFile("/download/" + id + "/" + file.getName, file.getAbsolutePath, true, maxWaitSeconds)
       })
+      ftpUtil.deleteDir("/download/" + id)
       ftpUtil.logout()
 
       ZipUtils.compressZip(Array(saveFilePath), saveCompressPath + ".zip")

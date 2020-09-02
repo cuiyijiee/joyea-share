@@ -313,12 +313,20 @@ public class FtpUtil {
     /**
      * 从FTP服务器删除文件
      *
-     * @param remoteFile
+     * @param remoteFilePath
      * @return
      * @throws Exception
      */
-    public boolean delete(String remoteFile) throws Exception {
-        return ftpClient.deleteFile(remoteFile);
+    public void deleteDir(String remoteFilePath) throws Exception {
+        try {
+            ftpClient.changeWorkingDirectory(remoteFilePath);
+            FTPFile[] files = ftpClient.listFiles();
+            for (FTPFile file : files) {
+                ftpClient.deleteFile(file.getName());
+            }
+        } catch (Exception e) {
+            logger.error("delete ftp file error: ", e);
+        }
     }
 
     /**
