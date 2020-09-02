@@ -19,7 +19,7 @@
                      style="">我的清单
           </el-button>
           <el-button size="small" icon="el-icon-tickets" @click="jumpToUploadManage"
-                     v-if="userInfo.email === '717'"
+                     v-if="userInfo.email === '0070'"
                      :class="{'is-active':currentPath==='/upload/manage'}"
                      style="margin-right: 10px">素材审核
           </el-button>
