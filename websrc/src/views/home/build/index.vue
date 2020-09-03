@@ -13,23 +13,23 @@
               @click="handleClickTopSearchKey(key)"><u>{{ key }}</u></span>
       </div>
     </div>
-    <!--        <div v-if="dir.currentPath.length === 1 && dir.currentPath[0] === '装调素材' && toCreateAlbum.list.length === 0"-->
-    <!--             style="height:1080px;padding: 0 150px;background: #d1d1d1;">-->
-    <!--            <div style="padding: 10px 10px 0 10px;height: 100%; "-->
-    <!--                 v-loading="dir.loadingDir || loading.search"-->
-    <!--                 element-loading-background="rgba(209, 209, 209)"-->
-    <!--            >-->
-    <!--                <el-row :gutter="10" justify="center" align="middle">-->
-    <!--                    <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6" v-for="menu in menuPath">-->
-    <!--                        <div class="menu-content" style="border: #000000 3px" @click="handleClickRootMenu(menu)">-->
-    <!--                            <img :src="menu.icon" style=""/>-->
-    <!--                        </div>-->
-    <!--                    </el-col>-->
-    <!--                </el-row>-->
-    <!--            </div>-->
-    <!--        </div>-->
-    <!--        <el-row v-else :gutter="20" style="padding: 10px 150px 0 150px;height:1080px;">-->
-    <el-row :gutter="20" style="padding: 10px 150px 0 150px;height:1080px;">
+    <div v-if="dir.currentPath.length === 1 && dir.currentPath[0] === '装调素材' && toCreateAlbum.list.length === 0"
+         style="height:1080px;padding: 0 150px;background: #d1d1d1;">
+      <div style="padding: 10px 10px 0 10px;height: 100%; "
+           v-loading="dir.loadingDir || loading.search"
+           element-loading-background="rgba(209, 209, 209)"
+      >
+        <el-row :gutter="10" justify="center" align="middle">
+          <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6" v-for="menu in menuPath">
+            <div class="menu-content" style="border: #000000 3px;" @click="handleClickRootMenu(menu)">
+              <img :src="menu.icon" style="width: 227px;height: 227px"/>
+            </div>
+          </el-col>
+        </el-row>
+      </div>
+    </div>
+    <el-row v-else :gutter="20" style="padding: 10px 150px 0 150px;height:1080px;">
+      <!--    <el-row :gutter="20" style="padding: 10px 150px 0 150px;height:1080px;">-->
       <el-col :span="18" class="bg-purple">
         <!--文件路径显示-->
         <el-row class="contentHead">

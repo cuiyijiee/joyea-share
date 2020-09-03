@@ -16,28 +16,25 @@ export function getDocumentImage(mimeType) {
 
 export let joyeaMenuPath = [
     {
-        name: "STICK线", path: "STICK线", icon: "menu-icon/11.png"
+        name: "装配作业指导类文件", path: "装配作业指导类文件", icon: "menu-icon/2-1.png"
     },
     {
-        name: "听装线", path: "听装线", icon: "menu-icon/12.png"
+        name: "调试作业指导文件", path: "调试作业指导文件", icon: "menu-icon/2-2.png"
     },
     {
-        name: "软双铝线", path: "软双铝线", icon: "menu-icon/13.png"
+        name: "我司设备培训素材", path: "我司设备培训素材", icon: "menu-icon/2-3.png"
     },
     {
-        name: "制粒线", path: "制粒线", icon: "menu-icon/14.png"
+        name: "外购大件类培训文件", path: "外购大件类培训文件", icon: "menu-icon/2-4.png"
     },
     {
-        name: "泡罩线", path: "泡罩线", icon: "menu-icon/15.png"
+        name: "通用元器件使用说明", path: "通用元器件使用说明", icon: "menu-icon/2-5.png"
     },
     {
-        name: "其他生产线", path: "其他生产线", icon: "menu-icon/18.png"
+        name: "新工具使用说明", path: "新工具使用说明", icon: "menu-icon/2-6.png"
     },
     {
-        name: "公司介绍", path: "公司介绍", icon: "menu-icon/16.png"
-    },
-    {
-        name: "友商信息", path: "友商信息", icon: "menu-icon/17.png"
+        name: "实验室", path: "实验室", icon: "menu-icon/2-7.png"
     }
 ]
 
