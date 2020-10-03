@@ -14,9 +14,19 @@
       </van-row>
     </van-cell>
     <van-divider/>
-    <van-cell title="我的清单" is-link @click="handleClickMyList"/>
-    <van-cell title="素材上传" is-link @click="handleClickUpload"/>
-    <van-cell title="我的上传" is-link @click="handleClickMyUpload"/>
+    <van-cell-group title="功能">
+      <van-cell title="素材上传" is-link @click="handleClickUpload"/>
+      <van-cell title="我的上传" is-link @click="handleClickMyUpload"/>
+      <van-cell title="我的清单" is-link @click="handleClickMyList"/>
+      <van-cell title="修改密码" is-link @click="handleClickChangePwd"/>
+    </van-cell-group>
+    <van-cell-group title="设置">
+      <van-cell center title="图片加载原图">
+        <template #right-icon>
+          <van-switch v-model="showRealImage" size="24"/>
+        </template>
+      </van-cell>
+    </van-cell-group>
     <van-button type="info" round block style="margin-top: 100px" @click="handleLogout">注销登录</van-button>
   </div>
 </template>
@@ -35,6 +45,14 @@ export default {
     return {}
   },
   computed: {
+    showRealImage: {
+      get: function () {
+        return this.$store.state.showRealImage;
+      },
+      set: function (newValue) {
+        this.$store.state.showRealImage = newValue;
+      }
+    },
     ...mapGetters([
       'userInfo'
     ])
@@ -48,6 +66,9 @@ export default {
     },
     handleClickMyList() {
       this.$router.push("/album")
+    },
+    handleClickChangePwd() {
+      this.$router.push("/user/changePwd")
     },
     handleClickUpload() {
       this.$router.push("/upload/index")

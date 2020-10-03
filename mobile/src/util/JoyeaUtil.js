@@ -10,7 +10,7 @@ export function newGenSrcPreviewSrc(path, neid, sessionId) {
         '?neid=' + neid + '&rev=&_=' + new Date().getTime() + "&X-LENOVO-SESS-ID=" + sessionId;
 }
 
-export function handleGoToPreview(context, row, session) {
+export function handleGoToPreview(context, row, session, isRealImage) {
     row = convertItem(row)
     let fileName = row.path.substr(row.path.lastIndexOf('/') + 1)
     let previewType = 'pic';    // if video is av
@@ -19,7 +19,10 @@ export function handleGoToPreview(context, row, session) {
     } else if (row.mime_type.startsWith("video")) {
         previewType = 'av'
     }
-    let url = genSrcPreviewSrc(row.neid, row.hash, row.rev, previewType, session);
+
+    let url = isRealImage ?
+        newGenSrcPreviewSrc(row.path, row.neid, session) :
+        genSrcPreviewSrc(row.neid, row.hash, row.rev, previewType, session);
     //let url = newGenSrcPreviewSrc(row.path, row.neid, session);
     if (row.mime_type.startsWith("video")) {
         callNextPlusPreview(fileName, url)

@@ -1,11 +1,13 @@
 <component name="libraryTable">
   <library name="sbt: tv.cntt:xitrum_2.12:3.29.0:jar">
     <CLASSES>
-      <root url="jar://$USER_HOME$/.ivy2/cache/tv.cntt/xitrum_2.12/jars/xitrum_2.12-3.29.0.jar!/" />
+      <root url="jar://$USER_HOME$/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/tv/cntt/xitrum_2.12/3.29.0/xitrum_2.12-3.29.0.jar!/" />
     </CLASSES>
-    <JAVADOC />
+    <JAVADOC>
+      <root url="jar://$USER_HOME$/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/tv/cntt/xitrum_2.12/3.29.0/xitrum_2.12-3.29.0-javadoc.jar!/" />
+    </JAVADOC>
     <SOURCES>
-      <root url="jar://$USER_HOME$/.ivy2/cache/tv.cntt/xitrum_2.12/srcs/xitrum_2.12-3.29.0-sources.jar!/" />
+      <root url="jar://$USER_HOME$/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/tv/cntt/xitrum_2.12/3.29.0/xitrum_2.12-3.29.0-sources.jar!/" />
     </SOURCES>
   </library>
 </component>

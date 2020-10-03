@@ -1,12 +1,15 @@
 import {ImagePreview} from 'vant';
 import {genSrcPreviewSrc, newGenSrcPreviewSrc} from './JoyeaUtil'
 
+import store from "../store"
+
 export function convertItem(item) {
     if (item.srcType) item.mime_type = item.srcType;
     if (item.srcNeid) item.neid = item.srcNeid;
     if (item.srcHash) item.hash = item.srcHash;
     if (item.srcRev) item.rev = item.srcRev;
     if (item.srcPath) item.path = item.srcPath;
+    item.joyeaDesc = item.srcDesc ? item.srcDesc : "";
     return item;
 }
 
@@ -24,20 +27,26 @@ export function GenImageListView(context, itemList, sessionId, clickItem) {
             index = tmp;
         }
         tmp++;
-        //return newGenSrcPreviewSrc(item.path, item.neid, sessionId);
-        return genSrcPreviewSrc( item.neid, item.hash, item.rev, "pic", sessionId); //neid, hash, rev, previewType, sessionId
+        let isRealImage = store.state.showRealImage;
+        if (isRealImage) {
+            return {
+                url: newGenSrcPreviewSrc(item.path, item.neid, sessionId),
+                joyeaDesc: item.joyeaDesc
+            };
+        } else {
+            return {
+                url: genSrcPreviewSrc(item.neid, item.hash, item.rev, "pic", sessionId), //neid, hash, rev, previewType, sessionId
+                joyeaDesc: item.joyeaDesc
+            }
+        }
     });
     if (list.length === 0) {
         context.$notify({
             message: "当前清单没有可以预览的图片！"
         });
     } else {
-        ImagePreview({
-            images: list,
-            startPosition: index ? index : 0,
-            maxZoom: 10,
-            minZoom: 1 / 10,
-            closeable: true
-        })
+        store.state.imagePreviewShow = true;
+        store.state.imagePreviewStartIndex = index ? index : 0;
+        store.state.imagePreviewImages = list;
     }
 }

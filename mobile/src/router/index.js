@@ -16,6 +16,7 @@ import AlbumDetail from "../views/AlbumDetail";
 import EditShareAlbum from "../views/EditShareAlbum";
 import LenovoDirSelector from "@/components/LenovoDirSelector";
 import MyUpload from "@/views/MyUpload";
+import ChangePwd from "@/views/ChangePwd";
 
 Vue.use(Router);
 
@@ -126,6 +127,15 @@ export default new Router({
             path: '/upload/mime',
             name: '我的上传',
             component: MyUpload,
+            meta: {
+                allowBack: true,
+                allowHome: true
+            }
+        },
+        {
+            path: '/user/changePwd',
+            name: '修改密码',
+            component: ChangePwd,
             meta: {
                 allowBack: true,
                 allowHome: true

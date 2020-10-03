@@ -108,3 +108,12 @@ input,textarea {
     width: 45px;
     height: 45px;
 }
+
+.van-image-preview__cover{
+    color: #8c939d;
+    position: absolute;
+    top: auto;
+    bottom: 1em;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}

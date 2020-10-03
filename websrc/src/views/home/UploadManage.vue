@@ -16,7 +16,7 @@
             <span></span>
             <div>
               <div>上传者:{{ record.uploaderName }}</div>
-              <div>上传文件说明:{{ record.srcDesc }}</div>
+              <div style="height:60px;line-height:20px">上传文件说明:{{ record.srcDesc }}</div>
               <time class="time">{{ record.createdAt }}</time>
             </div>
             <div class="bottom clearfix">

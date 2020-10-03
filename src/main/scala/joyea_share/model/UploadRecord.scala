@@ -1,6 +1,6 @@
 package joyea_share.model
 
-import java.sql.Timestamp
+import java.time.LocalDateTime
 
 import scalikejdbc._
 import scalikejdbc.async._
@@ -23,9 +23,9 @@ case class UploadRecord(
 
                          uploadPath: Option[String],
                          uploadPathNeid: Option[Long],
-                         createdAt: Timestamp,
+                         createdAt: LocalDateTime,
                          checked: Boolean,
-                         checkedAt: Option[Timestamp],
+                         checkedAt: Option[LocalDateTime],
                          tags: String,
                          refuseReason: Option[String]
                        )
@@ -37,7 +37,7 @@ object UploadRecord extends SQLSyntaxSupport[UploadRecord] with ShortenedNames {
 
   lazy val ur: scalikejdbc.QuerySQLSyntaxProvider[scalikejdbc.SQLSyntaxSupport[UploadRecord], UploadRecord] = UploadRecord.syntax("ur")
 
-  override def columnNames: Seq[String] = Seq("id", "uploader", "temp_src_name", "src_name", "src_neid", "src_rev", "src_hash", "src_desc", "src_type", "upload_path", "upload_path_neid", "created_at", "checked", "checked_at", "tags", "refuse_reason")
+  override def columnNames: Seq[String] = Seq("id", "uploader", "temp_src_name", "src_name", "src_neid", "src_rev", "src_hash", "src_desc","src_type", "upload_path", "upload_path_neid", "created_at", "checked", "checked_at", "tags", "refuse_reason")
 
   def apply(sc: SyntaxProvider[UploadRecord])(rs: WrappedResultSet): UploadRecord = apply(sc.resultName)(rs)
 
@@ -49,7 +49,7 @@ object UploadRecord extends SQLSyntaxSupport[UploadRecord] with ShortenedNames {
 
   def checkRecord(recordId: Long, allow: Boolean,
                   uploadPath: Option[String], uploadPathNeid: Option[Long], srcName: Option[String],
-                  refuseReason: Option[String] = None, checkedAt: Timestamp = new Timestamp(System.currentTimeMillis())): Future[Boolean] = withSQL {
+                  refuseReason: Option[String] = None, checkedAt: LocalDateTime = LocalDateTime.now()): Future[Boolean] = withSQL {
     if (allow) {
       update(UploadRecord).set(
         column.checked -> allow,
@@ -67,6 +67,12 @@ object UploadRecord extends SQLSyntaxSupport[UploadRecord] with ShortenedNames {
     }
   }.update().future().map(_ > 0)
 
+  def findByNeid(neid: Long): Future[Option[UploadRecord]] = {
+    withSQL {
+      selectFrom(UploadRecord as ur).where.eq(ur.srcNeid, neid)
+    }.map(UploadRecord(ur)).single().future()
+  }
+
   def find(id: Long): Future[Option[UploadRecord]] = {
     withSQL {
       selectFrom(UploadRecord as ur).where.eq(ur.id, id)
@@ -74,13 +80,11 @@ object UploadRecord extends SQLSyntaxSupport[UploadRecord] with ShortenedNames {
   }
 
   def create(uploader: String, srcNeid: Long, srcRev: String, srcType: String, srcHash: String, srcDesc: String,
-             createdAt: Timestamp = new Timestamp(System.currentTimeMillis()),
+             createdAt: LocalDateTime = LocalDateTime.now(),
              tempSrcName: String,
              refuseReason: Option[String] = None,
-             checked: Boolean = false, checkedAt: Option[Timestamp] = None, tags: Seq[String]): Future[UploadRecord] = {
-
+             checked: Boolean = false, checkedAt: Option[LocalDateTime] = None, tags: Seq[String]): Future[UploadRecord] = {
     val saveTags = getTagStr(tags)
-
     for {
       id <- withSQL {
         insert.into(UploadRecord).namedValues(
@@ -98,7 +102,7 @@ object UploadRecord extends SQLSyntaxSupport[UploadRecord] with ShortenedNames {
           column.refuseReason -> refuseReason
         )
       }.updateAndReturnGeneratedKey().future()
-    } yield new UploadRecord(id = id, uploader = uploader, srcHash = srcHash, srcDesc = srcDesc,
+    } yield new UploadRecord(id = id, uploader = uploader,  srcHash = srcHash, srcDesc = srcDesc,
       srcRev = srcRev, srcType = srcType, srcNeid = srcNeid, createdAt = createdAt, checked = checked,
       checkedAt = checkedAt, tags = saveTags, refuseReason = refuseReason, tempSrcName = tempSrcName,
       srcName = None, uploadPathNeid = None, uploadPath = None)
