@@ -70,3 +70,23 @@ export function uploadRecordManage(recordId, allow, refuseReason, uploadPath, up
         return res.data;
     })
 }
+
+export function uploadFile(file,fileDesc) {
+
+    let formData = new FormData();
+    formData.append('file', file)
+    formData.append('srcDesc', fileDesc)
+
+    //设置请求头
+    let config = {
+        headers: {'Content-Type': 'multipart/form-data'},
+        onUploadProgress: progressEvent => {
+            let completed = (progressEvent.loaded / progressEvent.total * 100 | 0) + "%";
+            console.log(completed)
+        }
+    };
+
+    return service.post('upload', formData, config).then(res => {
+        return res.data;
+    })
+}

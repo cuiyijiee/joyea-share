@@ -1,6 +1,6 @@
 package joyea_share.util
 
-import java.io.{File, IOException}
+import java.io.{File, FileNotFoundException, IOException}
 import java.net.URLEncoder
 
 import com.json.{JsonArray, JsonObject}
@@ -182,6 +182,54 @@ object LenovoUtil extends Log {
         }
       }
     })
+  }
+
+  //https://console.box.lenovo.com/v2/fileops/auth_upload/databox/
+  def preUpload(sessionId: String, file: File): Future[String] = {
+    val promise = Promise[String]
+    val requestUrl = "https://console.box.lenovo.com/v2/fileops/auth_upload/databox/营销素材展示/素材库上传临时文件夹?path_type=ent&bytes=" + file.length()
+    val request = HttpUtil.obtainBaseRequest(sessionId).url(requestUrl).get().build()
+    HttpUtil.okHttpClient.newCall(request).enqueue(new Callback {
+      override def onFailure(call: Call, e: IOException): Unit = {
+        promise.failure(e)
+      }
+
+      override def onResponse(call: Call, response: Response): Unit = {
+        promise.success(response.body().string())
+      }
+    })
+    promise.future
+  }
+
+
+  def uploadFile(sessionId: String, uploadRegion: String, file: File): Future[String] = {
+    val promise = Promise[String]
+    if (!file.exists()) {
+      promise.failure(new FileNotFoundException(s"to upload file ${file.getAbsolutePath} not exist!"))
+    }
+    val fileBody = RequestBody.create(file, MediaType.parse("application/octet-stream"))
+    val requestBody = new MultipartBody.Builder()
+      .setType(MultipartBody.FORM)
+      .addFormDataPart("file", file.getName, fileBody)
+      .build()
+
+    val uploadUrl = uploadRegion + "/v2/files/databox/营销素材展示/素材库上传临时文件夹/" + file.getName +
+      "?path_type=ent&bytes=" + file.length() + "&filename=" + file.getName + "$overwrite=true";
+
+    val request = HttpUtil.obtainBaseRequest(sessionId)
+      .post(requestBody)
+      .url(uploadUrl)
+      .build()
+    HttpUtil.okHttpClient.newCall(request).enqueue(new Callback {
+      override def onFailure(call: Call, e: IOException): Unit = {
+        promise.failure(e)
+      }
+
+      override def onResponse(call: Call, response: Response): Unit = {
+        promise.success(response.body().string())
+      }
+    })
+    promise.future
   }
 
   def downloadFileV2(sessionId: String, path: String, neid: String, rev: String, pathType: String = "ent", downloadFilePath: String, listener: CommonListener[File]): Unit = {

@@ -26,7 +26,7 @@ export function realUpload(realUploadDomain, file,realFileName, session,) {
     let config = {
         headers: {'Content-Type': 'multipart/form-data'},
         onUploadProgress: progressEvent => {
-            let completed = (progressEvent.loaded / progressEvent.total * 100 | 0) + "%";
+            // let completed = (progressEvent.loaded / progressEvent.total * 100 | 0) + "%";
         }
     };
 

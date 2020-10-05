@@ -18,10 +18,15 @@
                      :class="{'is-active':currentPath==='/manage/list'}"
                      style="">我的清单
           </el-button>
+          <el-button size="small" icon="el-icon-tickets" @click="jumpToUpload"
+                     v-if="userInfo.email === '717' || userInfo.email === '213'"
+                     :class="{'is-active':currentPath==='/upload/index'}"
+                     style="margin-right: 10px">素材上传
+          </el-button>
           <el-button size="small" icon="el-icon-tickets" @click="jumpToUploadManage"
                      v-if="userInfo.email === '717'"
                      :class="{'is-active':currentPath==='/upload/manage'}"
-                     style="margin-right: 10px">素材审核
+                     style="margin-left:0;margin-right: 10px">素材审核
           </el-button>
           <el-popover
               style="margin-right: 20px"
@@ -108,6 +113,9 @@ export default {
       if (this.currentPath !== '/build') {
         this.$router.replace("/build");
       }
+    },
+    jumpToUpload() {
+      this.$router.replace("/upload/index");
     },
     jumpToList() {
       this.$router.replace("/manage/list");
