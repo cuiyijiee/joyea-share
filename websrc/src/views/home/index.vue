@@ -19,7 +19,6 @@
                      style="">我的清单
           </el-button>
           <el-button size="small" icon="el-icon-tickets" @click="jumpToUpload"
-                     v-if="userInfo.email === '717' || userInfo.email === '213'"
                      :class="{'is-active':currentPath==='/upload/index'}"
                      style="margin-right: 10px">素材上传
           </el-button>
@@ -151,7 +150,7 @@ export default {
             id: task.id,
             startTime: task.startTime,
             firstSrcName: task.firstSrcName.substr(0, task.firstSrcName.lastIndexOf(".")),
-            status: task.finishTime.length !== 0,
+            status: task.finishTime && task.finishTime.length !== 0,
             opened: _this.handleQueryRecord(task.id)
           });
         });
@@ -167,7 +166,7 @@ export default {
               id: task.id,
               startTime: task.startTime,
               firstSrcName: task.firstSrcName.substr(0, task.firstSrcName.lastIndexOf(".")),
-              status: task.finishTime.length !== 0,
+              status: task.finishTime && task.finishTime.length !== 0,
               opened: _this.handleQueryRecord(task.id)
             });
           });

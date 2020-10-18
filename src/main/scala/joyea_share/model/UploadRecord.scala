@@ -30,7 +30,8 @@ case class UploadRecord(
                          tags: String,
                          refuseReason: Option[String],
 
-                         isPcUpload: Boolean
+                         isPcUpload: Boolean,
+                         finished: Boolean
                        )
 
 object UploadRecord extends SQLSyntaxSupport[UploadRecord] with ShortenedNames {
@@ -86,7 +87,7 @@ object UploadRecord extends SQLSyntaxSupport[UploadRecord] with ShortenedNames {
              srcHash: Option[String], srcDesc: String,
              createdAt: LocalDateTime = LocalDateTime.now(),
              tempSrcName: String,
-             refuseReason: Option[String] = None, isPcUpload: Boolean = false,
+             refuseReason: Option[String] = None, isPcUpload: Boolean = false, finished: Boolean = false,
              checked: Boolean = false, checkedAt: Option[LocalDateTime] = None, tags: Seq[String]): Future[UploadRecord] = {
     val saveTags = getTagStr(tags)
     for {
@@ -105,12 +106,21 @@ object UploadRecord extends SQLSyntaxSupport[UploadRecord] with ShortenedNames {
           column.tempSrcName -> tempSrcName,
           column.refuseReason -> refuseReason,
           column.isPcUpload -> isPcUpload,
+          column.finished -> finished,
         )
       }.updateAndReturnGeneratedKey().future()
     } yield new UploadRecord(id = id, uploader = uploader, srcHash = srcHash, srcDesc = srcDesc,
       srcRev = srcRev, srcType = srcType, srcNeid = srcNeid, createdAt = createdAt, checked = checked,
       checkedAt = checkedAt, tags = saveTags, refuseReason = refuseReason, tempSrcName = tempSrcName,
-      srcName = None, uploadPathNeid = None, uploadPath = None, isPcUpload = isPcUpload)
+      srcName = None, uploadPathNeid = None, uploadPath = None, isPcUpload = isPcUpload, finished = finished)
+  }
+
+  def updateStatus(recordId: Long, finished: Boolean = true): Future[Boolean] = {
+    withSQL {
+      update(UploadRecord).set(
+        column.finished -> finished,
+      ).where.eq(column.id, recordId)
+    }.update().future().map(_ > 0)
   }
 
   def uploadRecord(recordId: Long, srcNeid: Long, srcRev: String, srcType: String, srcHash: String): Future[Boolean] = {

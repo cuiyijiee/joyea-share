@@ -2,14 +2,12 @@ package joyea_share.module.download
 
 import java.io.{File, FileFilter}
 import java.util
-import java.util.{Calendar, Date, Timer, TimerTask}
 import java.util.concurrent.{ExecutorService, Executors, TimeUnit}
+import java.util.{Calendar, Date, Timer}
 
-import com.json.{JsonArray, WriterConfig}
 import com.utils.CommonUtil
-import joyea_share.util.{CommonListener, Constant, LenovoUtil, SUtil}
+import joyea_share.util.{CommonListener, LenovoUtil, SUtil}
 import xitrum.{Config, Log}
-
 
 trait DownloadManager {
 
@@ -20,7 +18,6 @@ trait DownloadManager {
 
 object DownloadManager extends Log {
 
-  private val baseRecordJsonDir: File = new File(s"./log/download/")
   private var adminSessionId: String = ""
   private var baseSaveFilePath: String = ""
   private var baseCompressSaveFilePath: String = ""
@@ -41,7 +38,6 @@ object DownloadManager extends Log {
 
   def init(): Unit = {
     initBaseSaveFilePath()
-    baseRecordJsonDir.mkdirs()
 
     getAdminTokenExecutor.scheduleWithFixedDelay(() => {
       genNewSession()
@@ -58,12 +54,6 @@ object DownloadManager extends Log {
     if (date.before(new Date())) {
       date = this.addDay(date, 1);
     }
-    deleteDownloadFileTimer.schedule(new TimerTask {
-      override def run(): Unit = {
-        val yesterdayDownloadDir = new File(s"${baseRecordJsonDir.getAbsolutePath}/${SUtil.genYesterdayDateString(formatString = "yy-MM-dd")}")
-        CommonUtil.delete(yesterdayDownloadDir)
-      }
-    }, date, PERIOD_DAY)
 
     //整点刷新配置
     getAdminTokenExecutor.scheduleWithFixedDelay(() => {
@@ -98,27 +88,12 @@ object DownloadManager extends Log {
         }
 
         override def onFinish(taskId: String, success: Int, failed: Int, total: Int): Unit = {
-          val recordJson = getTodayRecordJson()
-          val recordJsonArr = recordJson._1
-          recordJsonArr.add(task.toJson()) //记录当前记录
-          Config.xitrum.cache.put(Constant.DOWNLOAD_RECORD_CACHE_KEY, recordJsonArr) //回写缓存
-          CommonUtil.writeFile(recordJson._2, recordJsonArr.toString(WriterConfig.PRETTY_PRINT)) //回写文件
+          task.downloadFile.foreach(record => {
+            record.recordToDb()
+          })
         }
       })
     })
-  }
-
-  def getTodayRecordJson(): (JsonArray, File) = {
-    val recordJsonFile = new File(s"${baseRecordJsonDir.getAbsolutePath}/${SUtil.genDateString(formatString = "yy-MM-dd")}")
-    var recordJsonArr: JsonArray = null
-    if (recordJsonFile.exists()) { //如果今天的日志文件存在，则首先从缓存中读，没有再从文件中读取
-      recordJsonArr = Config.xitrum.cache.get(Constant.DOWNLOAD_RECORD_CACHE_KEY).getOrElse(
-        JsonArray.readFrom(CommonUtil.readFile(recordJsonFile, "[]"))
-      ).asInstanceOf[JsonArray]
-    } else { //如果今天日志文件不存在，则创建新的记录
-      recordJsonArr = new JsonArray()
-    }
-    (recordJsonArr, recordJsonFile)
   }
 
 

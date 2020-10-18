@@ -232,7 +232,7 @@ object LenovoUtil extends Log {
     promise.future
   }
 
-  def downloadFileV2(sessionId: String, path: String, neid: String, rev: String, pathType: String = "ent", downloadFilePath: String, listener: CommonListener[File]): Unit = {
+  def downloadFileV2(sessionId: String, path: String, neid: Long, rev: String, pathType: String = "ent", downloadFilePath: String, listener: CommonListener[File]): Unit = {
     val requestUrl = s"${BASE_URL}/dl_router/databox${URLEncoder.encode(path, "UTF-8").replaceAll("\\+", "%20")}?X-LENOVO-SESS-ID=$sessionId&path_type=$pathType&neid=$neid&rev=$rev"
     val request = HttpUtil.obtainBaseRequest(sessionId).url(requestUrl).build()
     HttpUtil.okHttpClient.newCall(request).enqueue(new Callback {

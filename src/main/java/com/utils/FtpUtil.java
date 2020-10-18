@@ -230,14 +230,15 @@ public class FtpUtil {
     /**
      * download single file
      */
-    public boolean downloadFile(String remoteFilePath, String localFilePath, Boolean needCheckEncrypted, int maxWaitSeconds) {
+    public boolean downloadFile(String remoteFilePath, String localFilePath,
+                                Boolean checkSwitch, Boolean needEncryptedOrNot, int maxWaitSeconds) {
         boolean encrypted = false;
         int checkNum = 30;
-        if (needCheckEncrypted) {
+        if (checkSwitch) {
             do {
                 encrypted = checkFileEncrypted(remoteFilePath);
-                logger.error("remote file is encrypted:" + encrypted);
-                if (!encrypted) {
+                logger.error(String.format("remote file is encrypted: %s, and need encrypted: %s", encrypted, needEncryptedOrNot));
+                if ((needEncryptedOrNot && !encrypted) || (!needEncryptedOrNot && encrypted)) {
                     try {
                         Thread.sleep(1000);
                         checkNum++;
@@ -248,7 +249,7 @@ public class FtpUtil {
                 if (checkNum > maxWaitSeconds) {
                     break;
                 }
-            } while (!encrypted);
+            } while ((needEncryptedOrNot && !encrypted) || (!needEncryptedOrNot && encrypted));
         }
         BufferedOutputStream bos = null;
         try {
