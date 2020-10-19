@@ -14,7 +14,11 @@ const store = new Vuex.Store({
             session: "",
             name: "",
             email: ""
-        }
+        },
+        showRealImage: false, //是否显示原图,
+        imagePreviewShow: false,
+        imagePreviewImages: [],
+        imagePreviewStartIndex: 0
     },
     getters: {
         getStateOrderList: function (state) {
@@ -26,11 +30,26 @@ const store = new Vuex.Store({
         userInfo: function (state) {
             return state.userInfo;
         },
+        showRealImage: function (state) {
+            return state.showRealImage;
+        },
         getOrderEditInfo: function (state) {
             return state.orderEditInfo;
+        },
+        imagePreviewShow: function (state) {
+            return state.imagePreviewShow;
+        },
+        imagePreviewImages: function (state) {
+            return state.imagePreviewImages;
+        },
+        imagePreviewStartIndex: function (state) {
+            return state.imagePreviewStartIndex;
         }
     },
     mutations: {
+        switchRealImage(state, isOn) {
+            state.showRealImage = isOn;
+        },
         add(state, item) {
             state.orderList.push(item);
         },
@@ -60,6 +79,9 @@ const store = new Vuex.Store({
         }
     },
     actions: {
+        switchRealImage(state, isOn) {
+            state.commit("switchRealImage", isOn);
+        },
         addFunc(state, item) {
             state.commit("add", item)
         },

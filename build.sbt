@@ -18,25 +18,20 @@ libraryDependencies += "org.json4s" %% "json4s-ext" % "3.6.7"
 libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.2.3"
 
 // For writing condition in logback.xml
-libraryDependencies += "org.codehaus.janino" % "janino" % "3.0.11"
+libraryDependencies += "org.codehaus.janino" % "janino" % "3.1.2"
 libraryDependencies += "commons-net" % "commons-net" % "3.6"
 libraryDependencies += "commons-io" % "commons-io" % "2.7"
 // https://mvnrepository.com/artifact/com.github.etaty/rediscala
 libraryDependencies += "com.github.etaty" %% "rediscala" % "1.9.0"
 
 // https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp
-libraryDependencies += "com.squareup.okhttp3" % "okhttp" % "3.14.1"
+libraryDependencies += "com.squareup.okhttp3" % "okhttp" % "4.9.0"
 
 libraryDependencies ++= Seq(
-  "org.scalikejdbc" %% "scalikejdbc" % "3.4.2",
-  "org.scalikejdbc" %% "scalikejdbc-async" % "0.13.0",
-  "org.scalikejdbc" %% "scalikejdbc-syntax-support-macro" % "3.4.2",
-  "com.github.jasync-sql" % "jasync-mysql" % "1.1.1-kts-9",
+  "org.scalikejdbc" %% "scalikejdbc-async" % "0.14.0",
+  "org.scalikejdbc" %% "scalikejdbc-syntax-support-macro" % "3.5.0",
+  "com.github.jasync-sql" % "jasync-mysql" % "1.1.3",
   "mysql" % "mysql-connector-java" % "8.0.19"
-)
-
-libraryDependencies ++= Seq(
-  "org.http4s" %% "http4s-blaze-client" % "0.21.4",
 )
 
 // https://mvnrepository.com/artifact/com.alibaba/easyexcel

@@ -1,44 +1,33 @@
 package joyea_share.module.download
 
 import java.io.{File, FileFilter}
-import java.util
+import java.time.LocalDateTime
 import java.util.{Date, UUID}
 
-import com.json.{JsonArray, JsonObject}
 import com.utils.{CommonUtil, FtpUtil}
 import joyea_share.service.RedisService
-import joyea_share.util.{CommonListener, LenovoUtil, SUtil, ZipUtils}
+import joyea_share.util.{BaseJsonFormat, CommonListener, LenovoUtil, ZipUtils}
+import org.json4s.jackson.Serialization
 import xitrum.{Config, Log}
+
 import scala.concurrent.ExecutionContext.Implicits.global
 
 case class DownloadTask(
                          id: String = UUID.randomUUID().toString,
-                         downloadFile: java.util.List[DownloadItem] = new util.ArrayList[DownloadItem](),
+                         downloadFile: Seq[DownloadRecord],
                          downloadRoleName: String,
-                         downloadRoleId: String
-                       ) extends Log {
+                         downloadRoleId: String,
+                         startTime: LocalDateTime = LocalDateTime.now,
+                         finishTime: Option[LocalDateTime] = None,
+                         firstSrcName: Option[String] = None,
+                       ) extends Log with BaseJsonFormat {
 
-  def toJson(): JsonObject = {
-
-    val fileArr = new JsonArray()
-    downloadFile.forEach(item => {
-      fileArr.add(item.toJson())
-    })
-
-    new JsonObject()
-      .add("id", id)
-      .add("file", fileArr)
-      .add("downloadRoleName", downloadRoleName)
-      .add("downloadRoleId", downloadRoleId)
-      .add("startTime", SUtil.genDateString(startDate))
-      .add("firstSrcName", downloadFile.get(0).fileName)
-      .add("finishTime", if (finishDate == null) "" else SUtil.genDateString(finishDate))
-
+  def toJson(): String = {
+    Serialization.write(this.copy(finishTime = Option(finishDate), firstSrcName = downloadFile.headOption.map(_.fileName)))
   }
 
   private var status: DownloadStatus.Value = DownloadStatus.READY
-  private val startDate: java.util.Date = new Date()
-  private var finishDate: java.util.Date = _
+  private var finishDate: LocalDateTime = _
   private var saveFilePath: String = ""
   private var saveCompressPath: String = ""
   private var downloadListener: DownloadListener = _
@@ -55,13 +44,13 @@ case class DownloadTask(
 
     new File(saveFilePath).mkdirs()
 
-    downloadListener.onStart(id, downloadFile.size())
+    downloadListener.onStart(id, downloadFile.length)
     status = DownloadStatus.DOWNLOAD
-    downloadFile.forEach(item => {
-      RedisService.recordFileDownload(item.neid).foreach(resp => {
+    downloadFile.foreach(item => {
+      RedisService.recordFileDownload(item.neid.toString).foreach(resp => {
         log.error(s"record download ${item.neid} with result : $resp")
       })
-      LenovoUtil.downloadFileV2(sessionId, item.path, item.neid, item.rev, "ent",
+      LenovoUtil.downloadFileV2(sessionId, item.filePath, item.neid, item.rev, "ent",
         saveFilePath + "/" + item.index + "--" + item.fileName, new CommonListener[File] {
           override def onSuccess(obj: File): Unit = {
             successNum = successNum + 1
@@ -87,8 +76,8 @@ case class DownloadTask(
 
   def checkFinish(): Unit = this.synchronized {
     //下载完成
-    downloadListener.onNext(id, downloadProgress, downloadFile.size())
-    if (downloadProgress >= downloadFile.size()) {
+    downloadListener.onNext(id, downloadProgress, downloadFile.length)
+    if (downloadProgress >= downloadFile.length) {
       //线程等待2秒，避免加密软件冲突
       CommonUtil.writeFile(s"$saveFilePath/请勿外泄.txt", "仅一公司内部资料，请勿外泄！")
 
@@ -109,16 +98,17 @@ case class DownloadTask(
       })
       val maxWaitSeconds = Config.application.getConfig("download").getInt("max_wait_seconds") * 1000
       fileList.foreach(file => {
-        ftpUtil.downloadFile("/download/" + id + "/" + file.getName, file.getAbsolutePath, true, maxWaitSeconds)
+        ftpUtil.downloadFile("/download/" + id + "/" + file.getName, file.getAbsolutePath,
+          true, true, maxWaitSeconds)
       })
       ftpUtil.deleteDir("/download/" + id)
       ftpUtil.logout()
 
       ZipUtils.compressZip(Array(saveFilePath), saveCompressPath + ".zip")
       //CommonUtil.delete(saveFilePath)
-      finishDate = new Date()
+      finishDate = LocalDateTime.now()
       status = DownloadStatus.FINISH
-      downloadListener.onFinish(taskId = id, successNum, failNum, downloadFile.size())
+      downloadListener.onFinish(taskId = id, successNum, failNum, downloadFile.length)
     }
   }
 

@@ -10,32 +10,7 @@ export function newGenSrcPreviewSrc(path, neid, sessionId) {
         '?neid=' + neid + '&rev=&_=' + new Date().getTime() + "&X-LENOVO-SESS-ID=" + sessionId;
 }
 
-
-export let joyeaMenuPath = [
-    {
-        name: "装配作业指导类文件", path: "装配作业指导类文件", icon: "menu-icon/2-1.png"
-    },
-    {
-        name: "调试作业指导文件", path: "调试作业指导文件", icon: "menu-icon/2-2.png"
-    },
-    {
-        name: "我司设备培训素材", path: "我司设备培训素材", icon: "menu-icon/2-3.png"
-    },
-    {
-        name: "外购大件类培训文件", path: "外购大件类培训文件", icon: "menu-icon/2-4.png"
-    },
-    {
-        name: "通用元器件使用说明", path: "通用元器件使用说明", icon: "menu-icon/2-5.png"
-    },
-    {
-        name: "新工具使用说明", path: "新工具使用说明", icon: "menu-icon/2-6.png"
-    },
-    {
-        name: "实验室", path: "实验室", icon: "menu-icon/2-7.png"
-    }
-]
-
-export function handleGoToPreview(context, row, session) {
+export function handleGoToPreview(context, row, session, isRealImage) {
     row = convertItem(row)
     let fileName = row.path.substr(row.path.lastIndexOf('/') + 1)
     let previewType = 'pic';    // if video is av
@@ -44,7 +19,10 @@ export function handleGoToPreview(context, row, session) {
     } else if (row.mime_type.startsWith("video")) {
         previewType = 'av'
     }
-    let url = genSrcPreviewSrc(row.neid, row.hash, row.rev, previewType, session);
+
+    let url = isRealImage ?
+        newGenSrcPreviewSrc(row.path, row.neid, session) :
+        genSrcPreviewSrc(row.neid, row.hash, row.rev, previewType, session);
     //let url = newGenSrcPreviewSrc(row.path, row.neid, session);
     if (row.mime_type.startsWith("video")) {
         callNextPlusPreview(fileName, url)

@@ -13,22 +13,19 @@
       <van-tag v-for="item in topSearchKey" style="margin: 5px 2px" @click="handleClickTopKey(item)">{{ item }}
       </van-tag>
     </div>
-            <div v-if="dir.currentPath.length === 1 && dir.currentPath[0] === '装调素材'" style="margin-bottom: 50px">
-                <van-grid :column-num="2">
-                    <van-grid-item class="my_van-grid-item" v-for="menu in joyeaMenuPath"
-                                   @click="handleClickRootMenu(menu.path)">
-<!--                        <div class="menu-content">-->
-<!--                            <van-image :src="menu.icon" fit="contain"-->
-<!--                                       style="width: 50px;height: 50px;padding: 30px 20px 10px 20px"/>-->
-<!--                            <div style="padding: 20px;height: 30px;font-size: 12px">{{menu.name}}</div>-->
-<!--                        </div>-->
-                      <van-image :src="menu.icon" fit="contain"
-                                 style="width: 100%"/>
-                    </van-grid-item>
-                </van-grid>
-            </div>
-            <div v-else>
-<!--    <div>-->
+    <div v-if="dir.currentPath.length === 1 && dir.currentPath[0] === '装调素材'" style="margin-bottom: 50px">
+      <van-grid :column-num="2">
+        <van-grid-item class="my_van-grid-item" v-for="menu in menuPath"
+                       @click="handleClickRootMenu(menu.path)">
+          <div class="menu-content">
+            <van-image :src="menu.icon" fit="contain"
+                       style="width: 50px;height: 50px;padding: 30px 20px 10px 20px"/>
+            <div style="padding: 20px;height: 30px;font-size: 12px">{{ menu.name }}</div>
+          </div>
+        </van-grid-item>
+      </van-grid>
+    </div>
+    <div v-else>
       <van-sticky :offset-top="46">
         <van-row style="background-color: #fff;padding: 8px 0">
           <van-col span="3">
@@ -107,7 +104,7 @@
                      @click="handleGotoPreviewImage(dir.tableData,item)"
                      :src="genPreviewUrl(item.neid,item.hash,item.rev,item.mime_type)"/>
                 <van-button @click="handleClickAddItem(item)" round plain hairline type="danger"
-                            style="position: absolute; top: 0; left: 0; border:#ffffff" icon="plus"
+                            style="position: absolute; top: 0px; left: 0px; border:#ffffff" icon="plus"
                             size="small"/>
               </div>
               <div>
@@ -176,14 +173,13 @@
 </template>
 
 <script>
-import api from "../../api/";
+import api, {getDefaultJoyeaDesc} from "../../api/";
 import {genSrcPreviewSrc, getDocumentImage, handleGoToPreview} from "../../util/JoyeaUtil"
 import {mapGetters} from "vuex"
 import eventBus from "../../service/eventbus";
 import VmBackTop from 'vue-multiple-back-top'
 import {GenImageListView} from "../../util/ImageViewUtil";
 import {Toast} from 'vant';
-import {joyeaMenuPath} from "../../util/JoyeaUtil"
 
 export default {
   name: "HomeContainer",
@@ -209,7 +205,32 @@ export default {
         loadingDir: false
       },
       isFirst: true,
-      joyeaMenuPath
+      menuPath: [
+        {
+          name: "STICK线", path: "STICK线", icon: "menu-icon/1.png"
+        },
+        {
+          name: "听装线", path: "听装线", icon: "menu-icon/2.png"
+        },
+        {
+          name: "软双铝线", path: "软双铝线", icon: "menu-icon/3.png"
+        },
+        {
+          name: "制粒线", path: "制粒线", icon: "menu-icon/4.png"
+        },
+        {
+          name: "泡罩线", path: "泡罩线", icon: "menu-icon/5.png"
+        },
+        {
+          name: "其他生产线", path: "其他生产线", icon: "menu-icon/8.png"
+        },
+        {
+          name: "公司介绍", path: "公司介绍", icon: "menu-icon/6.png"
+        },
+        {
+          name: "友商信息", path: "友商信息", icon: "menu-icon/7.png"
+        }
+      ]
     }
   },
   methods: {
@@ -239,11 +260,14 @@ export default {
     },
     handleClickAddItem(item) {
       if (!this.$store.getters.exist(item['neid'])) {
-        this.$store.dispatch("addFunc", item).then(() => {
-          this.$notify({type: 'success', message: '加入素材车成功！'});
-        }).catch(exception => {
-          this.$dialog.alert({
-            message: '加入素材车失败：' + exception
+        getDefaultJoyeaDesc(item['neid']).then(resp => {
+          item.joyeaDesc = resp.data;
+          this.$store.dispatch("addFunc", item).then(() => {
+            this.$notify({type: 'success', message: '加入素材车成功！'});
+          }).catch(exception => {
+            this.$dialog.alert({
+              message: '加入素材车失败：' + exception
+            })
           })
         })
       } else {

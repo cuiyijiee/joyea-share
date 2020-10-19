@@ -7,6 +7,7 @@ import Build from '../views/home/build'
 import List from '../views/home/manage/list'
 import Share from '../views/home/share'
 import UploadManage from "../views/home/UploadManage";
+import UploadIndex from "../views/home/upload/index";
 
 Vue.use(Router);
 
@@ -57,6 +58,16 @@ export default new Router({
             noChild: true,
             children: [
                 {path: '/upload/manage', component: UploadManage, name: 'uploadManage', desc: '素材审核'},
+            ]
+        },
+        {
+            path: '/',
+            name: '素材上传',
+            component: Home,
+            icon: 'el-icon-paperclip',
+            noChild: true,
+            children: [
+                {path: '/upload/index', component: UploadIndex, name: 'uploadIndex', desc: '素材上传'},
             ]
         },
         // {

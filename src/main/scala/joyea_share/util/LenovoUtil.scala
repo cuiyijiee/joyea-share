@@ -1,31 +1,20 @@
 package joyea_share.util
 
-import java.io.{BufferedInputStream, File, FileOutputStream, IOException, InputStream}
+import java.io.{File, FileNotFoundException, IOException}
 import java.net.URLEncoder
-import java.util.concurrent.{ExecutorService, Executors}
 
-import cats.effect.{Blocker, ContextShift, IO}
 import com.json.{JsonArray, JsonObject}
 import com.utils.CommonUtil
 import okhttp3._
-import org.http4s.client.{Client, JavaNetClientBuilder}
-import org.slf4s.LoggerFactory
 import xitrum.Log
 
-import scala.concurrent.{ExecutionContext, Future, Promise}
+import scala.concurrent.{Future, Promise}
 
 object LenovoUtil extends Log {
-
-  implicit val cs: ContextShift[IO] = IO.contextShift(ExecutionContext.global)
-  val blockingPool: ExecutorService = Executors.newFixedThreadPool(Runtime.getRuntime.availableProcessors() + 1)
-  val blocker: Blocker = Blocker.liftExecutorService(blockingPool)
-  val httpClient: Client[IO] = JavaNetClientBuilder[IO](blocker).create
-
 
   private val BASE_URL = "https://box.lenovo.com/v2"
   //全局搜索的URL
   private val BASE_SEARCH_FTS_URL = "https://console.box.lenovo.com/v2/fts_search"
-  private val DOWNLOAD_TIMEOUT = 2 * 60 * 1000
 
   /**
     * 登陆接口
@@ -40,7 +29,7 @@ object LenovoUtil extends Log {
     formBodyBuilder.add("password", pwd)
 
     val request = HttpUtil.obtainBaseRequest().url(s"$BASE_URL/user/login").post(formBodyBuilder.build()).build()
-    HttpUtil.obtainHttpClient().newCall(request).enqueue(new Callback {
+    HttpUtil.okHttpClient.newCall(request).enqueue(new Callback {
       override def onFailure(call: Call, e: IOException): Unit = {
         listener.onError(s"请求错误:${SUtil.convertExceptionToStr(e)}")
       }
@@ -74,7 +63,7 @@ object LenovoUtil extends Log {
     formBodyBuilder.add("user_slug", s"email:$user")
 
     val request = HttpUtil.obtainBaseRequest().url(s"$BASE_URL/user/logout").post(formBodyBuilder.build()).build()
-    HttpUtil.obtainHttpClient().newCall(request).enqueue(new Callback {
+    HttpUtil.okHttpClient.newCall(request).enqueue(new Callback {
       override def onFailure(call: Call, e: IOException): Unit = {
         listener.onError(s"请求错误:${SUtil.convertExceptionToStr(e)}")
       }
@@ -114,7 +103,7 @@ object LenovoUtil extends Log {
 
     val request = HttpUtil.obtainBaseRequest().url(urlBuilder.build()).build()
 
-    HttpUtil.obtainHttpClient().newCall(request).enqueue(new Callback {
+    HttpUtil.okHttpClient.newCall(request).enqueue(new Callback {
       override def onFailure(call: Call, e: IOException): Unit = {
         listener.onError(s"请求失败：${SUtil.convertExceptionToStr(e)}")
       }
@@ -142,7 +131,7 @@ object LenovoUtil extends Log {
 
     val request = HttpUtil.obtainBaseRequest().url(urlBuilder.build()).build()
 
-    HttpUtil.obtainHttpClient().newCall(request).enqueue(new Callback {
+    HttpUtil.okHttpClient.newCall(request).enqueue(new Callback {
       override def onFailure(call: Call, e: IOException): Unit = {
         listener.onError(s"请求失败：${SUtil.convertExceptionToStr(e)}")
       }
@@ -160,7 +149,7 @@ object LenovoUtil extends Log {
 
   def getUserInfo(sessionID: String, listener: CommonListener[JsonObject]): Unit = {
     val request = HttpUtil.obtainBaseRequest(sessionID).url("https://box.lenovo.com/v2/user/info/get").get().build()
-    HttpUtil.obtainHttpClient().newCall(request).enqueue(new Callback {
+    HttpUtil.okHttpClient.newCall(request).enqueue(new Callback {
       override def onFailure(call: Call, e: IOException): Unit = {
         listener.onError("请求失败！")
       }
@@ -179,7 +168,7 @@ object LenovoUtil extends Log {
   def listDir(sessionId: String, path: String, pathType: String = "ent", listener: CommonListener[JsonObject]): Unit = {
     val requestUrl = s"$BASE_URL/metadata/root${URLEncoder.encode(path, "UTF-8").replaceAll("\\+", "%20")}?X-LENOVO-SESS-ID=$sessionId&path_type=$pathType"
     val request = HttpUtil.obtainBaseRequest(sessionId).url(requestUrl).build()
-    HttpUtil.obtainHttpClient().newCall(request).enqueue(new Callback {
+    HttpUtil.okHttpClient.newCall(request).enqueue(new Callback {
       override def onFailure(call: Call, e: IOException): Unit = {
         listener.onError("请求失败！")
       }
@@ -195,10 +184,58 @@ object LenovoUtil extends Log {
     })
   }
 
-  def downloadFileV2(sessionId: String, path: String, neid: String, rev: String, pathType: String = "ent", downloadFilePath: String, listener: CommonListener[File]): Unit = {
+  //https://console.box.lenovo.com/v2/fileops/auth_upload/databox/
+  def preUpload(sessionId: String, file: File): Future[String] = {
+    val promise = Promise[String]
+    val requestUrl = "https://console.box.lenovo.com/v2/fileops/auth_upload/databox/装调素材/素材库上传临时文件夹?path_type=ent&bytes=" + file.length()
+    val request = HttpUtil.obtainBaseRequest(sessionId).url(requestUrl).get().build()
+    HttpUtil.okHttpClient.newCall(request).enqueue(new Callback {
+      override def onFailure(call: Call, e: IOException): Unit = {
+        promise.failure(e)
+      }
+
+      override def onResponse(call: Call, response: Response): Unit = {
+        promise.success(response.body().string())
+      }
+    })
+    promise.future
+  }
+
+
+  def uploadFile(sessionId: String, uploadRegion: String, file: File): Future[String] = {
+    val promise = Promise[String]
+    if (!file.exists()) {
+      promise.failure(new FileNotFoundException(s"to upload file ${file.getAbsolutePath} not exist!"))
+    }
+    val fileBody = RequestBody.create(file, MediaType.parse("application/octet-stream"))
+    val requestBody = new MultipartBody.Builder()
+      .setType(MultipartBody.FORM)
+      .addFormDataPart("file", file.getName, fileBody)
+      .build()
+
+    val uploadUrl = uploadRegion + "/v2/files/databox/装调素材/素材库上传临时文件夹/" + file.getName +
+      "?path_type=ent&bytes=" + file.length() + "&filename=" + file.getName + "$overwrite=true";
+
+    val request = HttpUtil.obtainBaseRequest(sessionId)
+      .post(requestBody)
+      .url(uploadUrl)
+      .build()
+    HttpUtil.okHttpClient.newCall(request).enqueue(new Callback {
+      override def onFailure(call: Call, e: IOException): Unit = {
+        promise.failure(e)
+      }
+
+      override def onResponse(call: Call, response: Response): Unit = {
+        promise.success(response.body().string())
+      }
+    })
+    promise.future
+  }
+
+  def downloadFileV2(sessionId: String, path: String, neid: Long, rev: String, pathType: String = "ent", downloadFilePath: String, listener: CommonListener[File]): Unit = {
     val requestUrl = s"${BASE_URL}/dl_router/databox${URLEncoder.encode(path, "UTF-8").replaceAll("\\+", "%20")}?X-LENOVO-SESS-ID=$sessionId&path_type=$pathType&neid=$neid&rev=$rev"
     val request = HttpUtil.obtainBaseRequest(sessionId).url(requestUrl).build()
-    HttpUtil.obtainHttpClient().newCall(request).enqueue(new Callback {
+    HttpUtil.okHttpClient.newCall(request).enqueue(new Callback {
       override def onFailure(call: Call, e: IOException): Unit = {
         listener.onError("请求失败！")
       }
@@ -244,7 +281,7 @@ object LenovoUtil extends Log {
     val urlBuilder = HttpUrl.parse("https://console.box.lenovo.com/v2/extra_meta").newBuilder()
     urlBuilder.addQueryParameter("neids", requestNeidsSb.toString)
     val request = HttpUtil.obtainBaseRequest(sessionID).url(urlBuilder.build()).get().build()
-    HttpUtil.obtainHttpClient().newCall(request).enqueue(new Callback {
+    HttpUtil.okHttpClient.newCall(request).enqueue(new Callback {
       override def onFailure(call: Call, e: IOException): Unit = {
         listener.onError("请求失败！")
       }
@@ -272,7 +309,7 @@ object LenovoUtil extends Log {
     formBodyBuilder.add("info", infoJson.toString())
 
     val request = HttpUtil.obtainBaseRequest().url(s"$BASE_URL/fileops/manage?X-LENOVO-SESS-ID=${session}").post(formBodyBuilder.build()).build()
-    HttpUtil.obtainHttpClient().newCall(request).enqueue(new Callback {
+    HttpUtil.okHttpClient.newCall(request).enqueue(new Callback {
       override def onFailure(call: Call, e: IOException): Unit = {
         promise.failure(e)
       }
@@ -305,7 +342,7 @@ object LenovoUtil extends Log {
     formBodyBuilder.add("info", infoJson.toString())
 
     val request = HttpUtil.obtainBaseRequest().url(s"$BASE_URL/fileops/manage?X-LENOVO-SESS-ID=${session}").post(formBodyBuilder.build()).build()
-    HttpUtil.obtainHttpClient().newCall(request).enqueue(new Callback {
+    HttpUtil.okHttpClient.newCall(request).enqueue(new Callback {
       override def onFailure(call: Call, e: IOException): Unit = {
         listener.onError(s"请求错误:${SUtil.convertExceptionToStr(e)}")
       }

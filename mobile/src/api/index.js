@@ -85,7 +85,7 @@ export function copyAlbum(albumId) {
     })
 }
 
-export function addUploadRecord(uid, tempSrcName, srcNeid, srcType, srcHash, srcRev,srcDesc, tags) {
+export function addUploadRecord(uid, tempSrcName, srcNeid, srcType, srcHash, srcRev, srcDesc, tags) {
     return service.post("/api/v1/upload/add", {
         tempSrcName: tempSrcName,
         uploader: uid,
@@ -93,7 +93,7 @@ export function addUploadRecord(uid, tempSrcName, srcNeid, srcType, srcHash, src
         srcType: srcType,
         srcHash: srcHash,
         srcRev: srcRev,
-        srcDesc:srcDesc,
+        srcDesc: srcDesc,
         tags: tags
     }).then(res => {
         return res.data
@@ -102,6 +102,23 @@ export function addUploadRecord(uid, tempSrcName, srcNeid, srcType, srcHash, src
 
 export function getMyUploadRecord() {
     return service.post("api/v1/upload/mime", {}).then(res => {
+        return res.data;
+    })
+}
+
+export function getDefaultJoyeaDesc(neid) {
+    return service.post("api/src/getDefaultJoyeaDesc", {
+        neid: neid
+    }).then(res => {
+        return res.data;
+    })
+}
+
+export function changePwd(curPwd, newPwd) {
+    return service.post("api/v1/user/changePwd", {
+        curPwd: curPwd,
+        newPwd: newPwd,
+    }).then(res => {
         return res.data;
     })
 }

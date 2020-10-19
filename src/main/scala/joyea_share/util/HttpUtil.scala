@@ -6,19 +6,11 @@ import okhttp3.{OkHttpClient, Request}
 
 object HttpUtil {
 
-  private var okHttpClient: OkHttpClient = _
-
-  def obtainHttpClient(): OkHttpClient = {
-
-    if (okHttpClient == null) {
-      okHttpClient = new OkHttpClient.Builder()
-        .connectTimeout(10, TimeUnit.SECONDS)
-        .writeTimeout(10, TimeUnit.SECONDS)
-        .readTimeout(30, TimeUnit.SECONDS)
-        .build()
-    }
-    okHttpClient
-  }
+  var okHttpClient: OkHttpClient = new OkHttpClient.Builder()
+    .connectTimeout(10, TimeUnit.SECONDS)
+    .writeTimeout(10, TimeUnit.SECONDS)
+    .readTimeout(30, TimeUnit.SECONDS)
+    .build()
 
   def obtainBaseRequest(): Request.Builder = {
     new Request.Builder()

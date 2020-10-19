@@ -1,45 +1,18 @@
 package joyea_share
 
-import java.io.File
-import java.util.concurrent.Executors
+import java.time.LocalDateTime
 
-import com.alibaba.excel.EasyExcel;
-import com.alibaba.excel.context.AnalysisContext;
-import com.alibaba.excel.event.AnalysisEventListener;
-import com.alibaba.excel.metadata.CellExtra;
-import com.alibaba.excel.read.listener.ReadListener;
-import joyea_share.model.JoyeaUser;
-
-import cats.effect.{Blocker, ContextShift, IO}
-import com.ExcelUtil
-import com.alibaba.excel.{EasyExcel, EasyExcelFactory}
 import joyea_share.db.MySQLSettings
 import joyea_share.model.JoyeaUser
-import joyea_share.util.{CommonListener, LenovoUtil}
-import org.http4s.client.{Client, JavaNetClientBuilder}
+import joyea_share.module.download.DownloadRecord
 
-import scala.concurrent.{Await, ExecutionContext}
+import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success}
-import scala.concurrent.duration._
 
 object BenchMark extends MySQLSettings {
 
   def main(args: Array[String]): Unit = {
-//    LenovoUtil.downloadFileV2(
-//      "34d9293b2a214580be60c055b195df25_346341_1766247_meta",
-//      "/信息化需求评级排序及执行反馈/1、素材库/SIS Go Gel功能饮料（格式工厂转码后）.mp4",
-//      "1109395002", "ca364ea082a811e99d290017fa00f183", "ent",
-//      "/Users/cuiyijie/IdeaProjects/joyea_share/release/SIS Go Gel功能饮料（格式工厂转码后）.mp4", new CommonListener[File] {
-//        override def onSuccess(obj: File): Unit = {
-//          println("123")
-//        }
-//
-//        override def onError(error: String): Unit = {
-//          println("234")
-//        }
-//      })
-//    Thread.sleep(10000)
-    createJoyeaUser()
+
   }
 
   def createJoyeaUser():Unit = {
@@ -142,25 +115,35 @@ object BenchMark extends MySQLSettings {
       Thread.sleep(100)
     })
   }
+    implicit val ctx: ExecutionContext = ExecutionContext.Implicits.global
 
-  def test(): Unit = {
-
-
-    Thread.sleep(2000)
-  }
-
-  def testNewClient(): Unit = {
-    implicit val cs: ContextShift[IO] = IO.contextShift(ExecutionContext.global)
-    val blockingPool = Executors.newFixedThreadPool(5)
-    val blocker = Blocker.liftExecutorService(blockingPool)
-    val httpClient: Client[IO] = JavaNetClientBuilder[IO](blocker).create
-
-    val request = httpClient.expect[String]("https://www.baidu.com")
-    request.unsafeRunAsync {
-      case Left(value) =>
-        value.printStackTrace()
-      case Right(value) =>
+    DownloadRecord.create("","123",123,"12313",LocalDateTime.now()).onComplete {
+      case Failure(exception) =>
+        exception.printStackTrace()
+      case Success(value) =>
         println(value)
     }
+
+//    val sessionId = "f8a1fa97b8ae49e8ad444761eadb5d03_346341_696047_meta"
+//    val file = new File("/Users/cuiyijie/IdeaProjects/joyea_share/websrc/vue.config.js")
+//    LenovoUtil.preUpload(sessionId, file)
+//      .onComplete {
+//        case Failure(exception) =>
+//          exception.printStackTrace()
+//        case Success(value) =>
+//          val json = JsonObject.readFrom(value)
+//          val region = json.getString("region", "")
+//          LenovoUtil.uploadFile(sessionId, region, file).onComplete {
+//            case Failure(exception) =>
+//              exception.printStackTrace()
+//            case Success(value) =>
+//              println(value)
+//          }
+//      }
+
+
+
+  def test(): Unit = {
+    Thread.sleep(2000)
   }
 }

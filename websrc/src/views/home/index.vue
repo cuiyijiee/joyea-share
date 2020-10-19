@@ -18,10 +18,14 @@
                      :class="{'is-active':currentPath==='/manage/list'}"
                      style="">我的清单
           </el-button>
+          <el-button size="small" icon="el-icon-tickets" @click="jumpToUpload"
+                     :class="{'is-active':currentPath==='/upload/index'}"
+                     style="margin-right: 10px">素材上传
+          </el-button>
           <el-button size="small" icon="el-icon-tickets" @click="jumpToUploadManage"
                      v-if="userInfo.email === '0070'"
                      :class="{'is-active':currentPath==='/upload/manage'}"
-                     style="margin-right: 10px">素材审核
+                     style="margin-left:0;margin-right: 10px">素材审核
           </el-button>
           <el-popover
               style="margin-right: 20px"
@@ -109,6 +113,9 @@ export default {
         this.$router.replace("/build");
       }
     },
+    jumpToUpload() {
+      this.$router.replace("/upload/index");
+    },
     jumpToList() {
       this.$router.replace("/manage/list");
     },
@@ -143,7 +150,7 @@ export default {
             id: task.id,
             startTime: task.startTime,
             firstSrcName: task.firstSrcName.substr(0, task.firstSrcName.lastIndexOf(".")),
-            status: task.finishTime.length !== 0,
+            status: task.finishTime && task.finishTime.length !== 0,
             opened: _this.handleQueryRecord(task.id)
           });
         });
@@ -159,7 +166,7 @@ export default {
               id: task.id,
               startTime: task.startTime,
               firstSrcName: task.firstSrcName.substr(0, task.firstSrcName.lastIndexOf(".")),
-              status: task.finishTime.length !== 0,
+              status: task.finishTime && task.finishTime.length !== 0,
               opened: _this.handleQueryRecord(task.id)
             });
           });

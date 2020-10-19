@@ -43,7 +43,7 @@ object JoyeaUser extends SQLSyntaxSupport[JoyeaUser] with ShortenedNames {
         column.isAdmin -> isAdmin,
       )
     }.updateAndReturnGeneratedKey().future()
-         ) yield new JoyeaUser(id = userId, joyeaId = joyeaId, joyeaName = joyeaName, password = password,isAdmin = isAdmin, position = position, department = department, updateAt = updateAt)
+         ) yield new JoyeaUser(id = userId, joyeaId = joyeaId, joyeaName = joyeaName, password = password, isAdmin = isAdmin, position = position, department = department, updateAt = updateAt)
   }
 
   def findByJoyeaId(joyeaId: String)(implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[Option[JoyeaUser]] = {
@@ -51,5 +51,12 @@ object JoyeaUser extends SQLSyntaxSupport[JoyeaUser] with ShortenedNames {
       select.from(JoyeaUser as ju)
         .where.eq(ju.joyeaId, joyeaId)
     }.map(JoyeaUser(ju)).single().future()
+  }
+
+  def changePwd(uid: Long, newPwd: String)
+               (implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[Boolean] = {
+    withSQL {
+      update(JoyeaUser).set(column.password -> newPwd).where.eq(column.id, uid)
+    }.update().future().map(_ > 0)
   }
 }
