@@ -4,7 +4,7 @@ import java.util.concurrent.TimeUnit
 
 import okhttp3.{OkHttpClient, Request}
 
-object HttpUtil {
+object OkHttpUtil {
 
   var okHttpClient: OkHttpClient = new OkHttpClient.Builder()
     .connectTimeout(10, TimeUnit.SECONDS)

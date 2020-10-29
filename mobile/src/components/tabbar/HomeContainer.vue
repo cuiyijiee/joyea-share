@@ -173,7 +173,7 @@
 </template>
 
 <script>
-import api, {getDefaultJoyeaDesc} from "../../api/";
+import api, {getDefaultJoyeaDesc,getTopSearchKey} from "../../api/";
 import {genSrcPreviewSrc, getDocumentImage, handleGoToPreview} from "../../util/JoyeaUtil"
 import {mapGetters} from "vuex"
 import eventBus from "../../service/eventbus";
@@ -311,10 +311,9 @@ export default {
       return genSrcPreviewSrc(neid, hash, rev, previewType, this.userInfo.session);
     },
     handleGetTopSearchKey() {
-      api({
-        action: "getTopSearchKey"
-      }).then(resp => {
-        this.topSearchKey = resp["data"];
+      getTopSearchKey().then(resp => {
+        console.log("receive top search key: " + JSON.stringify(resp));
+        this.topSearchKey = resp['data'];
       })
     },
     handleListLenovoDir(path, pathType) {

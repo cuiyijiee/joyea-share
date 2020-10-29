@@ -77,6 +77,12 @@ export function switchShare(albumId, share, albumName, shareCoverId, shareLocalC
     })
 }
 
+export function getTopSearchKey() {
+    return service.post('api/v1/search/key/top', {}).then(res => {
+        return res.data;
+    })
+}
+
 export function copyAlbum(albumId) {
     return service.post("api/v1/album/copy", {
         albumId: albumId

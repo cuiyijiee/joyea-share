@@ -1,9 +1,6 @@
 package joyea_share.handler
 
-import java.util.concurrent.TimeoutException
-
 import com.json.{JsonArray, JsonObject, WriterConfig}
-import joyea_share.Boot
 import joyea_share.db.MySQLSettings
 import joyea_share.handler.interfaces.{ExecListener, IAction}
 import joyea_share.model.{AlbumSrc, SrcCollect}
@@ -26,7 +23,7 @@ class SearchHandler extends IAction {
       log.info(s"record search key $searchKey with result $result")
     })(ctx)
 
-    LenovoUtil.ftsSearch(DownloadManager.getAdminToken(), searchKey = searchKey, searchType = "", offset = offset, new CommonListener[JsonObject] {
+    LenovoUtil.newFtsSearch(DownloadManager.getAdminToken(), searchKey = searchKey, searchType = "", offset = offset, new CommonListener[JsonObject] {
       override def onSuccess(obj: JsonObject): Unit = {
         val searchResultValue = obj.get("content")
         if (searchResultValue != null && searchResultValue.isArray) {

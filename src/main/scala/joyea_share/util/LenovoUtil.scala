@@ -6,6 +6,7 @@ import java.net.URLEncoder
 import com.json.{JsonArray, JsonObject}
 import com.utils.CommonUtil
 import okhttp3._
+import org.cuje.lib.net.HttpUtil
 import xitrum.Log
 
 import scala.concurrent.{Future, Promise}
@@ -17,19 +18,19 @@ object LenovoUtil extends Log {
   private val BASE_SEARCH_FTS_URL = "https://console.box.lenovo.com/v2/fts_search"
 
   /**
-    * 登陆接口
-    *
-    * @param user
-    * @param pwd
-    * @param listener
-    */
+   * 登陆接口
+   *
+   * @param user
+   * @param pwd
+   * @param listener
+   */
   def login(user: String, pwd: String, listener: CommonListener[(String, String, Long)]): Unit = {
     val formBodyBuilder = new FormBody.Builder()
     formBodyBuilder.add("user_slug", s"email:$user")
     formBodyBuilder.add("password", pwd)
 
-    val request = HttpUtil.obtainBaseRequest().url(s"$BASE_URL/user/login").post(formBodyBuilder.build()).build()
-    HttpUtil.okHttpClient.newCall(request).enqueue(new Callback {
+    val request = OkHttpUtil.obtainBaseRequest().url(s"$BASE_URL/user/login").post(formBodyBuilder.build()).build()
+    OkHttpUtil.okHttpClient.newCall(request).enqueue(new Callback {
       override def onFailure(call: Call, e: IOException): Unit = {
         listener.onError(s"请求错误:${SUtil.convertExceptionToStr(e)}")
       }
@@ -53,17 +54,17 @@ object LenovoUtil extends Log {
   }
 
   /**
-    * 注销接口
-    *
-    * @param user
-    * @param listener
-    */
+   * 注销接口
+   *
+   * @param user
+   * @param listener
+   */
   def logout(user: String, listener: CommonListener[String]): Unit = {
     val formBodyBuilder = new FormBody.Builder()
     formBodyBuilder.add("user_slug", s"email:$user")
 
-    val request = HttpUtil.obtainBaseRequest().url(s"$BASE_URL/user/logout").post(formBodyBuilder.build()).build()
-    HttpUtil.okHttpClient.newCall(request).enqueue(new Callback {
+    val request = OkHttpUtil.obtainBaseRequest().url(s"$BASE_URL/user/logout").post(formBodyBuilder.build()).build()
+    OkHttpUtil.okHttpClient.newCall(request).enqueue(new Callback {
       override def onFailure(call: Call, e: IOException): Unit = {
         listener.onError(s"请求错误:${SUtil.convertExceptionToStr(e)}")
       }
@@ -80,15 +81,33 @@ object LenovoUtil extends Log {
     })
   }
 
+  def ftsSearch(searchKey: String, searchType: String = "", offset: Int = 0)
+               (implicit requestSession: String): Future[String] = {
+    HttpUtil.get(
+      BASE_SEARCH_FTS_URL,
+      Map(
+        "with_fts" -> true,
+        "neid" -> "",
+        "aid" -> "",
+        "path_type" -> "ent",
+        "path" -> "/",
+        "X-LENOVO-SESS-ID" -> requestSession,
+        "query" -> searchKey,
+        "type" -> searchType,
+        "offset" -> offset,
+      )
+    )
+  }
+
   /**
-    * 全局搜索接口
-    *
-    * @param sessionID
-    * @param searchKey
-    * @param offset
-    * @param listener
-    */
-  def ftsSearch(sessionID: String, searchKey: String, searchType: String = "", offset: Long = 0, listener: CommonListener[JsonObject]): Unit = {
+   * 全局搜索接口
+   *
+   * @param sessionID
+   * @param searchKey
+   * @param offset
+   * @param listener
+   */
+  def newFtsSearch(sessionID: String, searchKey: String, searchType: String = "", offset: Long = 0, listener: CommonListener[JsonObject]): Unit = {
 
     val urlBuilder = HttpUrl.parse(BASE_SEARCH_FTS_URL).newBuilder()
     urlBuilder.addQueryParameter("with_fts", "true")
@@ -101,9 +120,9 @@ object LenovoUtil extends Log {
       .addQueryParameter("type", searchType)
       .addQueryParameter("offset", offset.toString)
 
-    val request = HttpUtil.obtainBaseRequest().url(urlBuilder.build()).build()
+    val request = OkHttpUtil.obtainBaseRequest().url(urlBuilder.build()).build()
 
-    HttpUtil.okHttpClient.newCall(request).enqueue(new Callback {
+    OkHttpUtil.okHttpClient.newCall(request).enqueue(new Callback {
       override def onFailure(call: Call, e: IOException): Unit = {
         listener.onError(s"请求失败：${SUtil.convertExceptionToStr(e)}")
       }
@@ -129,9 +148,9 @@ object LenovoUtil extends Log {
       //.addQueryParameter("type", "pic")
       .addQueryParameter("X-LENOVO-SESS-ID", sessionID)
 
-    val request = HttpUtil.obtainBaseRequest().url(urlBuilder.build()).build()
+    val request = OkHttpUtil.obtainBaseRequest().url(urlBuilder.build()).build()
 
-    HttpUtil.okHttpClient.newCall(request).enqueue(new Callback {
+    OkHttpUtil.okHttpClient.newCall(request).enqueue(new Callback {
       override def onFailure(call: Call, e: IOException): Unit = {
         listener.onError(s"请求失败：${SUtil.convertExceptionToStr(e)}")
       }
@@ -148,8 +167,8 @@ object LenovoUtil extends Log {
   }
 
   def getUserInfo(sessionID: String, listener: CommonListener[JsonObject]): Unit = {
-    val request = HttpUtil.obtainBaseRequest(sessionID).url("https://box.lenovo.com/v2/user/info/get").get().build()
-    HttpUtil.okHttpClient.newCall(request).enqueue(new Callback {
+    val request = OkHttpUtil.obtainBaseRequest(sessionID).url("https://box.lenovo.com/v2/user/info/get").get().build()
+    OkHttpUtil.okHttpClient.newCall(request).enqueue(new Callback {
       override def onFailure(call: Call, e: IOException): Unit = {
         listener.onError("请求失败！")
       }
@@ -167,8 +186,8 @@ object LenovoUtil extends Log {
 
   def listDir(sessionId: String, path: String, pathType: String = "ent", listener: CommonListener[JsonObject]): Unit = {
     val requestUrl = s"$BASE_URL/metadata/root${URLEncoder.encode(path, "UTF-8").replaceAll("\\+", "%20")}?X-LENOVO-SESS-ID=$sessionId&path_type=$pathType"
-    val request = HttpUtil.obtainBaseRequest(sessionId).url(requestUrl).build()
-    HttpUtil.okHttpClient.newCall(request).enqueue(new Callback {
+    val request = OkHttpUtil.obtainBaseRequest(sessionId).url(requestUrl).build()
+    OkHttpUtil.okHttpClient.newCall(request).enqueue(new Callback {
       override def onFailure(call: Call, e: IOException): Unit = {
         listener.onError("请求失败！")
       }
@@ -188,8 +207,8 @@ object LenovoUtil extends Log {
   def preUpload(sessionId: String, file: File): Future[String] = {
     val promise = Promise[String]
     val requestUrl = "https://console.box.lenovo.com/v2/fileops/auth_upload/databox/营销素材展示/素材库上传临时文件夹?path_type=ent&bytes=" + file.length()
-    val request = HttpUtil.obtainBaseRequest(sessionId).url(requestUrl).get().build()
-    HttpUtil.okHttpClient.newCall(request).enqueue(new Callback {
+    val request = OkHttpUtil.obtainBaseRequest(sessionId).url(requestUrl).get().build()
+    OkHttpUtil.okHttpClient.newCall(request).enqueue(new Callback {
       override def onFailure(call: Call, e: IOException): Unit = {
         promise.failure(e)
       }
@@ -216,11 +235,11 @@ object LenovoUtil extends Log {
     val uploadUrl = uploadRegion + "/v2/files/databox/营销素材展示/素材库上传临时文件夹/" + file.getName +
       "?path_type=ent&bytes=" + file.length() + "&filename=" + file.getName + "$overwrite=true";
 
-    val request = HttpUtil.obtainBaseRequest(sessionId)
+    val request = OkHttpUtil.obtainBaseRequest(sessionId)
       .post(requestBody)
       .url(uploadUrl)
       .build()
-    HttpUtil.okHttpClient.newCall(request).enqueue(new Callback {
+    OkHttpUtil.okHttpClient.newCall(request).enqueue(new Callback {
       override def onFailure(call: Call, e: IOException): Unit = {
         promise.failure(e)
       }
@@ -234,8 +253,8 @@ object LenovoUtil extends Log {
 
   def downloadFileV2(sessionId: String, path: String, neid: Long, rev: String, pathType: String = "ent", downloadFilePath: String, listener: CommonListener[File]): Unit = {
     val requestUrl = s"${BASE_URL}/dl_router/databox${URLEncoder.encode(path, "UTF-8").replaceAll("\\+", "%20")}?X-LENOVO-SESS-ID=$sessionId&path_type=$pathType&neid=$neid&rev=$rev"
-    val request = HttpUtil.obtainBaseRequest(sessionId).url(requestUrl).build()
-    HttpUtil.okHttpClient.newCall(request).enqueue(new Callback {
+    val request = OkHttpUtil.obtainBaseRequest(sessionId).url(requestUrl).build()
+    OkHttpUtil.okHttpClient.newCall(request).enqueue(new Callback {
       override def onFailure(call: Call, e: IOException): Unit = {
         listener.onError("请求失败！")
       }
@@ -280,8 +299,8 @@ object LenovoUtil extends Log {
 
     val urlBuilder = HttpUrl.parse("https://console.box.lenovo.com/v2/extra_meta").newBuilder()
     urlBuilder.addQueryParameter("neids", requestNeidsSb.toString)
-    val request = HttpUtil.obtainBaseRequest(sessionID).url(urlBuilder.build()).get().build()
-    HttpUtil.okHttpClient.newCall(request).enqueue(new Callback {
+    val request = OkHttpUtil.obtainBaseRequest(sessionID).url(urlBuilder.build()).get().build()
+    OkHttpUtil.okHttpClient.newCall(request).enqueue(new Callback {
       override def onFailure(call: Call, e: IOException): Unit = {
         listener.onError("请求失败！")
       }
@@ -308,8 +327,8 @@ object LenovoUtil extends Log {
     formBodyBuilder.add("op", "rename")
     formBodyBuilder.add("info", infoJson.toString())
 
-    val request = HttpUtil.obtainBaseRequest().url(s"$BASE_URL/fileops/manage?X-LENOVO-SESS-ID=${session}").post(formBodyBuilder.build()).build()
-    HttpUtil.okHttpClient.newCall(request).enqueue(new Callback {
+    val request = OkHttpUtil.obtainBaseRequest().url(s"$BASE_URL/fileops/manage?X-LENOVO-SESS-ID=${session}").post(formBodyBuilder.build()).build()
+    OkHttpUtil.okHttpClient.newCall(request).enqueue(new Callback {
       override def onFailure(call: Call, e: IOException): Unit = {
         promise.failure(e)
       }
@@ -341,8 +360,8 @@ object LenovoUtil extends Log {
     formBodyBuilder.add("auto_rename", "false")
     formBodyBuilder.add("info", infoJson.toString())
 
-    val request = HttpUtil.obtainBaseRequest().url(s"$BASE_URL/fileops/manage?X-LENOVO-SESS-ID=${session}").post(formBodyBuilder.build()).build()
-    HttpUtil.okHttpClient.newCall(request).enqueue(new Callback {
+    val request = OkHttpUtil.obtainBaseRequest().url(s"$BASE_URL/fileops/manage?X-LENOVO-SESS-ID=${session}").post(formBodyBuilder.build()).build()
+    OkHttpUtil.okHttpClient.newCall(request).enqueue(new Callback {
       override def onFailure(call: Call, e: IOException): Unit = {
         listener.onError(s"请求错误:${SUtil.convertExceptionToStr(e)}")
       }

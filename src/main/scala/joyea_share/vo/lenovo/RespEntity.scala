@@ -1,0 +1,50 @@
+package joyea_share.vo.lenovo
+
+case class FtpSearchResp(
+                          has_more: Boolean,
+                          next_offset: Int,
+                          transactionId: String,
+                          status: Int,
+                          content: Seq[FtpSearchContent]
+                        )
+
+case class FtpSearchContent(
+                             prefix_neid: String,
+                             fileindex: Option[Int],
+                             from_name: String,
+                             result: String,
+                             path: String,
+                             router: Any,
+                             nsid: Long,
+                             is_deleted: Boolean,
+                             has_docs_lock: Option[Boolean],
+                             is_dir: Boolean,
+                             is_shared: Boolean,
+                             modified: String,
+                             creator_uid: Long,
+                             from: String,
+                             topSort: Int,
+                             neid: Long,
+                             folder_dc_type: Int,
+                             creator: String,
+                             rev: Option[String],
+                             utime: Long,
+                             authable: Boolean,
+                             region_id: Int,
+                             support_preview: Option[String],
+                             path_type: String,
+                             thumb_exist: Option[Boolean],
+                             access_mode: Int,
+                             lock_uid: Option[Int],
+                             rev_index: Option[Int],
+                             delivery_code: String,
+                             size: String,
+                             updator_uid: Long,
+                             mime_type: Option[String],
+                             bytes: Long,
+                             updator: String,
+                             hash: String,
+                             access_restriction: Int,
+                             content: Option[String],
+                             filename: String
+                           )
