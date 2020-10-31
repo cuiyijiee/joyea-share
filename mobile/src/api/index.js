@@ -112,6 +112,12 @@ export function getMyUploadRecord() {
     })
 }
 
+export function yesterdayUpload(){
+    return service.post("api/v1/upload/yesterday",{}).then(res => {
+        return res.data;
+    })
+}
+
 export function getDefaultJoyeaDesc(neid) {
     return service.post("api/src/getDefaultJoyeaDesc", {
         neid: neid

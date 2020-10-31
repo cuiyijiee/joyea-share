@@ -19,6 +19,12 @@
       <van-cell title="我的上传" is-link @click="handleClickMyUpload"/>
       <van-cell title="我的清单" is-link @click="handleClickMyList"/>
       <van-cell title="修改密码" is-link @click="handleClickChangePwd"/>
+      <van-cell is-link @click="handleClickYesterdayUpload">
+        <template #title>
+          <span class="custom-title">最新素材</span>
+          <van-tag type="danger" style="margin-left: 5px">NEW</van-tag>
+        </template>
+      </van-cell>
     </van-cell-group>
     <van-cell-group title="设置">
       <van-cell center title="图片加载原图">
@@ -34,7 +40,7 @@
 <script>
 import {mapGetters, mapActions} from "vuex";
 import avatars from 'vue-avatars'
-import {logout} from "../../api";
+import {logout} from "@/api";
 
 export default {
   components: {
@@ -75,6 +81,9 @@ export default {
     },
     handleClickMyUpload() {
       this.$router.push("/upload/mime")
+    },
+    handleClickYesterdayUpload(){
+      this.$router.push("/yesterdayUpload")
     },
     handleLogout() {
       this.$dialog.confirm({

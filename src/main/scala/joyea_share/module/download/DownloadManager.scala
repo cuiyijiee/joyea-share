@@ -43,7 +43,6 @@ object DownloadManager extends Log {
       genNewSession()
     }, 0, 30, TimeUnit.MINUTES)
 
-    val deleteDownloadFileTimer = new Timer()
     val calendar = Calendar.getInstance()
     calendar.set(Calendar.HOUR_OF_DAY, 2) //凌晨1点
     calendar.set(Calendar.MINUTE, 0)
@@ -114,10 +113,6 @@ object DownloadManager extends Log {
 
   def getBaseCompressSaveFilePath(): String = {
     baseCompressSaveFilePath
-  }
-
-  def getBaseSaveFilePath(): String = {
-    baseSaveFilePath
   }
 
   def getTodayTaskMap(): java.util.Map[String, DownloadTask] = {

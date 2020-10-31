@@ -1,6 +1,6 @@
 <template>
   <div id="order">
-    <van-empty v-if="orderList.length === 0" description="清单车空空如也"/>
+    <van-empty v-if="orderList.length === 0" description="素材车空空如也"/>
     <div style="margin-bottom: 100px">
       <van-swipe-cell v-for="item in orderList" :key="item.path">
         <van-card @click="handleClickOrderItem(item)"

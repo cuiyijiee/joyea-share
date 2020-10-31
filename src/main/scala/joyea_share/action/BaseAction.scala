@@ -17,7 +17,7 @@ abstract class BaseAction[T: Manifest] extends Action with SkipCsrfCheck with Lo
 
   override def execute(): Unit = {
     try {
-      log.error("request: " + requestContentString)
+      //log.error("request: " + requestContentString)
       val request = Serialization.read[T](requestContentString)
       safeExecute(req = request)
     } catch {
@@ -59,12 +59,12 @@ abstract class BaseAction[T: Manifest] extends Action with SkipCsrfCheck with Lo
 
 
   def baseResponseSuccess(data: Any): Unit = {
-    log.error("response success: " + data)
+    //log.error("response success: " + data)
     respondJsonText(Serialization.write(BaseResp(2000, data)))
   }
 
   def baseResponseError(code: Int): Unit = {
-    log.error("response error: " + code)
+    //log.error("response error: " + code)
     respondJsonText(Serialization.write(BaseResp(code, null)))
   }
 

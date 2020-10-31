@@ -149,7 +149,7 @@ import {GenImageListView} from "../../util/ImageViewUtil";
 import {Toast} from "vant";
 
 export default {
-  name: "SearchResult",
+  name: "SearchResultContainer",
   components: {
     VmBackTop
   },

@@ -28,6 +28,9 @@ object JoyeaUser extends SQLSyntaxSupport[JoyeaUser] with ShortenedNames {
 
   def apply(rn: ResultName[JoyeaUser])(rs: WrappedResultSet): JoyeaUser = autoConstruct(rs, rn)
 
+  def opt(s: SyntaxProvider[JoyeaUser])(rs: WrappedResultSet): Option[JoyeaUser] =
+    rs.longOpt(s.resultName.joyeaId).map(_ => apply(s.resultName)(rs))
+
   def create(joyeaId: String, joyeaName: String, password: String, position: String,
              isAdmin: Boolean = false,
              department: String, updateAt: Timestamp = new Timestamp(System.currentTimeMillis()))

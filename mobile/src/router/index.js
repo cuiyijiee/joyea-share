@@ -4,8 +4,9 @@ import Router from 'vue-router';
 import HomeContainer from "../components/tabbar/HomeContainer";
 import OrderContainer from "../components/tabbar/OrderContainer";
 import MineContainer from "../components/tabbar/MineContainer";
-import SearchResult from "../components/tabbar/SearchContainer";
+import SearchResultContainer from "../components/tabbar/SearchResultContainer";
 import SquareContainer from "../components/tabbar/SquareContainer";
+import YesterdayUploadContainer from "@/components/tabbar/YesterdayUploadContainer";
 import UploadIndex from "../views/upload/Index";
 
 import Main from "../views/Main";
@@ -68,14 +69,23 @@ export default new Router({
                     }
                 },
                 {
-                    path: '/search',
+                    path: 'search',
                     name: '搜索结果',
-                    component: SearchResult,
+                    component: SearchResultContainer,
                     meta: {
                         allowBack: true,
                         allowHome: false
                     }
-                }
+                },
+                {
+                    path: 'yesterdayUpload',
+                    name: '最新素材',
+                    component: YesterdayUploadContainer,
+                    meta: {
+                        allowHome: false,
+                        allowBack: true
+                    }
+                },
             ]
         },
         {

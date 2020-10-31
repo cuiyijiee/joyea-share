@@ -20,8 +20,6 @@ if (process.env.NODE_ENV !== 'production') {
     new VConsole()
 }
 
-
-
 Vue.prototype.$fileName = genFileName;
 
 Vue.use(Vant);

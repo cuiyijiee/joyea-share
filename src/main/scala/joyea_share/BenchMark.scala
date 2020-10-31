@@ -1,5 +1,7 @@
 package joyea_share
 
+import joyea_share.db.MySQLSettings
+import joyea_share.model.UploadRecord
 import joyea_share.util.{BaseJsonFormat, LenovoUtil}
 import joyea_share.vo.lenovo.FtpSearchResp
 import org.json4s.jackson.Serialization
@@ -7,21 +9,29 @@ import org.json4s.jackson.Serialization
 import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success}
 
-object BenchMark extends BaseJsonFormat {
+object BenchMark extends MySQLSettings {
 
   def main(args: Array[String]): Unit = {
 
     implicit val ctx: ExecutionContext = ExecutionContext.Implicits.global
     implicit val session:String = "2cc84bf21f2740f2888cb7154ee29133_346341_696047_meta"
-    LenovoUtil.ftsSearch(
-      "听装","",202
-    ).onComplete {
+
+    UploadRecord.yesterdayUploadRecord().onComplete {
       case Failure(exception) =>
         exception.printStackTrace()
       case Success(value) =>
-        val resp = Serialization.read[FtpSearchResp](value)
-        println(s"current find file: ${resp.content.length},and has more: ${resp.has_more},and next_offset is: ${resp.next_offset}")
+            println(value)
     }
+    scala.io.StdIn.readLine()
+//    LenovoUtil.ftsSearch(
+//      "听装","",202
+//    ).onComplete {
+//      case Failure(exception) =>
+//        exception.printStackTrace()
+//      case Success(value) =>
+//        val resp = Serialization.read[FtpSearchResp](value)
+//        println(s"current find file: ${resp.content.length},and has more: ${resp.has_more},and next_offset is: ${resp.next_offset}")
+//    }
 //    DownloadRecord.create("","123",123,"12313",LocalDateTime.now()).onComplete {
 //      case Failure(exception) =>
 //        exception.printStackTrace()
