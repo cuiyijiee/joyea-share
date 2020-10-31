@@ -56,6 +56,7 @@ import {mapState, mapActions, mapGetters} from "vuex"
 import {genSrcPreviewSrc} from "../../util/JoyeaUtil";
 import api from "../../api";
 import {getDocumentImage} from '../../util/JoyeaUtil';
+import {createAlbum} from "../../api/"
 
 export default {
   name: "OrderContainer",
@@ -111,26 +112,38 @@ export default {
     },
     handleSubmitNewAlbum() {
       if (this.newAlbumName.length === 0) {
-        this.$notify({type: 'warning', message: '清单名称不能为空，你先设置！'});
+        this.$notify({type: 'warning', message: '清单名称不能为空，请先设置！'});
         return;
       }
-      api({
-        action: 'album',
-        method: this.editMode ? 'reSave' : 'save',
-        id: this.getOrderEditInfo.id,
-        name: this.newAlbumName,
-        src: this.orderList
-      }).then(response => {
-        if (response.result) {
-          this.$notify({type: 'success', message: this.editMode ? '重新编辑成功' : '保存成功'});
-          this.$store.dispatch("clearFunc");
-          this.setOrderEditInfoFunc({}).then(() => {
+      if(!this.editMode ){  //创建新的清单
+        createAlbum(this.newAlbumName,this.orderList).then(resp => {
+          if(resp.code === 2000){
+            this.$notify({type: 'success', message: '保存成功'});
+            this.$store.dispatch("clearFunc");
+            this.setOrderEditInfoFunc({})
+          }else{
+            this.$notify({type: 'warning', message: '保存失败'});
+          }
+        })
+      }else{  //保存编辑之后的清单
+        api({
+          action: 'album',
+          method: this.editMode ? 'reSave' : 'save',
+          id: this.getOrderEditInfo.id,
+          name: this.newAlbumName,
+          src: this.orderList
+        }).then(response => {
+          if (response.result) {
+            this.$notify({type: 'success', message: this.editMode ? '重新编辑成功' : '保存成功'});
+            this.$store.dispatch("clearFunc");
+            this.setOrderEditInfoFunc({}).then(() => {
 
-          })
-        } else {
-          this.$notify({type: 'warning', message: this.editMode ? '重新编辑失败' : '保存失败'});
-        }
-      });
+            })
+          } else {
+            this.$notify({type: 'warning', message: this.editMode ? '重新编辑失败' : '保存失败'});
+          }
+        });
+      }
     },
     genPreviewUrl(neid, hash, rev, mime_type) {
       let previewType = 'pic';    // if video is av

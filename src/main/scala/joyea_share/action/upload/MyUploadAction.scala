@@ -8,7 +8,7 @@ import xitrum.annotation.POST
 class MyUploadAction extends BaseAction[MyUploadReq] {
   override def safeExecute(req: MyUploadReq): Unit = {
     UploadRecord.findAllByUid(myUid).onComplete(safeResponse[List[UploadRecord]](_, resp => {
-      cyjResponseSuccess(resp)
+      baseResponseSuccess(resp)
     }))
   }
 }

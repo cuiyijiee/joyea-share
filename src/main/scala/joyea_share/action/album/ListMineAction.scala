@@ -15,7 +15,7 @@ class ListMineAction extends BaseAction[EmptyReq] {
     override def safeExecute(req: EmptyReq): Unit = {
         Album.findByUserId(myUid).onComplete(safeResponse[List[Album]](_, albumList => {
 
-            cyjResponseSuccess(albumList.map(album => {
+            baseResponseSuccess(albumList.map(album => {
                 AlbumDetailResp(
                     albumId = album.albumId,
                     userId = album.userId,

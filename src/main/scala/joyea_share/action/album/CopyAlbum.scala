@@ -21,7 +21,7 @@ class CopyAlbum extends BaseAction[CopyAlbumReq] {
               })
             }))
             Album.addLike(albumId = album.albumId).onComplete(safeResponse[Int](_, result => {
-              cyjResponseSuccess(true)
+              baseResponseSuccess(true)
             }))
           }))
       }

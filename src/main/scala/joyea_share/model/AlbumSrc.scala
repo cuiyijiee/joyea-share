@@ -1,10 +1,12 @@
 package joyea_share.model
 
-import java.sql.Timestamp
+import java.time.OffsetDateTime
 
 import scalikejdbc._
 import async._
 import com.json.JsonObject
+import org.cuje.lib.TimeUtil
+
 import scala.concurrent.Future
 
 case class AlbumSrc(
@@ -19,7 +21,7 @@ case class AlbumSrc(
                      srcDesc: String,
                      srcFileName: String,
                      srcBytes: Long,
-                     createdAt: Timestamp
+                     createdAt: OffsetDateTime = OffsetDateTime.now()
                    ) extends ShortenedNames {
 
     def toJson: JsonObject = new JsonObject()
@@ -34,7 +36,7 @@ case class AlbumSrc(
       .add("desc", this.srcDesc)
       .add("bytes", this.srcBytes)
       .add("filename", this.srcFileName)
-      .add("created_at", this.createdAt.getTime)
+      .add("created_at", TimeUtil.offsetDataTimeToTimestamp(this.createdAt))
 }
 
 object AlbumSrc extends SQLSyntaxSupport[AlbumSrc] with ShortenedNames {
@@ -47,8 +49,49 @@ object AlbumSrc extends SQLSyntaxSupport[AlbumSrc] with ShortenedNames {
 
     def apply(as: ResultName[AlbumSrc])(rs: WrappedResultSet): AlbumSrc = autoConstruct(rs, as)
 
+    def createMany(albumSrcList: Seq[AlbumSrc])
+                  (implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[Int] = {
+        if (albumSrcList.nonEmpty) {
+            val insertCsv = albumSrcList.map(src => {
+                Seq(
+                    src.srcNeid,
+                    src.albumId,
+                    src.srcPath,
+                    src.srcType,
+                    src.srcHash,
+                    src.srcRev,
+                    src.srcSize,
+                    src.srcDesc,
+                    src.srcFileName,
+                    src.srcBytes,
+                    sqls.currentTimestamp
+                )
+            })
+            withSQL {
+                insertInto(AlbumSrc)
+                  .columns(
+                      column.srcNeid,
+                      column.albumId,
+                      column.srcPath,
+                      column.srcType,
+                      column.srcHash,
+                      column.srcRev,
+                      column.srcSize,
+                      column.srcDesc,
+                      column.srcFileName,
+                      column.srcBytes,
+                      column.createdAt
+                  ).values(
+                    insertCsv: _*
+                )
+            }.update().future()
+        } else {
+            Future(0)
+        }
+    }
+
     def create(srcNeid: Long, albumId: Long, srcPath: String, srcType: String, srcHash: String, srcRev: String,
-               srcSize: String, srcDesc: String, srcFileName: String, srcBytes: Long, createdAt: Timestamp = new Timestamp(System.currentTimeMillis()))
+               srcSize: String, srcDesc: String, srcFileName: String, srcBytes: Long, createdAt: OffsetDateTime = OffsetDateTime.now())
               (implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[AlbumSrc] = {
         for {
             id <- withSQL {
@@ -90,7 +133,7 @@ object AlbumSrc extends SQLSyntaxSupport[AlbumSrc] with ShortenedNames {
         selectFrom(AlbumSrc as albums).where.eq(albums.srcNeid, srcNeid)
     }.map(AlbumSrc(albums)).list().future()
 
-    def countByNeid(srcNeid:Long)(implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[Long] = withSQL {
+    def countByNeid(srcNeid: Long)(implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[Long] = withSQL {
         select(sqls.count).from(AlbumSrc as albums).where.eq(albums.srcNeid, srcNeid)
     }.map(_.long(1)).single().future().map(_.get)
 

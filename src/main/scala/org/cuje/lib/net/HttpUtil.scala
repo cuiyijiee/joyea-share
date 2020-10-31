@@ -10,7 +10,7 @@ import scala.concurrent.{Future, Promise}
 object HttpUtil {
 
   val okhttpClient: OkHttpClient = new OkHttpClient.Builder()
-    .proxy(new Proxy(Proxy.Type.HTTP,new InetSocketAddress("10.80.1.18", 7890)))
+//    .proxy(new Proxy(Proxy.Type.HTTP,new InetSocketAddress("10.80.1.18", 7890)))
     .build()
 
   val JSON: MediaType = MediaType.parse("application/json; charset=utf-8")

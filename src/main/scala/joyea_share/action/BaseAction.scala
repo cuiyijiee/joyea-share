@@ -22,10 +22,10 @@ abstract class BaseAction[T: Manifest] extends Action with SkipCsrfCheck with Lo
       safeExecute(req = request)
     } catch {
       case e: UserNotAuthException =>
-        cyjResponseError(ErrorCode.userSessionInvalid)
+        baseResponseError(ErrorCode.userSessionInvalid)
       case e: Throwable =>
         e.printStackTrace()
-        cyjResponseError(ErrorCode.unknownError)
+        baseResponseError(ErrorCode.unknownError)
     }
   }
 
@@ -53,17 +53,17 @@ abstract class BaseAction[T: Manifest] extends Action with SkipCsrfCheck with Lo
         result(value)
       case Failure(exception) =>
         log.error("query database error:",exception)
-        cyjResponseError(ErrorCode.dbExecuteError)
+        baseResponseError(ErrorCode.dbExecuteError)
     }
   }
 
 
-  def cyjResponseSuccess(data: Any): Unit = {
+  def baseResponseSuccess(data: Any): Unit = {
     log.error("response success: " + data)
     respondJsonText(Serialization.write(BaseResp(2000, data)))
   }
 
-  def cyjResponseError(code: Int): Unit = {
+  def baseResponseError(code: Int): Unit = {
     log.error("response error: " + code)
     respondJsonText(Serialization.write(BaseResp(code, null)))
   }

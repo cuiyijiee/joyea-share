@@ -11,7 +11,7 @@ class CreateUploadAction extends BaseAction[CreateUploadReq] {
       srcNeid = req.srcNeid, srcDesc = req.srcDesc,
       srcType = req.srcType, srcRev = req.srcRev, srcHash = req.srcHash, tags = req.tags,isPcUpload = false)
       .onComplete(safeResponse[UploadRecord](_, resp => {
-        cyjResponseSuccess("ok")
+        baseResponseSuccess("ok")
       }))
   }
 }

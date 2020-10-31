@@ -8,5 +8,6 @@ object ErrorCode {
 
   val dbExecuteError:Int = 4002
 
+  val albumHasExist:Int = 4101
 
 }

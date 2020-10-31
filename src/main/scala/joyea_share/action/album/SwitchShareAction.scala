@@ -19,7 +19,7 @@ class SwitchShareAction extends BaseAction[SwitchShareReq] {
       shichangTagId = req.shichangTagId,
     )
       .onComplete(safeResponse[Boolean](_, result => {
-        cyjResponseSuccess(result)
+        baseResponseSuccess(result)
       }))
   }
 }

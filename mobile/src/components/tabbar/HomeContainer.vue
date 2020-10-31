@@ -312,7 +312,6 @@ export default {
     },
     handleGetTopSearchKey() {
       getTopSearchKey().then(resp => {
-        console.log("receive top search key: " + JSON.stringify(resp));
         this.topSearchKey = resp['data'];
       })
     },

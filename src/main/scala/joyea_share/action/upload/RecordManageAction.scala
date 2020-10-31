@@ -29,24 +29,24 @@ class RecordManageAction extends BaseAction[UploadRecordManageReq] {
                             RedisService.recordUpload(record.uploader)
                           }
 
-                          cyjResponseSuccess(result && renameResult)
+                          baseResponseSuccess(result && renameResult)
                         }))
                     }))
                 }
 
                 override def onError(error: String): Unit = {
-                  cyjResponseError(ErrorCode.unknownError)
+                  baseResponseError(ErrorCode.unknownError)
                 }
               })
           } else {
             UploadRecord.checkRecord(recordId = record.id, allow = req.allow, refuseReason = req.refuseReason,
               uploadPath = req.uploadPath, uploadPathNeid = req.uploadPathNeid, srcName = req.srcName)
               .onComplete(safeResponse[Boolean](_, result => {
-                cyjResponseSuccess(result)
+                baseResponseSuccess(result)
               }))
           }
         } else {
-          cyjResponseError(ErrorCode.unknownError)
+          baseResponseError(ErrorCode.unknownError)
         }
       }))
   }

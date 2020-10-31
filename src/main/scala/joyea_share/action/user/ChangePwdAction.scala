@@ -11,13 +11,13 @@ class ChangePwdAction extends BaseAction[ChangePwdReq] {
       if (maybeUser.isDefined) {
         if (maybeUser.get.password.equals(req.curPwd)) {
           JoyeaUser.changePwd(maybeUser.get.id, req.newPwd).onComplete(safeResponse[Boolean](_, result => {
-            cyjResponseSuccess(result)
+            baseResponseSuccess(result)
           }))
         } else {
-          cyjResponseSuccess(false)
+          baseResponseSuccess(false)
         }
       } else {
-        cyjResponseSuccess(false)
+        baseResponseSuccess(false)
       }
     }))
   }

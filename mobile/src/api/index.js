@@ -128,3 +128,12 @@ export function changePwd(curPwd, newPwd) {
         return res.data;
     })
 }
+
+export function createAlbum(name,fileList){
+    return service.post('/api/v1/album/collect/save',{
+        name:name,
+        src:fileList
+    }).then(resp => {
+        return resp.data;
+    })
+}
