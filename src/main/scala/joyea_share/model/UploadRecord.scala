@@ -167,6 +167,7 @@ object UploadRecord extends SQLSyntaxSupport[UploadRecord] with ShortenedNames {
               .and.isNull(ur.refuseReason)
               .and.eq(ur.finished, true)
               .and.append(sqls"""to_days(now()) - to_days(${ur.checkedAt}) = 1""")
+              .orderBy(ur.checkedAt).desc  //以审核时间倒叙展示
         }.one(UploadRecord(ur))
           .toOne(JoyeaUser.opt(ju))
           .map((uploadRecord, joyeaUserOpt) => uploadRecord.copy(uploaderName = joyeaUserOpt.map(_.joyeaName).getOrElse("")))

@@ -16,13 +16,13 @@ class RecordManageAction extends BaseAction[UploadRecordManageReq] {
         if (recordOpt.isDefined) {
           val record = recordOpt.get
           if (req.allow) {
-            LenovoUtil.moveFile(toMoveFileNeid = record.srcNeid.get, toDirPath = req.uploadPathNeid.get, session = DownloadManager.getAdminToken(),
+            LenovoUtil.moveFile(toMoveFileNeid = record.srcNeid.get, toDirPath = req.uploadPathNeid.get, session = DownloadManager.getAdminToken,
               listener = new CommonListener[Boolean] {
                 override def onSuccess(obj: Boolean): Unit = {
                   UploadRecord.checkRecord(recordId = record.id, req.allow,
                     uploadPath = req.uploadPath, uploadPathNeid = req.uploadPathNeid, srcName = req.srcName)
                     .onComplete(safeResponse[Boolean](_, result => {
-                      LenovoUtil.renameFile(record.srcNeid.get, req.srcName.get, DownloadManager.getAdminToken())
+                      LenovoUtil.renameFile(record.srcNeid.get, req.srcName.get, DownloadManager.getAdminToken)
                         .onComplete(safeResponse[Boolean](_, renameResult => {
 
                           if (req.needCount) {

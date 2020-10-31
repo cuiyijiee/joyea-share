@@ -10,4 +10,5 @@ object ErrorCode {
 
   val albumHasExist:Int = 4101
 
+  val toDownloadListIsEmpty:Int = 4201
 }

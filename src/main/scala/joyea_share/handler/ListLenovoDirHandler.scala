@@ -18,7 +18,7 @@ class ListLenovoDirHandler extends IAction {
     override def execute(request: JsonObject, listener: ExecListener): Unit = {
         val path = request.getString("path", "/")
         val pathType = request.getString("path_type", "ent")
-        LenovoUtil.listDir(DownloadManager.getAdminToken(), path, pathType, new CommonListener[JsonObject] {
+        LenovoUtil.listDir(DownloadManager.getAdminToken, path, pathType, new CommonListener[JsonObject] {
             override def onSuccess(obj: JsonObject): Unit = {
                 val contentOpt = obj.get("content")
                 val neidList = new util.ArrayList[Long]()
@@ -59,7 +59,7 @@ class ListLenovoDirHandler extends IAction {
                         content.add("ref_num", refNum)
                     })
 
-                    LenovoUtil.getExtraMeta(DownloadManager.getAdminToken(), neidList, new CommonListener[JsonObject] {
+                    LenovoUtil.getExtraMeta(DownloadManager.getAdminToken, neidList, new CommonListener[JsonObject] {
                         override def onSuccess(metaJson: JsonObject): Unit = {
                             contentJsonArr.forEach(contentValue => {
                                 val content = contentValue.asObject()

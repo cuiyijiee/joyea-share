@@ -10,7 +10,7 @@ import xitrum.annotation.POST
 class CheckAction extends BaseAction[EmptyReq] {
   override def safeExecute(req: EmptyReq): Unit = {
     if (sessiono("user_id").isDefined) {
-      baseResponseSuccess(DownloadManager.getAdminToken())
+      baseResponseSuccess(DownloadManager.getAdminToken)
     } else {
       baseResponseError(ErrorCode.userSessionInvalid)
     }

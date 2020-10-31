@@ -42,13 +42,13 @@ object UploadManager extends Log {
               ftpUtil.downloadFile("/upload/" + toUploadFile.getName, toUploadFile.getAbsolutePath, true, false, maxWaitSeconds)
               ftpUtil.logout()
 
-              LenovoUtil.preUpload(DownloadManager.getAdminToken(), toUploadFile).onComplete {
+              LenovoUtil.preUpload(DownloadManager.getAdminToken, toUploadFile).onComplete {
                 case Failure(exception) =>
                   log.error("pre upload file exist exception: ", exception)
                 case Success(value) =>
                   val json = JsonObject.readFrom(value)
                   val region = json.getString("region", "")
-                  LenovoUtil.uploadFile(DownloadManager.getAdminToken(), region, toUploadFile).onComplete {
+                  LenovoUtil.uploadFile(DownloadManager.getAdminToken, region, toUploadFile).onComplete {
                     case Failure(exception) =>
                       log.error("real upload file exist exception: ", exception)
                     case Success(value) =>

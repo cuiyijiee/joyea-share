@@ -24,7 +24,7 @@ class LoginAction extends BaseAction[LoginReq] {
             session("user_id") = value.get.joyeaId
             baseResponseSuccess(LoginResp(
               userName = value.get.joyeaName,
-              session = DownloadManager.getAdminToken(),
+              session = DownloadManager.getAdminToken,
               isAdmin = value.get.isAdmin
             ))
           } else {

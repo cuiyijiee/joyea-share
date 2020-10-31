@@ -10,7 +10,7 @@
             </el-input>
             <div style="padding:15px 0;color: #ffffff">热门搜索:
                 <span style="padding: 5px" v-for="key in topSearchKey"
-                      @click="handleClickTopSearchKey(key)"><u>{{key}}</u></span>
+                      @click="handleClickTopSearchKey(key)"><u>{{ key }}</u></span>
             </div>
         </div>
         <div v-if="dir.currentPath.length === 1 && dir.currentPath[0] === '营销素材展示' && toCreateAlbum.list.length === 0"
@@ -39,11 +39,11 @@
                               v-if="item !== '营销素材展示'">
                                     /
                                     <span style=" color:#000000;font-size: 15px;cursor:pointer;"
-                                          @click="handleClickDirPath(item,index)">{{item}}</span>
+                                          @click="handleClickDirPath(item,index)">{{ item }}</span>
                                 </span>
                     </el-col>
                     <el-col :span="3" :offset="3">
-                        共{{dir.tableData.length}}个资源
+                        共{{ dir.tableData.length }}个资源
                     </el-col>
                 </el-row>
                 <el-table ref="fileTable"
@@ -54,8 +54,8 @@
                           @row-click="handleClickDirItem"
                           style="width: 100%;">
                     <el-table-column
-                            show-overflow-tooltip
-                            label="文件名">
+                        show-overflow-tooltip
+                        label="文件名">
                         <template slot-scope="scope">
                             <div style="">
                                 <i v-if="scope.row.is_dir" class="el-icon-folder-opened"></i>
@@ -68,10 +68,13 @@
                                      :src="genPreviewUrl(scope.row.neid,scope.row.hash,scope.row.rev,scope.row.mime_type)">
                                 <i v-else-if="scope.row.mime_type.startsWith('doc')" class="el-icon-tickets"></i>
                                 <i v-else class="el-icon-question"></i>
-                                <span style="vertical-align:top;color: #333333"> {{' ' + scope.row.path.substr(scope.row.path.lastIndexOf('/')+1)}}</span>
+                                <span
+                                    style="vertical-align:top;color: #333333"> {{
+                                        ' ' + scope.row.path.substr(scope.row.path.lastIndexOf('/') + 1)
+                                    }}</span>
                                 <div v-if="scope.row.tags">
                                     <el-tag style="margin-right: 2px" v-for="tag in scope.row.tags" type="info"
-                                            size="mini">{{tag.replace(markReg,"")}}
+                                            size="mini">{{ tag.replace(markReg, "") }}
                                     </el-tag>
                                 </div>
                             </div>
@@ -79,17 +82,17 @@
                     </el-table-column>
                     <el-table-column label="引用次数" width="100">
                         <template slot-scope="scope">
-                            <span>{{scope.row.is_dir ? '-' :scope.row.ref_num}}</span>
+                            <span>{{ scope.row.is_dir ? '-' : scope.row.ref_num }}</span>
                         </template>
                     </el-table-column>
                     <el-table-column label="下载次数" width="100">
                         <template slot-scope="scope">
-                            <span>{{scope.row.is_dir ? '-' :scope.row.download_num}}</span>
+                            <span>{{ scope.row.is_dir ? '-' : scope.row.download_num }}</span>
                         </template>
                     </el-table-column>
                     <el-table-column
-                            label="操作"
-                            width="180">
+                        label="操作"
+                        width="180">
                         <template slot-scope="scope">
                             <span v-if="scope.row.is_dir">-</span>
                             <span v-else>
@@ -104,7 +107,7 @@
             <el-col :span="6" class="bg-purple">
                 <div class="content_div">
                     <div style="width: 100%" class="center_vertical">
-                        <h1>清单编辑列表（{{toCreateAlbum.list.length}}）</h1>
+                        <h1>清单编辑列表（{{ toCreateAlbum.list.length }}）</h1>
                     </div>
                     <el-table stripe empty-text="清单内还没有内容"
                               row-key="neid" ref="table" id="toSortTable"
@@ -177,8 +180,8 @@
         <el-dialog :title="'【' + selectListName +'】清单详情'" :visible.sync="visible.listDetailDialogVisible">
             <el-table :data="listDetail" @selection-change="handleSelectListItem" v-loading="loading.listDetailLoading">
                 <el-table-column
-                        type="selection"
-                        width="55">
+                    type="selection"
+                    width="55">
                 </el-table-column>
                 <el-table-column label="预览">
                     <template slot-scope="scope">
@@ -234,11 +237,11 @@
                                 <i v-else-if="scope.row.mime_type.startsWith('doc')"
                                    class="el-icon-tickets"></i>
                                 <i v-else class="el-icon-question"></i>
-                                {{scope.row.path.substr(scope.row.path.lastIndexOf("/")+1)}}</h4>
+                                {{ scope.row.path.substr(scope.row.path.lastIndexOf("/") + 1) }}</h4>
                             <!--                                    {{scope.row.path}}-->
                             <div v-if="scope.row.tags">
                                 <el-tag style="margin-right: 2px" v-for="tag in scope.row.tags" type="info"
-                                        size="mini">{{tag.replace(markReg,"")}}
+                                        size="mini">{{ tag.replace(markReg, "") }}
                                 </el-tag>
                             </div>
                         </div>
@@ -246,12 +249,12 @@
                 </el-table-column>
                 <el-table-column label="引用次数" width="100">
                     <template slot-scope="scope">
-                        <span>{{scope.row.is_dir ? '-' :scope.row.ref_num}}</span>
+                        <span>{{ scope.row.is_dir ? '-' : scope.row.ref_num }}</span>
                     </template>
                 </el-table-column>
                 <el-table-column label="下载次数" width="100">
                     <template slot-scope="scope">
-                        <span>{{scope.row.is_dir ? '-' :scope.row.download_num}}</span>
+                        <span>{{ scope.row.is_dir ? '-' : scope.row.download_num }}</span>
                     </template>
                 </el-table-column>
                 <el-table-column label="操作" width="180">
@@ -278,292 +281,251 @@
 </template>
 
 <script>
-    import api, {getTopSearchKey} from "../../../api";
-    import genSrcPreviewSrc from "../../../utils"
-    import Sortable from 'sortablejs';
-    import videojs from 'video.js'
-    import {getDocumentImage} from "../../../utils/JoyeaUtil";
-    import {mapGetters} from "vuex";
-    import {joyeaMenuPath} from "../../../utils/JoyeaUtil";
+import api, {getTopSearchKey, prepareDownloadFile, queryDownload} from "../../../api";
+import genSrcPreviewSrc from "../../../utils"
+import Sortable from 'sortablejs';
+import videojs from 'video.js'
+import {getDocumentImage} from "../../../utils/JoyeaUtil";
+import {mapGetters} from "vuex";
+import {joyeaMenuPath} from "../../../utils/JoyeaUtil";
 
-    export default {
-        name: "index",
-        components: {},
-        data() {
-            return {
-                dir: {
-                    currentPath: [],
-                    tableData: [],
-                    loadingDir: false
-                },
-                markReg: /<mark>|<\/mark>/g,
-                searchTabName: "dir", // dir ,pan ,list
-                search: {
-                    type: '',
-                    key: '',
-                    hasNext: false
-                },
-                loading: {
-                    search: false,
-                    searchMore: false,
-                    searchList: false,
-                    saveList: false,
-                    fullscreenLoading: false,
-                    listDetailLoading: false,
-                },
-                menuPath: joyeaMenuPath,
-                searchResult: [],
-                searchListResult: [],
-                selectListId: 0,
-                selectListName: 0,
-                selectListItem: [],
-                listDetail: [],
-                topSearchKey: [],
-                toCreateAlbum: {
-                    idEditMode: false, //是否是编辑模式
-                    editListId: -1,
-                    name: '',       //清单名称
-                    list: [],       //资源列表
-                    modifyRow: '',
-                    toAddRow: {},
-                    previewUrl: '',
-                    descSelectDialogVisible: false,
-                    toSelectDesc: []
-                },
-                loadMoreForm: {
-                    key: '',
-                    nextOffset: 0
-                },
-                visible: {
-                    listDetailDialogVisible: false,
-                    videoDialogVisible: false,
-                    imageDialogVisible: false,
-                    searchDialogVisible: false
-                },
-                defaultImg: 'this.src="' + require('@assets/error.png') + '"', //默认图地址
-                player: null,
-                toPlayVideo: {
-                    title: '',
-                    url: ''
-                },
-                toPlayImage: {
-                    title: '',
-                    url: ''
-                }
+export default {
+    name: "index",
+    components: {},
+    data() {
+        return {
+            dir: {
+                currentPath: [],
+                tableData: [],
+                loadingDir: false
+            },
+            markReg: /<mark>|<\/mark>/g,
+            searchTabName: "dir", // dir ,pan ,list
+            search: {
+                type: '',
+                key: '',
+                hasNext: false
+            },
+            loading: {
+                search: false,
+                searchMore: false,
+                searchList: false,
+                saveList: false,
+                fullscreenLoading: false,
+                listDetailLoading: false,
+            },
+            menuPath: joyeaMenuPath,
+            searchResult: [],
+            searchListResult: [],
+            selectListId: 0,
+            selectListName: 0,
+            selectListItem: [],
+            listDetail: [],
+            topSearchKey: [],
+            toCreateAlbum: {
+                idEditMode: false, //是否是编辑模式
+                editListId: -1,
+                name: '',       //清单名称
+                list: [],       //资源列表
+                modifyRow: '',
+                toAddRow: {},
+                previewUrl: '',
+                descSelectDialogVisible: false,
+                toSelectDesc: []
+            },
+            loadMoreForm: {
+                key: '',
+                nextOffset: 0
+            },
+            visible: {
+                listDetailDialogVisible: false,
+                videoDialogVisible: false,
+                imageDialogVisible: false,
+                searchDialogVisible: false
+            },
+            defaultImg: 'this.src="' + require('@assets/error.png') + '"', //默认图地址
+            player: null,
+            toPlayVideo: {
+                title: '',
+                url: ''
+            },
+            toPlayImage: {
+                title: '',
+                url: ''
+            }
+        }
+    },
+    computed: {
+        ...mapGetters({
+            'userInfo': 'userInfo/userInfo'
+        })
+    },
+    methods: {
+        handleClickRootMenu(menu) {
+            this.handleListLenovoDir("/营销素材展示/" + menu.path, "ent")
+        },
+        handleClickTopSearchKey(key) {
+            this.handleSearch(key);
+        },
+        handleGetDocumentImage(mimeType) {
+            return getDocumentImage(mimeType)
+        },
+        handlePlayVideo(url, title) {
+            this.visible.videoDialogVisible = true;
+            this.toPlayVideo.url = url;
+            this.toPlayVideo.title = title;
+        },
+        handlePlayImage(url, title) {
+            this.visible.imageDialogVisible = true;
+            this.toPlayImage.url = url;
+            this.toPlayImage.title = title;
+        },
+        playVideo() {
+            let _this = this;
+            if (this.player == null) {
+                videojs(document.getElementById('myVideo'), {
+                    controls: true, // 是否显示控制条
+                    preload: 'auto',
+                    autoplay: false,
+                    fluid: true, // 自适应宽高
+                    language: 'zh-CN', // 设置语言
+                    muted: false, // 是否静音
+                    inactivityTimeout: false,
+                    controlBar: { // 设置控制条组件
+                        children: [
+                            {name: 'playToggle'}, // 播放按钮
+                            {name: 'currentTimeDisplay'}, // 当前已播放时间
+                            {name: 'progressControl'}, // 播放进度条
+                            {name: 'durationDisplay'}, // 总时间
+                            {
+                                name: 'volumePanel', // 音量控制
+                                inline: false, // 不使用水平方式
+                            },
+                            {name: 'FullscreenToggle'} // 全屏
+                        ]
+                    },
+                    sources: [ // 视频源
+                        {
+                            src: _this.toPlayVideo.url,
+                            type: 'video/mp4',
+                        }
+                    ]
+                }, function () {
+                    _this.player = this;
+                });
+            } else {
+                const data = {
+                    src: _this.toPlayVideo.url,
+                    type: 'video/mp4'
+                };
+                this.player.pause();
+                this.player.src(data);
+                this.player.load(data);
+                this.player.play();
             }
         },
-        computed: {
-            ...mapGetters({
-                'userInfo': 'userInfo/userInfo'
-            })
+        handleCloseVideo() {
+            if (this.player != null) {
+                this.player.pause();
+            }
         },
-        methods: {
-            handleClickRootMenu(menu) {
-                this.handleListLenovoDir("/营销素材展示/" + menu.path, "ent")
-            },
-            handleClickTopSearchKey(key) {
-                this.handleSearch(key);
-            },
-            handleGetDocumentImage(mimeType) {
-                return getDocumentImage(mimeType)
-            },
-            handlePlayVideo(url, title) {
-                this.visible.videoDialogVisible = true;
-                this.toPlayVideo.url = url;
-                this.toPlayVideo.title = title;
-            },
-            handlePlayImage(url, title) {
-                this.visible.imageDialogVisible = true;
-                this.toPlayImage.url = url;
-                this.toPlayImage.title = title;
-            },
-            playVideo() {
-                let _this = this;
-                if (this.player == null) {
-                    videojs(document.getElementById('myVideo'), {
-                        controls: true, // 是否显示控制条
-                        preload: 'auto',
-                        autoplay: false,
-                        fluid: true, // 自适应宽高
-                        language: 'zh-CN', // 设置语言
-                        muted: false, // 是否静音
-                        inactivityTimeout: false,
-                        controlBar: { // 设置控制条组件
-                            children: [
-                                {name: 'playToggle'}, // 播放按钮
-                                {name: 'currentTimeDisplay'}, // 当前已播放时间
-                                {name: 'progressControl'}, // 播放进度条
-                                {name: 'durationDisplay'}, // 总时间
-                                {
-                                    name: 'volumePanel', // 音量控制
-                                    inline: false, // 不使用水平方式
-                                },
-                                {name: 'FullscreenToggle'} // 全屏
-                            ]
-                        },
-                        sources: [ // 视频源
-                            {
-                                src: _this.toPlayVideo.url,
-                                type: 'video/mp4',
-                            }
-                        ]
-                    }, function () {
-                        _this.player = this;
+        handleCloseImage() {
+            this.toPlayImage.url = "";
+        },
+        handleSelectListItem(val) {
+            this.selectListItem = val;
+        },
+        handleAddListDetailToBuild() {
+            this.selectListItem.forEach(item => {
+                this.toCreateAlbum.list.push({
+                    joyeaDesc: item.desc,
+                    path: item.path,
+                    neid: item.neid,
+                    hash: item.hash,
+                    rev: item.rev,
+                    mime_type: item.mime_type,
+                    filename: item.path.substr(item.path.lastIndexOf("/") + 1),
+                    bytes: item.bytes,
+                    isModify: false
+                })
+            });
+            api({
+                action: "referList",
+                albumId: this.selectListId
+            }).then(response => {
+                if (response.result) {
+
+                } else {
+                    console.log("引用计数失败：" + response.msg)
+                }
+            });
+            this.visible.listDetailDialogVisible = false;
+        },
+        handleSeeListDetail(row) {
+            this.visible.listDetailDialogVisible = true;
+            this.loading.listDetailLoading = true;
+            this.listDetail = [];
+            this.selectListItem = [];
+            this.selectListId = row.album_id;
+            this.selectListName = row.album_name;
+            api({
+                action: "listDetail",
+                albumId: row.album_id,
+            }).then(response => {
+                if (response.result) {
+                    response.list.forEach(item => {
+                        this.listDetail.push(item)
                     });
                 } else {
-                    const data = {
-                        src: _this.toPlayVideo.url,
-                        type: 'video/mp4'
-                    };
-                    this.player.pause();
-                    this.player.src(data);
-                    this.player.load(data);
-                    this.player.play();
+                    _this.$notify.error({
+                        title: '查看出错',
+                        message: '查看过程出现错误：' + response.msg
+                    });
+                    console.log(response.msg)
                 }
-            },
-            handleCloseVideo() {
-                if (this.player != null) {
-                    this.player.pause();
-                }
-            },
-            handleCloseImage() {
-                this.toPlayImage.url = "";
-            },
-            handleSelectListItem(val) {
-                this.selectListItem = val;
-            },
-            handleAddListDetailToBuild() {
-                this.selectListItem.forEach(item => {
-                    this.toCreateAlbum.list.push({
-                        joyeaDesc: item.desc,
-                        path: item.path,
-                        neid: item.neid,
-                        hash: item.hash,
-                        rev: item.rev,
-                        mime_type: item.mime_type,
-                        filename: item.path.substr(item.path.lastIndexOf("/") + 1),
-                        bytes: item.bytes,
-                        isModify: false
-                    })
-                });
-                api({
-                    action: "referList",
-                    albumId: this.selectListId
-                }).then(response => {
-                    if (response.result) {
+                this.loading.listDetailLoading = false;
+            })
+        },
+        handleSearch(searchKey) {
+            let _this = this;
+            if (searchKey !== undefined && typeof (searchKey) == 'string') {
+                _this.search.key = searchKey;
+            }
+            if (_this.search.key.trim().length === 0) {
+                _this.$message.warning("请输入搜索的关键字！")
+            } else {
+                if (_this.searchTabName === 'list') {
+                    _this.loading.searchList = true;
+                    api({
+                        action: "searchList",
+                        searchKey: _searchKey
+                    }).then(response => {
+                        _this.loading.searchList = false;
+                        if (response.result) {
+                            _this.searchListResult = [];
+                            if (response.list.length === 0) {
+                                _this.$message.error("没有搜索到与【" + _this.search.key + "】有关的清单！")
+                            } else {
+                                response.list.forEach(list => {
+                                    _this.searchListResult.push(list)
+                                })
+                            }
 
-                    } else {
-                        console.log("引用计数失败：" + response.msg)
-                    }
-                });
-                this.visible.listDetailDialogVisible = false;
-            },
-            handleSeeListDetail(row) {
-                this.visible.listDetailDialogVisible = true;
-                this.loading.listDetailLoading = true;
-                this.listDetail = [];
-                this.selectListItem = [];
-                this.selectListId = row.album_id;
-                this.selectListName = row.album_name;
-                api({
-                    action: "listDetail",
-                    albumId: row.album_id,
-                }).then(response => {
-                    if (response.result) {
-                        response.list.forEach(item => {
-                            this.listDetail.push(item)
-                        });
-                    } else {
-                        _this.$notify.error({
-                            title: '查看出错',
-                            message: '查看过程出现错误：' + response.msg
-                        });
-                        console.log(response.msg)
-                    }
-                    this.loading.listDetailLoading = false;
-                })
-            },
-            handleSearch(searchKey) {
-                let _this = this;
-                if (searchKey !== undefined && typeof (searchKey) == 'string') {
-                    _this.search.key = searchKey;
-                }
-                if (_this.search.key.trim().length === 0) {
-                    _this.$message.warning("请输入搜索的关键字！")
+                        } else {
+                            _this.$notify.error({
+                                title: '搜索出错',
+                                message: '搜索过程出现错误：' + response.msg
+                            });
+                            console.log(response.msg)
+                        }
+                    });
+                    _this.searchTabName = "list";
                 } else {
-                    if (_this.searchTabName === 'list') {
-                        _this.loading.searchList = true;
-                        api({
-                            action: "searchList",
-                            searchKey: _searchKey
-                        }).then(response => {
-                            _this.loading.searchList = false;
-                            if (response.result) {
-                                _this.searchListResult = [];
-                                if (response.list.length === 0) {
-                                    _this.$message.error("没有搜索到与【" + _this.search.key + "】有关的清单！")
-                                } else {
-                                    response.list.forEach(list => {
-                                        _this.searchListResult.push(list)
-                                    })
-                                }
-
-                            } else {
-                                _this.$notify.error({
-                                    title: '搜索出错',
-                                    message: '搜索过程出现错误：' + response.msg
-                                });
-                                console.log(response.msg)
-                            }
-                        });
-                        _this.searchTabName = "list";
-                    } else {
-                        _this.loading.search = true;
-                        api({
-                            action: 'search',
-                            searchKey: _this.search.key,
-                            offset: 0
-                        }).then(response => {
-                            if (response.result) {
-                                _this.search.hasNext = response["has_more"];
-                                if (_this.search.hasNext) {
-                                    _this.loadMoreForm.key = _this.search.key;
-                                    _this.loadMoreForm.nextOffset = response["next_offset"];
-                                }
-                                _this.searchResult = [];
-                                if (response.content.length === 0) {
-                                    _this.$message.error("没有搜索到与【" + _this.search.key + "】有关的文件或文件夹！")
-                                } else {
-                                    _this.visible.searchDialogVisible = true;
-                                    response.content.forEach(item => {
-                                        item.joyeaDesc = "";
-                                        item.isModify = false;
-                                        _this.searchResult.push(item)
-                                    })
-                                }
-                            } else {
-                                _this.$notify.error({
-                                    title: '搜索出错',
-                                    message: '搜索过程出现错误：' + response.msg
-                                });
-                                console.log(response.msg)
-                            }
-                        }).finally(() => {
-                            _this.loading.search = false
-                        });
-                        _this.searchTabName = "pan";
-                    }
-                }
-            },
-            handleLoadMore() {
-                let _this = this;
-                if (_this.loadMoreForm.key.trim().length !== 0) {
-                    _this.loading.searchMore = true;
+                    _this.loading.search = true;
                     api({
                         action: 'search',
-                        searchKey: _this.loadMoreForm.key,
-                        searchType: _this.loadMoreForm.type,
-                        offset: _this.loadMoreForm.nextOffset
+                        searchKey: _this.search.key,
+                        offset: 0
                     }).then(response => {
                         if (response.result) {
                             _this.search.hasNext = response["has_more"];
@@ -571,12 +533,17 @@
                                 _this.loadMoreForm.key = _this.search.key;
                                 _this.loadMoreForm.nextOffset = response["next_offset"];
                             }
-                            //_this.searchResult = [];
-                            response.content.forEach(item => {
-                                item.joyeaDesc = "";
-                                item.isModify = false;
-                                _this.searchResult.push(item)
-                            })
+                            _this.searchResult = [];
+                            if (response.content.length === 0) {
+                                _this.$message.error("没有搜索到与【" + _this.search.key + "】有关的文件或文件夹！")
+                            } else {
+                                _this.visible.searchDialogVisible = true;
+                                response.content.forEach(item => {
+                                    item.joyeaDesc = "";
+                                    item.isModify = false;
+                                    _this.searchResult.push(item)
+                                })
+                            }
                         } else {
                             _this.$notify.error({
                                 title: '搜索出错',
@@ -585,428 +552,458 @@
                             console.log(response.msg)
                         }
                     }).finally(() => {
-                        _this.loading.searchMore = false
-                    })
-                }
-            },
-            handleAdd(index, row) {
-                let isIn = false;
-                this.toCreateAlbum.list.forEach(item => {
-                    if (item.neid === row.neid) {
-                        isIn = true;
-                    }
-                });
-                if (isIn) {
-                    this.$confirm('编辑列表中已经存在该记录，是否继续添加?', '提示', {
-                        confirmButtonText: '继续添加',
-                        cancelButtonText: '取消添加',
-                        type: 'warning'
-                    }).then(() => {
-                        this.toCreateAlbum.list.push(row);
-                    }).catch(() => {
-                        this.$message({
-                            type: 'info',
-                            message: '取消添加'
-                        });
+                        _this.loading.search = false
                     });
-                } else {
-                    this.toCreateAlbum.list.push(row);
+                    _this.searchTabName = "pan";
                 }
-            },
-            handleSelectDesc(row, column, event) {
-                this.toCreateAlbum.toAddRow.joyeaDesc = row.desc;
-                this.toCreateAlbum.list.push(this.toCreateAlbum.toAddRow);
-                this.toCreateAlbum.toAddRow = {};
-                this.toCreateAlbum.toSelectDesc = [];
-                this.toCreateAlbum.descSelectDialogVisible = false;
-            },
-            handleCustomDesc() {
-                this.toCreateAlbum.toAddRow.joyeaDesc = "";
-                this.toCreateAlbum.list.push(this.toCreateAlbum.toAddRow);
-                this.toCreateAlbum.toAddRow = {};
-                this.toCreateAlbum.toSelectDesc = [];
-                //this.$set(this.toCreateAlbum,"descSelectDialogVisible",false);
-                this.toCreateAlbum.descSelectDialogVisible = false;
-            },
-            handleCollect(index, row) {
+            }
+        },
+        handleLoadMore() {
+            let _this = this;
+            if (_this.loadMoreForm.key.trim().length !== 0) {
+                _this.loading.searchMore = true;
                 api({
-                    action: "srcCollect",
-                    method: row.collect ? 'unCollect' : 'collect',
-                    neid: row.neid,
-                    path: row.path,
-                    type: row.mime_type,
-                    hash: row.hash,
-                    rev: row.rev,
-                    size: row.size
+                    action: 'search',
+                    searchKey: _this.loadMoreForm.key,
+                    searchType: _this.loadMoreForm.type,
+                    offset: _this.loadMoreForm.nextOffset
                 }).then(response => {
                     if (response.result) {
-                        row.collect = !row.collect;
-                        this.$notify.success({
-                            type: "success",
-                            title: "提示",
-                            message: row.collect ? "收藏成功:" + row.path.substr(row.path.lastIndexOf('/') + 1) : "取消收藏成功:" + row.path.substr(row.path.lastIndexOf('/') + 1)
+                        _this.search.hasNext = response["has_more"];
+                        if (_this.search.hasNext) {
+                            _this.loadMoreForm.key = _this.search.key;
+                            _this.loadMoreForm.nextOffset = response["next_offset"];
+                        }
+                        //_this.searchResult = [];
+                        response.content.forEach(item => {
+                            item.joyeaDesc = "";
+                            item.isModify = false;
+                            _this.searchResult.push(item)
                         })
                     } else {
+                        _this.$notify.error({
+                            title: '搜索出错',
+                            message: '搜索过程出现错误：' + response.msg
+                        });
                         console.log(response.msg)
                     }
+                }).finally(() => {
+                    _this.loading.searchMore = false
                 })
-            },
-            handleModify(index, row, cg) {
-                //点击修改 判断是否已经保存所有操作
-                for (let i of this.toCreateAlbum.list) {
-                    if (i.isModify && i.path !== row.path) {
-                        this.$message.warning("请先保存当前编辑项");
-                        return false;
-                    }
+            }
+        },
+        handleAdd(index, row) {
+            let isIn = false;
+            this.toCreateAlbum.list.forEach(item => {
+                if (item.neid === row.neid) {
+                    isIn = true;
                 }
-                //是否是取消操作
-                if (!cg) {
-                    if (!this.toCreateAlbum.modifyRow.path) {
-                    }
-                    return row.isModify = !row.isModify;
-                }
-                //提交数据
-                if (row.isModify) {
-                    this.toCreateAlbum.list[index].joyeaDesc = this.toCreateAlbum.modifyRow.joyeaDesc;
-                    row.isModify = false;
-                } else {
-                    this.toCreateAlbum.modifyRow = JSON.parse(JSON.stringify(row));
-                    row.isModify = true;
-                }
-                return false;
-            },
-            handleDelete(index, row) {
-                this.toCreateAlbum.list.splice(index, 1);
-            },
-            genPreviewUrl(neid, hash, rev, mime_type) {
-                let previewType = 'pic';    // if video is av
-                if (mime_type.startsWith("doc")) {
-                    previewType = 'doc'
-                } else if (mime_type.startsWith("video")) {
-                    previewType = 'av'
-                }
-                return genSrcPreviewSrc(neid, hash, rev, previewType, this.userInfo.session);
-            },
-            handleSaveList() {
-                this.$prompt(this.toCreateAlbum.idEditMode ? '当前是编辑模式，重命名清单名称！' : '请输入要保存的清单的名称',
-                    this.toCreateAlbum.idEditMode ? '编辑提示' : '保存提示',
-                    {
-                        confirmButtonText: this.toCreateAlbum.idEditMode ? '重新保存' : '保存清单',
-                        cancelButtonText: '取消',
-                        inputValue: this.toCreateAlbum.name
-                    }
-                ).then(action => {
-                    let listName = action.value;
-                    this.loading.saveList = true;
-                    api({
-                        action: 'album',
-                        method: this.toCreateAlbum.idEditMode ? 'reSave' : 'save',
-                        id: this.toCreateAlbum.editListId,
-                        name: listName,
-                        src: this.toCreateAlbum.list
-                    }).then(response => {
-                        if (response.result) {
-                            this.$notify.success({
-                                title: this.toCreateAlbum.idEditMode ? "编辑结果" : "保存结果",
-                                message: this.toCreateAlbum.idEditMode ? "重新保存成功" : '保存成功'
-                            })
-                        } else {
-                            console.log(response.msg);
-                            this.$notify.error({
-                                title: "保存结果",
-                                message: this.toCreateAlbum.idEditMode ? "重新保存失败" : '保存失败'
-                            })
-                        }
-                        this.loading.saveList = false;
-                        this.$router.push("/manage/list");
-                    });
+            });
+            if (isIn) {
+                this.$confirm('编辑列表中已经存在该记录，是否继续添加?', '提示', {
+                    confirmButtonText: '继续添加',
+                    cancelButtonText: '取消添加',
+                    type: 'warning'
+                }).then(() => {
+                    this.toCreateAlbum.list.push(row);
                 }).catch(() => {
                     this.$message({
                         type: 'info',
-                        message: '取消保存'
+                        message: '取消添加'
                     });
                 });
-            },
-            handleClearList() {
-                this.$alert('当前列表还没有保存，确定清空吗？', '清空提示', {
-                    confirmButtonText: '确定',
-                    callback: action => {
-                        this.toCreateAlbum.list = [];
-                    }
-                });
-            },
-            handleGoToPreview(row) {
-                let previewType = 'pic';    // if video is av
-                if (row.mime_type.startsWith("doc")) {
-                    previewType = 'doc'
-                } else if (row.mime_type.startsWith("video")) {
-                    previewType = 'av'
-                }
-                let url = genSrcPreviewSrc(row.neid, row.hash, row.rev, previewType, this.userInfo.session);
-                if (row.mime_type.startsWith("video")) {
-                    this.handlePlayVideo(url, row.path.substr(row.path.lastIndexOf("/") + 1),);
-                } else if (row.mime_type.startsWith("image")) {
-                    //this.handlePlayImage(url, row.path.substr(row.path.lastIndexOf("/") + 1),);
-                } else if (row.mime_type.startsWith("doc")) {
-                    window.open(url);
-                } else {
-                    this.$message.error("暂不支持的预览类型！")
-                }
-            },
-            handleDownloadSrc(isList, row) {
-                let _this = this;
-                let toDownloadList = [];
-                let totalBytes = 0;
-                if (isList) {
-                    let index = 0;
-                    this.toCreateAlbum.list.forEach(src => {
-                        totalBytes += src.bytes;
-                        toDownloadList.push({
-                            index: index += 1,
-                            filename: src.path.substr(src.path.lastIndexOf("/") + 1),
-                            rev: src.rev,
-                            neid: src.neid.toString(),
-                            path: src.path.replace("+", "%2b"),
-                            path_type: src.path_type
-                        })
+            } else {
+                this.toCreateAlbum.list.push(row);
+            }
+        },
+        handleSelectDesc(row, column, event) {
+            this.toCreateAlbum.toAddRow.joyeaDesc = row.desc;
+            this.toCreateAlbum.list.push(this.toCreateAlbum.toAddRow);
+            this.toCreateAlbum.toAddRow = {};
+            this.toCreateAlbum.toSelectDesc = [];
+            this.toCreateAlbum.descSelectDialogVisible = false;
+        },
+        handleCustomDesc() {
+            this.toCreateAlbum.toAddRow.joyeaDesc = "";
+            this.toCreateAlbum.list.push(this.toCreateAlbum.toAddRow);
+            this.toCreateAlbum.toAddRow = {};
+            this.toCreateAlbum.toSelectDesc = [];
+            //this.$set(this.toCreateAlbum,"descSelectDialogVisible",false);
+            this.toCreateAlbum.descSelectDialogVisible = false;
+        },
+        handleCollect(index, row) {
+            api({
+                action: "srcCollect",
+                method: row.collect ? 'unCollect' : 'collect',
+                neid: row.neid,
+                path: row.path,
+                type: row.mime_type,
+                hash: row.hash,
+                rev: row.rev,
+                size: row.size
+            }).then(response => {
+                if (response.result) {
+                    row.collect = !row.collect;
+                    this.$notify.success({
+                        type: "success",
+                        title: "提示",
+                        message: row.collect ? "收藏成功:" + row.path.substr(row.path.lastIndexOf('/') + 1) : "取消收藏成功:" + row.path.substr(row.path.lastIndexOf('/') + 1)
                     })
                 } else {
-                    toDownloadList.push({
-                        filename: row.path.substr(row.path.lastIndexOf("/") + 1),
-                        rev: row.rev,
-                        neid: row.neid.toString(),
-                        path_type: row.path_type
-                    })
+                    console.log(response.msg)
                 }
-                let totalKb = totalBytes / 1024;
-                let totalMb = totalKb / 1024;
-                let warnMb = 300;
-                this.$confirm(
-                    "您已选中【 " + toDownloadList.length + " 】个文件，" + (totalMb > warnMb
-                    ? ("待准备文件列表大小为【 " + totalMb.toFixed(2) + "MB 】,文件较大，建议您分批次准备。")
-                    : ("待准备文件列表大小为【 " + (totalMb > 1 ? totalMb.toFixed(2) + "MB" : totalKb.toFixed(2) + "KB") + " 】。")) + "准备完成后会在右上角提示您下载!",
-                    '提示',
-                    {
-                        confirmButtonText: '准备',
-                        cancelButtonText: '取消',
-                        type: totalMb > warnMb ? "danger" : "primary"
-                    }).then(() => {
-                    //this.loading.fullscreenLoading = true;
-                    api({
-                        action: "downloadSrc",
-                        src: toDownloadList
-                    }).then(response => {
-                        let taskId = response.id;
-                        console.log("获取到下载ID：" + taskId);
-                        this.$store.dispatch('downloadStatus/setVisible', true);
+            })
+        },
+        handleModify(index, row, cg) {
+            //点击修改 判断是否已经保存所有操作
+            for (let i of this.toCreateAlbum.list) {
+                if (i.isModify && i.path !== row.path) {
+                    this.$message.warning("请先保存当前编辑项");
+                    return false;
+                }
+            }
+            //是否是取消操作
+            if (!cg) {
+                if (!this.toCreateAlbum.modifyRow.path) {
+                }
+                return row.isModify = !row.isModify;
+            }
+            //提交数据
+            if (row.isModify) {
+                this.toCreateAlbum.list[index].joyeaDesc = this.toCreateAlbum.modifyRow.joyeaDesc;
+                row.isModify = false;
+            } else {
+                this.toCreateAlbum.modifyRow = JSON.parse(JSON.stringify(row));
+                row.isModify = true;
+            }
+            return false;
+        },
+        handleDelete(index, row) {
+            this.toCreateAlbum.list.splice(index, 1);
+        },
+        genPreviewUrl(neid, hash, rev, mime_type) {
+            let previewType = 'pic';    // if video is av
+            if (mime_type.startsWith("doc")) {
+                previewType = 'doc'
+            } else if (mime_type.startsWith("video")) {
+                previewType = 'av'
+            }
+            return genSrcPreviewSrc(neid, hash, rev, previewType, this.userInfo.session);
+        },
+        handleSaveList() {
+            this.$prompt(this.toCreateAlbum.idEditMode ? '当前是编辑模式，重命名清单名称！' : '请输入要保存的清单的名称',
+                this.toCreateAlbum.idEditMode ? '编辑提示' : '保存提示',
+                {
+                    confirmButtonText: this.toCreateAlbum.idEditMode ? '重新保存' : '保存清单',
+                    cancelButtonText: '取消',
+                    inputValue: this.toCreateAlbum.name
+                }
+            ).then(action => {
+                let listName = action.value;
+                this.loading.saveList = true;
+                api({
+                    action: 'album',
+                    method: this.toCreateAlbum.idEditMode ? 'reSave' : 'save',
+                    id: this.toCreateAlbum.editListId,
+                    name: listName,
+                    src: this.toCreateAlbum.list
+                }).then(response => {
+                    if (response.result) {
                         this.$notify.success({
-                            title: "提示",
-                            message: "成功创建下载任务"
-                        });
-                        let timer = 0;
-                        timer = setInterval(function () {
-                            api({
-                                action: "queryDownload",
-                                id: taskId
-                            }).then(response => {
-                                if (response.done) {
-                                    _this.$notify.success({
-                                        title: "任务下载提示",
-                                        message: "您有一个下载任务【" + taskId + "】已准备好！"
-                                    });
-                                    clearInterval(timer);
-                                    _this.$store.dispatch('downloadStatus/setVisible', false);
-                                }
-                            });
-                        }, 2 * 1000);
+                            title: this.toCreateAlbum.idEditMode ? "编辑结果" : "保存结果",
+                            message: this.toCreateAlbum.idEditMode ? "重新保存成功" : '保存成功'
+                        })
+                    } else {
+                        console.log(response.msg);
+                        this.$notify.error({
+                            title: "保存结果",
+                            message: this.toCreateAlbum.idEditMode ? "重新保存失败" : '保存失败'
+                        })
+                    }
+                    this.loading.saveList = false;
+                    this.$router.push("/manage/list");
+                });
+            }).catch(() => {
+                this.$message({
+                    type: 'info',
+                    message: '取消保存'
+                });
+            });
+        },
+        handleClearList() {
+            this.$alert('当前列表还没有保存，确定清空吗？', '清空提示', {
+                confirmButtonText: '确定',
+                callback: action => {
+                    this.toCreateAlbum.list = [];
+                }
+            });
+        },
+        handleGoToPreview(row) {
+            let previewType = 'pic';    // if video is av
+            if (row.mime_type.startsWith("doc")) {
+                previewType = 'doc'
+            } else if (row.mime_type.startsWith("video")) {
+                previewType = 'av'
+            }
+            let url = genSrcPreviewSrc(row.neid, row.hash, row.rev, previewType, this.userInfo.session);
+            if (row.mime_type.startsWith("video")) {
+                this.handlePlayVideo(url, row.path.substr(row.path.lastIndexOf("/") + 1),);
+            } else if (row.mime_type.startsWith("image")) {
+                //this.handlePlayImage(url, row.path.substr(row.path.lastIndexOf("/") + 1),);
+            } else if (row.mime_type.startsWith("doc")) {
+                window.open(url);
+            } else {
+                this.$message.error("暂不支持的预览类型！")
+            }
+        },
+        handleDownloadSrc(isList, row) {
+            let _this = this;
+            let toDownloadList = [];
+            let totalBytes = 0;
+            if (isList) {
+                let index = 0;
+                this.toCreateAlbum.list.forEach(src => {
+                    totalBytes += src.bytes;
+                    toDownloadList.push({
+                        index: index += 1,
+                        filename: src.path.substr(src.path.lastIndexOf("/") + 1),
+                        rev: src.rev,
+                        neid: src.neid,
+                        path: src.path.replace("+", "%2b"),
+                        path_type: src.path_type
                     })
+                })
+            } else {
+                toDownloadList.push({
+                    filename: row.path.substr(row.path.lastIndexOf("/") + 1),
+                    rev: row.rev,
+                    neid: row.neid.toString(),
+                    path_type: row.path_type
+                })
+            }
+            let totalKb = totalBytes / 1024;
+            let totalMb = totalKb / 1024;
+            let warnMb = 300;
+            this.$confirm(
+                "您已选中【 " + toDownloadList.length + " 】个文件，" + (totalMb > warnMb
+                ? ("待准备文件列表大小为【 " + totalMb.toFixed(2) + "MB 】,文件较大，建议您分批次准备。")
+                : ("待准备文件列表大小为【 " + (totalMb > 1 ? totalMb.toFixed(2) + "MB" : totalKb.toFixed(2) + "KB") + " 】。")) + "准备完成后会在右上角提示您下载!",
+                '提示',
+                {
+                    confirmButtonText: '准备',
+                    cancelButtonText: '取消',
+                    type: totalMb > warnMb ? "danger" : "primary"
+                }).then(() => {
+                //this.loading.fullscreenLoading = true;
+                prepareDownloadFile(toDownloadList).then(resp => {
+                    let taskId = resp.data;
+                    console.log("获取到下载ID：" + taskId);
+                    this.$store.dispatch('downloadStatus/setVisible', true);
+                    this.$notify.success({
+                        title: "提示",
+                        message: "成功创建下载任务"
+                    });
+                    let timer = 0;
+                    timer = setInterval(function () {
+                        queryDownload(taskId).then(resp => {
+                            if (resp.data) {
+                                _this.$notify.success({
+                                    title: "任务下载提示",
+                                    message: "您有一个下载任务【" + taskId + "】已准备好！"
+                                });
+                                clearInterval(timer);
+                                _this.$store.dispatch('downloadStatus/setVisible', false);
+                            }
+                        })
+                    }, 2 * 1000);
                 }).catch(() => {
                     this.$message({
                         type: 'info',
                         message: '已取消下载'
                     });
                 });
-            },
-            handleClickDirPath(item, index) {
-                let toReachPath = "";
-                for (let i = 0; i <= index; i++) {
-                    toReachPath = toReachPath + "/" + this.dir.currentPath[i]
-                }
-                this.handleListLenovoDir(toReachPath, "ent")
-            },
-            handleListLenovoDir(path, pathType) {
-                this.dir.loadingDir = true;
-                api({
-                    action: 'listLenovoDir',
-                    path: path.replace("+", "%2B"),
-                    path_type: pathType === undefined ? 'ent' : pathType
-                }).then(response => {
-                    if (response.result) {
-                        this.dir.tableData = [];
-                        if (response.data.content) {
-                            response.data.content.forEach(item => {
-                                item.joyeaDesc = "";
-                                item.isModify = false;
-                                this.dir.tableData.push(item)
-                            });
-                            this.dir.currentPath = [];
-                            response.data.path.split('/').forEach(item => {
-                                if (item.length !== 0) {
-                                    this.dir.currentPath.push(item)
-                                }
-                            });
-                        }
-                    } else {
-                        this.$notify.error({
-                            title: '提示',
-                            message: '文件夹列表获取失败'
+            })
+        },
+        handleClickDirPath(item, index) {
+            let toReachPath = "";
+            for (let i = 0; i <= index; i++) {
+                toReachPath = toReachPath + "/" + this.dir.currentPath[i]
+            }
+            this.handleListLenovoDir(toReachPath, "ent")
+        },
+        handleListLenovoDir(path, pathType) {
+            this.dir.loadingDir = true;
+            api({
+                action: 'listLenovoDir',
+                path: path.replace("+", "%2B"),
+                path_type: pathType === undefined ? 'ent' : pathType
+            }).then(response => {
+                if (response.result) {
+                    this.dir.tableData = [];
+                    if (response.data.content) {
+                        response.data.content.forEach(item => {
+                            item.joyeaDesc = "";
+                            item.isModify = false;
+                            this.dir.tableData.push(item)
                         });
-                        console.log('文件夹列表获取失败' + response.msg)
+                        this.dir.currentPath = [];
+                        response.data.path.split('/').forEach(item => {
+                            if (item.length !== 0) {
+                                this.dir.currentPath.push(item)
+                            }
+                        });
                     }
-                    this.dir.loadingDir = false;
-                });
-            },
-            handleClickDirItem(row, column, event) {
-                this.visible.searchDialogVisible = false;
-                this.searchTabName = "dir";
-                if (row.is_dir) {
-                    this.handleListLenovoDir(row.path, 'ent')
                 } else {
-                    this.handleGoToPreview(row);
+                    this.$notify.error({
+                        title: '提示',
+                        message: '文件夹列表获取失败'
+                    });
+                    console.log('文件夹列表获取失败' + response.msg)
                 }
-            },
-            handleClickSearch(row, column, event) {
-                if (row.is_dir) {
-                    this.handleClickDirItem(row);
-                }
-            },
-            handleGetTopSearchKey() {
-                getTopSearchKey().then(resp => {
-                    this.topSearchKey = resp.data;
-                })
+                this.dir.loadingDir = false;
+            });
+        },
+        handleClickDirItem(row, column, event) {
+            this.visible.searchDialogVisible = false;
+            this.searchTabName = "dir";
+            if (row.is_dir) {
+                this.handleListLenovoDir(row.path, 'ent')
+            } else {
+                this.handleGoToPreview(row);
             }
         },
-        mounted() {
-            this.handleListLenovoDir("/营销素材展示", "ent");
-            let toEditList = this.$route.params.toEditList;
-            if (toEditList) {
-                this.toCreateAlbum.idEditMode = true;
-                this.toCreateAlbum.name = toEditList.name;
-                this.toCreateAlbum.editListId = toEditList.id;
-                toEditList.list.forEach(src => {
-                    //注意这里直接使用.，视图会不更新，一定要使用this.$set
-                    this.$set(src, "joyeaDesc", src.desc);
-                    this.$set(src, "isModify", false);
-                    this.toCreateAlbum.list.push(src);
-                });
+        handleClickSearch(row, column, event) {
+            if (row.is_dir) {
+                this.handleClickDirItem(row);
             }
-            this.handleGetTopSearchKey();
-            const table = document.querySelector('#toSortTable .el-table__body-wrapper tbody');
-            const self = this;
-            Sortable.create(table, {
-                onEnd({newIndex, oldIndex}) {
-                    const targetRow = self.toCreateAlbum.list.splice(oldIndex, 1)[0];
-                    self.toCreateAlbum.list.splice(newIndex, 0, targetRow)
-                }
+        },
+        handleGetTopSearchKey() {
+            getTopSearchKey().then(resp => {
+                this.topSearchKey = resp.data;
+            })
+        }
+    },
+    mounted() {
+        this.handleListLenovoDir("/营销素材展示", "ent");
+        let toEditList = this.$route.params.toEditList;
+        if (toEditList) {
+            this.toCreateAlbum.idEditMode = true;
+            this.toCreateAlbum.name = toEditList.name;
+            this.toCreateAlbum.editListId = toEditList.id;
+            toEditList.list.forEach(src => {
+                //注意这里直接使用.，视图会不更新，一定要使用this.$set
+                this.$set(src, "joyeaDesc", src.desc);
+                this.$set(src, "isModify", false);
+                this.toCreateAlbum.list.push(src);
             });
         }
+        this.handleGetTopSearchKey();
+        const table = document.querySelector('#toSortTable .el-table__body-wrapper tbody');
+        const self = this;
+        Sortable.create(table, {
+            onEnd({newIndex, oldIndex}) {
+                const targetRow = self.toCreateAlbum.list.splice(oldIndex, 1)[0];
+                self.toCreateAlbum.list.splice(newIndex, 0, targetRow)
+            }
+        });
     }
+}
 </script>
 
 <style lang="scss" scoped>
 
-    .px10_divider {
-        padding: 10px;
+.px10_divider {
+    padding: 10px;
+}
+
+.input-with-select .el-input-group__prepend {
+    background-color: #fff;
+}
+
+.el-row {
+    margin-bottom: 20px;
+
+    &:last-child {
+        margin-bottom: 0;
     }
+}
 
-    .input-with-select .el-input-group__prepend {
-        background-color: #fff;
-    }
+.el-col {
+    border-radius: 4px;
+}
 
-    .el-row {
-        margin-bottom: 20px;
+.bg-purple-dark {
+    background: #99a9bf;
+}
 
-        &:last-child {
-            margin-bottom: 0;
-        }
-    }
+.bg-purple {
+    padding: 5px;
 
-    .el-col {
-        border-radius: 4px;
-    }
+}
 
-    .bg-purple-dark {
-        background: #99a9bf;
-    }
+.grid-content {
+    border-radius: 4px;
+    min-height: 36px;
+}
 
-    .bg-purple {
-        padding: 5px;
+.row-bg {
+    padding: 10px 0;
+    background-color: #f9fafc;
+}
 
-    }
+.no_display {
+    display: none;
+}
 
-    .grid-content {
-        border-radius: 4px;
-        min-height: 36px;
-    }
+.center_vertical {
+    padding: 1px;
+    background: #d3dce6;
+    text-align: center;
+}
 
-    .row-bg {
-        padding: 10px 0;
-        background-color: #f9fafc;
-    }
-
-    .no_display {
-        display: none;
-    }
-
-    .center_vertical {
-        padding: 1px;
-        background: #d3dce6;
-        text-align: center;
-    }
-
-    .load_more_bt {
-        margin-top: 5px;
-        width: 100%;
-    }
+.load_more_bt {
+    margin-top: 5px;
+    width: 100%;
+}
 
 
-    .contentHead {
-        font-size: 12px;
-        color: gray;
-        margin: 10px auto;
-    }
+.contentHead {
+    font-size: 12px;
+    color: gray;
+    margin: 10px auto;
+}
 
-    .box-card {
-        width: 220px;
-        height: 220px;
-    }
+.box-card {
+    width: 220px;
+    height: 220px;
+}
 
-    .menu-content {
-        margin: 20px auto;
-        height: 225px;
-        width: 225px;
-        background-image: linear-gradient(to bottom right, #ffffff, #c7c7c7);
-        text-align: center;
-        box-shadow: 4px 4px 2px #888888;
-    }
+.menu-content {
+    margin: 20px auto;
+    height: 225px;
+    width: 225px;
+    background-image: linear-gradient(to bottom right, #ffffff, #c7c7c7);
+    text-align: center;
+    box-shadow: 4px 4px 2px #888888;
+}
 
-    .search-button {
-        background: #eb7708 !important;
-        color: #ffffff !important;
-    }
+.search-button {
+    background: #eb7708 !important;
+    color: #ffffff !important;
+}
 
-    /deep/ .el-input-group__append {
-        background: #ffffff;
-        border-bottom-right-radius: 100px !important;
-        border-top-right-radius: 100px !important;
-    }
+/deep/ .el-input-group__append {
+    background: #ffffff;
+    border-bottom-right-radius: 100px !important;
+    border-top-right-radius: 100px !important;
+}
 
-    /deep/ .search-button--default {
-        border-bottom-right-radius: 100px !important;
-        border-top-right-radius: 100px !important;
-    }
+/deep/ .search-button--default {
+    border-bottom-right-radius: 100px !important;
+    border-top-right-radius: 100px !important;
+}
 
-    .el-icon-folder-opened {
-        color: #fec04a;
-    }
+.el-icon-folder-opened {
+    color: #fec04a;
+}
 </style>
