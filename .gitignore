@@ -1,7 +1,7 @@
 .idea
 target
 upload
-download
+/download
 project/target
 websrc/dist
 mobile/dist
