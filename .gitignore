@@ -1,8 +1,9 @@
 .idea
 target
-upload
 /download
+/upload
 project/target
 websrc/dist
 mobile/dist
+tmp
 .DS_Store
