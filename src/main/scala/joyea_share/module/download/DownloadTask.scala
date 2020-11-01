@@ -2,12 +2,12 @@ package joyea_share.module.download
 
 import java.io.{File, FileFilter}
 import java.time.{LocalDateTime, OffsetDateTime}
-import java.util.{Date, UUID}
+import java.util.UUID
 
 import com.utils.{CommonUtil, FtpUtil}
+import joyea_share.model.DownloadRecord
 import joyea_share.service.RedisService
-import joyea_share.util.{BaseJsonFormat, CommonListener, LenovoUtil, ZipUtils}
-import org.json4s.jackson.Serialization
+import joyea_share.util.{CommonListener, LenovoUtil, ZipUtils}
 import xitrum.{Config, Log}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -28,8 +28,6 @@ case class DownloadTask(
     private var downloadProgress: Int = 0
     private var successNum: Int = 0
     private var failNum: Int = 0
-    //超时时间为2分钟，超过时间则下载失败
-    //private val DOWNLOAD_TIMEOUT = 2 * 60 * 1000
 
     def execute(sessionId: String, baseSavePath: String, baseCompressSavePath: String, listener: DownloadListener): Unit = {
         downloadListener = listener
@@ -101,7 +99,6 @@ case class DownloadTask(
             }
 
             ZipUtils.compressZip(Array(saveFilePath), saveCompressPath + ".zip")
-            //CommonUtil.delete(saveFilePath)
             finishDate = LocalDateTime.now()
             status = DownloadStatus.FINISH
             downloadListener.onFinish(taskId = id, successNum, failNum, downloadFile.length)

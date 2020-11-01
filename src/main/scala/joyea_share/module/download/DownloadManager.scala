@@ -15,7 +15,7 @@ trait DownloadManager {
 object DownloadManager extends Log {
 
     private var adminSessionId: String = ""
-    private val getAdminTokenExecutor = Executors.newScheduledThreadPool(4)
+    private val getAdminTokenExecutor = Executors.newScheduledThreadPool(1)
     private val executor: ExecutorService = Executors.newFixedThreadPool(Runtime.getRuntime.availableProcessors())
 
     //用来存放所有的任务，每天清除一次
@@ -25,21 +25,14 @@ object DownloadManager extends Log {
 
         getAdminTokenExecutor.scheduleWithFixedDelay(() => {
 
-            genNewSession()
-
-            //删除非当天下载文件夹的文件，防止文件把服务器空间占满
-            val saveDir = getTodayDownloadDir(true)
-            saveDir.getParentFile.listFiles(new FileFilter {
-                override def accept(pathname: File): Boolean = !pathname.getName.equals(saveDir.getName)
-            }).foreach(file => {
-                CommonUtil.delete(file)
-            })
-            val compressSaveDir = getTodayDownloadDir(false)
-            compressSaveDir.getParentFile.listFiles(new FileFilter {
-                override def accept(pathname: File): Boolean = !pathname.getName.equals(compressSaveDir.getName)
-            }).foreach(file => {
-                CommonUtil.delete(file)
-            })
+            try {
+                genNewSession()
+                getTodayDownloadDir(true)
+                getTodayDownloadDir(false)
+            } catch {
+                case e: Exception =>
+                    log.error("gen new admin session error: ", e)
+            }
 
         }, 0, 30, TimeUnit.MINUTES)
     }
@@ -74,13 +67,18 @@ object DownloadManager extends Log {
         val filePath = if (isCompressed) {
             "download/compressed/" + SUtil.genDateString(formatString = "yy-MM-dd")
         } else {
-            "download/" + SUtil.genDateString(formatString = "yy-MM-dd")
+            "download/origin/" + SUtil.genDateString(formatString = "yy-MM-dd")
         }
-        val file = new File(filePath)
-        if (file.exists()) {
-            file.mkdirs()
+        val saveDir = new File(filePath)
+        if (!saveDir.exists()) {
+            saveDir.mkdirs()
         }
-        file
+        saveDir.getParentFile.listFiles(new FileFilter {
+            override def accept(pathname: File): Boolean = !pathname.getName.equals(saveDir.getName)
+        }).foreach(file => {
+            CommonUtil.delete(file)
+        })
+        saveDir
     }
 
     def queryTask(taskId: String): DownloadStatus.Value = {

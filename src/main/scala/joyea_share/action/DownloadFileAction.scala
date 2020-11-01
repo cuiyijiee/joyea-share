@@ -9,7 +9,7 @@ import xitrum.{Action, Config, Log}
 import xitrum.annotation.GET
 
 @GET("download/:id/:firstSrcName")
-class DownloadSrcAction extends Action with Log{
+class DownloadFileAction extends Action with Log{
 
     override def execute(): Unit = {
         try {

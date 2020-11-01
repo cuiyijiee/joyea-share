@@ -49,6 +49,9 @@ object AlbumSrc extends SQLSyntaxSupport[AlbumSrc] with ShortenedNames {
 
     def apply(as: ResultName[AlbumSrc])(rs: WrappedResultSet): AlbumSrc = autoConstruct(rs, as)
 
+    def opt(s: SyntaxProvider[AlbumSrc])(rs: WrappedResultSet): Option[AlbumSrc] =
+        rs.longOpt(s.resultName.id).map(_ => apply(s.resultName)(rs))
+
     def createMany(albumSrcList: Seq[AlbumSrc])
                   (implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[Int] = {
         if (albumSrcList.nonEmpty) {

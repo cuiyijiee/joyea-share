@@ -1,8 +1,7 @@
-package joyea_share.module.download
+package joyea_share.model
 
 import java.time.OffsetDateTime
 
-import joyea_share.model.Album.{EC, ECGlobal}
 import scalikejdbc._
 import scalikejdbc.async._
 

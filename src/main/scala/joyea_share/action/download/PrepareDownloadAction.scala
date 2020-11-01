@@ -2,7 +2,8 @@ package joyea_share.action.download
 
 import joyea_share.action.BaseAction
 import joyea_share.define.ErrorCode
-import joyea_share.module.download.{DownloadManager, DownloadRecord, DownloadTask}
+import joyea_share.model.DownloadRecord
+import joyea_share.module.download.{DownloadManager, DownloadTask}
 import xitrum.annotation.POST
 
 @POST("/api/v1/download/prepare")
