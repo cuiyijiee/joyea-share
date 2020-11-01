@@ -1,4 +1,3 @@
-import {ImagePreview} from 'vant';
 import {genSrcPreviewSrc, newGenSrcPreviewSrc} from './JoyeaUtil'
 
 import store from "../store"
@@ -9,6 +8,7 @@ export function convertItem(item) {
     if (item.srcHash) item.hash = item.srcHash;
     if (item.srcRev) item.rev = item.srcRev;
     if (item.srcPath) item.path = item.srcPath;
+    if (item.uploadPath) item.path = item.uploadPath;
     item.joyeaDesc = item.srcDesc ? item.srcDesc : "";
     return item;
 }

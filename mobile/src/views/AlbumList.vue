@@ -16,22 +16,22 @@
             </template>
         </van-swipe-cell>
         <van-action-sheet v-model="albumVisible" :title="albumItem.albumName">
-            <van-grid border :column-num="3" :gutter="5">
-                <van-card
-                    v-for="item in albumItem.srcList"
-                    @click="handlePreview(item)">
-                    <template #thumb>
-                        <van-image width="80" height="80" v-if="item.srcType.startsWith('image')"
-                                   :src="getPreviewUrl(item)"/>
-                        <van-image v-else width="80" height="80" :src="getDocumentImage(item.srcType)"></van-image>
-                    </template>
-                    <template #tags>
-                        <div>{{ item.srcPath.substr(item.srcPath.lastIndexOf('/') + 1) }}</div>
-                        <div v-if="item.srcDesc && item.srcDesc.trim().length > 0"
-                        style="color: #8c939d">
-                            解说词:{{ item.srcDesc }}</div>
-                    </template>
-                </van-card>
+            <van-card
+                v-for="item in albumItem.srcList"
+                @click="handlePreview(item)">
+                <template #thumb>
+                    <van-image width="80" height="80" v-if="item.srcType.startsWith('image')"
+                               :src="getPreviewUrl(item)"/>
+                    <van-image v-else width="80" height="80" :src="getDocumentImage(item.srcType)"></van-image>
+                </template>
+                <template #tags>
+                    <div>{{ item.srcPath.substr(item.srcPath.lastIndexOf('/') + 1) }}</div>
+                    <div v-if="item.srcDesc && item.srcDesc.trim().length > 0"
+                         style="color: #8c939d">
+                        解说词:{{ item.srcDesc }}</div>
+                </template>
+            </van-card>
+<!--            <van-grid border :column-num="3" :gutter="5">-->
 <!--                <van-grid-item-->
 <!--                    v-for="item in albumItem.srcList" @click="handleGotoPreview(item)">-->
 <!--                    <van-image v-if="item.srcType.startsWith('image')" class="my_icon my_preview_size"-->
@@ -52,7 +52,7 @@
 <!--                        <van-tag round type="success" v-for="tag in item.tags">{{ tag.replace(markReg, "") }}</van-tag>-->
 <!--                    </div>-->
 <!--                </van-grid-item>-->
-            </van-grid>
+<!--            </van-grid>-->
         </van-action-sheet>
     </div>
 </template>
