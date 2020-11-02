@@ -153,7 +153,13 @@ export default {
             event.stopPropagation();
         },
         handlePreview(clickItem) {
-            GenImageListView(this, this.albumItem.srcList, this.userInfo.session, clickItem);
+            if (clickItem.mime_type.startsWith("video")) {
+                this.handlePreviewVideo(clickItem);
+            } else if (clickItem.mime_type.startsWith("doc")) {
+                this.handlePreviewDoc(clickItem);
+            } else {
+                GenImageListView(this, this.albumItem.srcList, this.userInfo.session, clickItem);
+            }
         },
         genPreviewUrl(srcNeid, srcHash, srcRev, srcType) {
             let previewType = 'pic';    // if video is av

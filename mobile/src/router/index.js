@@ -6,14 +6,13 @@ import OrderContainer from "../components/tabbar/OrderContainer";
 import MineContainer from "../components/tabbar/MineContainer";
 import SearchResultContainer from "../components/tabbar/SearchResultContainer";
 import SquareContainer from "../components/tabbar/SquareContainer";
-import YesterdayUploadContainer from "@/components/tabbar/YesterdayUploadContainer";
+import LatestUploadContainer from "@/components/tabbar/LatestUploadContainer";
 import UploadIndex from "../views/upload/Index";
 
 import Main from "../views/Main";
 import Login from "../views/Login"
 import AlbumList from "../views/AlbumList";
 
-import AlbumDetail from "../views/AlbumDetail";
 import EditShareAlbum from "../views/EditShareAlbum";
 import LenovoDirSelector from "@/components/LenovoDirSelector";
 import MyUpload from "@/views/MyUpload";
@@ -78,9 +77,9 @@ export default new Router({
                     }
                 },
                 {
-                    path: 'yesterdayUpload',
+                    path: 'latestUpload',
                     name: '最新素材',
-                    component: YesterdayUploadContainer,
+                    component: LatestUploadContainer,
                     meta: {
                         allowHome: false,
                         allowBack: true
@@ -92,15 +91,6 @@ export default new Router({
             path: '/album',
             name: '我的清单',
             component: AlbumList,
-            meta: {
-                allowBack: true,
-                allowHome: true
-            }
-        },
-        {
-            path: '/albumDetail',
-            name: '清单详情',
-            component: AlbumDetail,
             meta: {
                 allowBack: true,
                 allowHome: true

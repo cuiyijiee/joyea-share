@@ -19,7 +19,7 @@
       <van-cell title="我的上传" is-link @click="handleClickMyUpload"/>
       <van-cell title="我的清单" is-link @click="handleClickMyList"/>
       <van-cell title="修改密码" is-link @click="handleClickChangePwd"/>
-      <van-cell is-link @click="handleClickYesterdayUpload">
+      <van-cell is-link @click="handleClickLatestUpload">
         <template #title>
           <span class="custom-title">最新素材</span>
           <van-tag type="danger" style="margin-left: 5px">NEW</van-tag>
@@ -82,8 +82,8 @@ export default {
     handleClickMyUpload() {
       this.$router.push("/upload/mime")
     },
-    handleClickYesterdayUpload(){
-      this.$router.push("/yesterdayUpload")
+      handleClickLatestUpload(){
+      this.$router.push("/latestUpload")
     },
     handleLogout() {
       this.$dialog.confirm({
