@@ -16,7 +16,7 @@ object BenchMark extends MySQLSettings {
     implicit val ctx: ExecutionContext = ExecutionContext.Implicits.global
     implicit val session:String = "2cc84bf21f2740f2888cb7154ee29133_346341_696047_meta"
 
-    UploadRecord.yesterdayUploadRecord().onComplete {
+    UploadRecord.latestUploadRecord(10).onComplete {
       case Failure(exception) =>
         exception.printStackTrace()
       case Success(value) =>

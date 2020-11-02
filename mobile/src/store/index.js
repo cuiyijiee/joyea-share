@@ -18,7 +18,8 @@ const store = new Vuex.Store({
         showRealImage: false, //是否显示原图,
         imagePreviewShow: false,
         imagePreviewImages: [],
-        imagePreviewStartIndex: 0
+        imagePreviewStartIndex: 0,
+        latestReadUploadSrcId: 0
     },
     getters: {
         getStateOrderList: function (state) {
@@ -44,6 +45,9 @@ const store = new Vuex.Store({
         },
         imagePreviewStartIndex: function (state) {
             return state.imagePreviewStartIndex;
+        },
+        latestReadUploadSrcId:function (state){
+            return state.latestReadUploadSrcId;
         }
     },
     mutations: {
@@ -76,6 +80,9 @@ const store = new Vuex.Store({
         },
         setEditInfo(state, albumInfo) {
             state.orderEditInfo = albumInfo;
+        },
+        setLatestReadUploadSrcId(state,id){
+            state.latestReadUploadSrcId = id;
         }
     },
     actions: {
@@ -103,6 +110,9 @@ const store = new Vuex.Store({
         setOrderEditInfoFunc(state, albumInfo) {
             state.commit("setEditInfo", albumInfo)
         },
+        setLatestReadUploadSrcIdFunc(state,id){
+            state.commit("setLatestReadUploadSrcId",id);
+        }
     }
 });
 

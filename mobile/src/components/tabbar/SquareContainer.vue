@@ -96,7 +96,7 @@
         <van-action-sheet v-model="albumVisible" :title="albumItem.albumName">
             <van-card
                 v-for="item in albumItem.srcList"
-                @click="handlePreview(item)">
+                @click="handleClickItem(item)">
                 <template #thumb>
                     <van-image width="80" height="80" v-if="item.srcType.startsWith('image')"
                                :src="getPreviewUrl(item)"/>
@@ -110,28 +110,6 @@
                     </div>
                 </template>
             </van-card>
-            <!--            <van-grid border :column-num="3" :gutter="5">-->
-            <!--                <van-grid-item-->
-            <!--                        v-for="item in albumItem.srcList" @click="handleGotoPreview(item)">-->
-            <!--                    <van-image v-if="item.srcType.startsWith('image')" class="my_icon my_preview_size"-->
-            <!--                               @click="handlePreview(item)"-->
-            <!--                               :src="genPreviewUrl(item.srcNeid,item.srcHash,item.srcRev,item.srcType)"/>-->
-            <!--                    <van-image v-else-if="item.srcType.startsWith('video')" class="my_icon my_preview_size"-->
-            <!--                               @click="handlePreviewVideo(item)"-->
-            <!--                               src="video.png"/>-->
-            <!--                    <van-image v-else-if="item.srcType.startsWith('doc')" class="my_icon my_preview_size"-->
-            <!--                               @click="handlePreviewDoc(item)"-->
-            <!--                               :src="handleGetDocumentImage(item.srcType)"/>-->
-            <!--                    <van-image v-else class="my_icon my_preview_size" @click="handlePreview(item)"-->
-            <!--                               src="unknown.png"/>-->
-            <!--                    <div style="width: 98%">-->
-            <!--                        <div style="font-size:10px;-webkit-text-size-adjust: none;word-break:break-all;">-->
-            <!--                            {{item.srcPath.substr(item.srcPath.lastIndexOf('/')+1)}}-->
-            <!--                        </div>-->
-            <!--                        <van-tag round type="success" v-for="tag in item.tags">{{tag.replace(markReg,"")}}</van-tag>-->
-            <!--                    </div>-->
-            <!--                </van-grid-item>-->
-            <!--            </van-grid>-->
         </van-action-sheet>
         <van-button @click="handleClickShareAlbum" class="float-button" round type="info" icon="plus"></van-button>
     </div>
@@ -143,7 +121,7 @@ import {genSrcPreviewSrc, getDocumentImage, handleGoToPreview} from "../../util/
 import {mapGetters} from "vuex";
 import {hangyeOption, jixingOption, xianbieOption, jieduanOption, shichangOption} from "../../util/JoyeaTagUtil";
 import {albumCoverOption} from "../../util/JoyeaTagUtil";
-import {GenImageListView,convertItem} from "../../util/ImageViewUtil";
+import {convertItem} from "../../util/ImageViewUtil";
 
 export default {
     name: "SquareContainer",
@@ -237,32 +215,10 @@ export default {
             this.albumItem = item;
             this.albumVisible = true;
         },
-        handleGetDocumentImage(mimeType) {
-            return getDocumentImage(mimeType)
-        },
-        handleGotoPreview(item) {
-            if (item.mime_type.startsWith("image")) {
-            } else {
-                this.handlePreview(item)
-            }
-        },
-        handlePreviewDoc(clickItem) {
-            handleGoToPreview(this, clickItem, this.userInfo.session);
+        handleClickItem(clickItem) {
             event.stopPropagation();
-        },
-        handlePreviewVideo(clickItem) {
-            handleGoToPreview(this, clickItem, this.userInfo.session);
-            event.stopPropagation();
-        },
-        handlePreview(clickItem) {
             clickItem = convertItem(clickItem);
-            if (clickItem.mime_type.startsWith("video")) {
-                this.handlePreviewVideo(clickItem);
-            } else if (clickItem.mime_type.startsWith("doc")) {
-                this.handlePreviewDoc(clickItem);
-            } else {
-                GenImageListView(this, this.albumItem.srcList, this.userInfo.session, clickItem);
-            }
+            handleGoToPreview(this, clickItem, this.userInfo.session, this.albumItem.srcList);
         },
         genPreviewUrl(srcNeid, srcHash, srcRev, srcType) {
             let previewType = 'pic';    // if video is av

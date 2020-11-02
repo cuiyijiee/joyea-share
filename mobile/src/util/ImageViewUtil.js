@@ -1,4 +1,4 @@
-import {genSrcPreviewSrc, newGenSrcPreviewSrc} from './JoyeaUtil'
+import {genSrcPreviewSrc, genSrcOriginSrc} from './JoyeaUtil'
 
 import store from "../store"
 
@@ -8,13 +8,11 @@ export function convertItem(item) {
     if (item.srcHash) item.hash = item.srcHash;
     if (item.srcRev) item.rev = item.srcRev;
     if (item.srcPath) item.path = item.srcPath;
-    //if (item.uploadPath) item.path = item.uploadPath;
     item.joyeaDesc = item.srcDesc ? item.srcDesc : "";
     item.filename = item.srcName ? item.srcName : "";
-
-    if(!item.size) item.size = "0";
-    if(!item.bytes) item.bytes = 0;
-
+    if (item.uploadPath) item.path = item.uploadPath + item.srcName;
+    if (!item.size) item.size = "0";
+    if (!item.bytes) item.bytes = 0;
     return item;
 }
 
@@ -35,7 +33,7 @@ export function GenImageListView(context, itemList, sessionId, clickItem) {
         let isRealImage = store.state.showRealImage;
         if (isRealImage) {
             return {
-                url: newGenSrcPreviewSrc(item.path, item.neid, sessionId),
+                url: genSrcOriginSrc(item.path, item.neid, sessionId),
                 joyeaDesc: item.joyeaDesc
             };
         } else {

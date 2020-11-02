@@ -33,7 +33,6 @@ class SearchHandler extends IAction {
                     searchResultValue.asArray().forEach(value => {
                         val itemJson = value.asObject()
                         //如果客户端搜索的类型是全部，则需要进一步判断一下
-                        log.info(itemJson.toString(WriterConfig.PRETTY_PRINT))
                         if (!itemJson.getString("path", "").contains("素材库上传临时文件夹")) {
                             contentJsonArr.add(itemJson)
                         }

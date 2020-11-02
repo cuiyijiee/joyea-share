@@ -28,31 +28,10 @@
                     <div>{{ item.srcPath.substr(item.srcPath.lastIndexOf('/') + 1) }}</div>
                     <div v-if="item.srcDesc && item.srcDesc.trim().length > 0"
                          style="color: #8c939d">
-                        解说词:{{ item.srcDesc }}</div>
+                        解说词:{{ item.srcDesc }}
+                    </div>
                 </template>
             </van-card>
-<!--            <van-grid border :column-num="3" :gutter="5">-->
-<!--                <van-grid-item-->
-<!--                    v-for="item in albumItem.srcList" @click="handleGotoPreview(item)">-->
-<!--                    <van-image v-if="item.srcType.startsWith('image')" class="my_icon my_preview_size"-->
-<!--                               @click="handlePreview(item)"-->
-<!--                               :src="genPreviewUrl(item.srcNeid,item.srcHash,item.srcRev,item.srcType)"/>-->
-<!--                    <van-image v-else-if="item.srcType.startsWith('video')" class="my_icon my_preview_size"-->
-<!--                               @click="handlePreviewVideo(item)"-->
-<!--                               src="video.png"/>-->
-<!--                    <van-image v-else-if="item.srcType.startsWith('doc')" class="my_icon my_preview_size"-->
-<!--                               @click="handlePreviewVideo(item)"-->
-<!--                               :src="handleGetDocumentImage(item.srcType)"/>-->
-<!--                    <van-image v-else class="my_icon my_preview_size" @click="handlePreview(item)"-->
-<!--                               src="unknown.png"/>-->
-<!--                    <div style="width: 98%">-->
-<!--                        <div style="font-size:10px;-webkit-text-size-adjust: none;word-break:break-all;">-->
-<!--                            {{ item.srcPath.substr(item.srcPath.lastIndexOf('/') + 1) }}-->
-<!--                        </div>-->
-<!--                        <van-tag round type="success" v-for="tag in item.tags">{{ tag.replace(markReg, "") }}</van-tag>-->
-<!--                    </div>-->
-<!--                </van-grid-item>-->
-<!--            </van-grid>-->
         </van-action-sheet>
     </div>
 </template>
@@ -61,7 +40,7 @@
 import api, {listMineAlbum} from "../api";
 import {genSrcPreviewSrc, getDocumentImage, handleGoToPreview} from "../util/JoyeaUtil"
 import {mapGetters, mapActions} from "vuex";
-import {GenImageListView, convertItem} from "../util/ImageViewUtil";
+import {convertItem} from "../util/ImageViewUtil";
 import {switchShare} from "../api";
 
 export default {
@@ -142,24 +121,9 @@ export default {
                 })
             })
         },
-        handleGotoPreview(item) {
-            if (item.mime_type.startsWith("image")) {
-            } else {
-                this.handlePreview(item)
-            }
-        },
-        handlePreviewVideo(clickItem) {
-            handleGoToPreview(this, clickItem, this.userInfo.session);
-            event.stopPropagation();
-        },
         handlePreview(clickItem) {
-            if (clickItem.mime_type.startsWith("video")) {
-                this.handlePreviewVideo(clickItem);
-            } else if (clickItem.mime_type.startsWith("doc")) {
-                this.handlePreviewDoc(clickItem);
-            } else {
-                GenImageListView(this, this.albumItem.srcList, this.userInfo.session, clickItem);
-            }
+            clickItem = convertItem(clickItem);
+            handleGoToPreview(this, clickItem, this.userInfo.session, this.albumItem.srcList);
         },
         genPreviewUrl(srcNeid, srcHash, srcRev, srcType) {
             let previewType = 'pic';    // if video is av

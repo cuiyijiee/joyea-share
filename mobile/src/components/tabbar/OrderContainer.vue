@@ -53,9 +53,8 @@
 <script>
 
 import {mapState, mapActions, mapGetters} from "vuex"
-import {genSrcPreviewSrc} from "../../util/JoyeaUtil";
+import {genSrcPreviewSrc,getDocumentImage} from "../../util/JoyeaUtil";
 import api from "../../api";
-import {getDocumentImage} from '../../util/JoyeaUtil';
 import {createAlbum} from "../../api/"
 
 export default {

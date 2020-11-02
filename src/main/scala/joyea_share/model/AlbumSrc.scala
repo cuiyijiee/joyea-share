@@ -84,7 +84,7 @@ object AlbumSrc extends SQLSyntaxSupport[AlbumSrc] with ShortenedNames {
                       column.srcFileName,
                       column.srcBytes,
                       column.createdAt
-                  ).values(
+                  ).multipleValues(
                     insertCsv: _*
                 )
             }.update().future()

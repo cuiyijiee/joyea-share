@@ -112,8 +112,10 @@ export function getMyUploadRecord() {
     })
 }
 
-export function yesterdayUpload(){
-    return service.post("api/v1/upload/yesterday",{}).then(res => {
+export function latestUpload(num){
+    return service.post("api/v1/upload/latest",{
+        num:num
+    }).then(res => {
         return res.data;
     })
 }
