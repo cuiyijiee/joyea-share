@@ -14,8 +14,14 @@ import {genFileName} from './util/JoyeaUtil'
 
 Vue.config.productionTip = false;
 
+import moment from 'moment';
+
+Vue.filter('dateFormat', function (dataStr, pattern = 'YYYY-MM-DD HH:mm:ss') {
+    return moment(new Date(dataStr)).format(pattern);
+})
 
 import VConsole from 'vconsole'
+
 if (process.env.NODE_ENV !== 'production') {
     new VConsole()
 }

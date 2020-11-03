@@ -16,7 +16,7 @@
           管理员移至:{{ item.uploadPath.replace("/营销素材展示", "首页") + "/" + item.srcName }}
         </div>
         <div v-if="item.checkedAt && !item.checked">审核意见:{{ item.refuseReason }}</div>
-        <div>上传时间:{{ item.createdAt }}</div>
+        <div>上传时间:{{ item.createdAt | dateFormat }}</div>
       </template>
     </van-card>
   </div>
