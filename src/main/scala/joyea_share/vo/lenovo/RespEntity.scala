@@ -1,14 +1,14 @@
 package joyea_share.vo.lenovo
 
-case class FtpSearchResp(
+case class FtsSearchResp(
                           has_more: Boolean,
                           next_offset: Int,
                           transactionId: String,
                           status: Int,
-                          content: Seq[FtpSearchContent]
+                          content: Seq[FtsSearchContent]
                         )
 
-case class FtpSearchContent(
+case class FtsSearchContent(
                              prefix_neid: String,
                              fileindex: Option[Int],
                              from_name: String,

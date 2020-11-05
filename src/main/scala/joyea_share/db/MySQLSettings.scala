@@ -3,7 +3,6 @@ package joyea_share.db
 import scalikejdbc.async.AsyncConnectionPool
 import xitrum.Config
 
-import scala.concurrent._
 import scala.concurrent.duration._
 
 trait MySQLSettings {

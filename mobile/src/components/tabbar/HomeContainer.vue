@@ -170,7 +170,6 @@
         </div>
     </div>
 </template>
-
 <script>
 import api, {getDefaultJoyeaDesc, getTopSearchKey} from "../../api/";
 import {genSrcPreviewSrc, getDocumentImage, handleGoToPreview} from "../../util/JoyeaUtil"
