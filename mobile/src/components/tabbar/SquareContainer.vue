@@ -98,7 +98,7 @@
                 v-for="item in albumItem.srcList"
                 @click="handleClickItem(item)">
                 <template #thumb>
-                    <van-image width="80" height="80" v-if="item.srcType.startsWith('image')"
+                    <van-image width="80" height="80" v-if="item.srcType.startsWith('image') "
                                :src="getPreviewUrl(item)"/>
                     <van-image v-else width="80" height="80" :src="getDocumentImage(item.srcType)"></van-image>
                 </template>

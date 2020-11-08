@@ -1,6 +1,7 @@
 package joyea_share
 
 import joyea_share.db.MySQLSettings
+import joyea_share.model.UploadIntegral
 import joyea_share.util.LenovoUtil
 import joyea_share.vo.lenovo.FtsSearchResp
 import org.json4s.DefaultFormats
@@ -23,15 +24,22 @@ object BenchMark extends MySQLSettings {
 //                println(value)
 //        }
 
-        LenovoUtil.ftsSearch(
-            "听装", "", 202
-        ).onComplete {
-            case Failure(exception) =>
-                exception.printStackTrace()
-            case Success(value) =>
-                val resp = Serialization.read[FtsSearchResp](value)
-                println(s"current find file: ${resp.content.length},and has more: ${resp.has_more},and next_offset is: ${resp.next_offset}")
-        }
+//        LenovoUtil.ftsSearch(
+//            "听装", "", 202
+//        ).onComplete {
+//            case Failure(exception) =>
+//                exception.printStackTrace()
+//            case Success(value) =>
+//                val resp = Serialization.read[FtsSearchResp](value)
+//                println(s"current find file: ${resp.content.length},and has more: ${resp.has_more},and next_offset is: ${resp.next_offset}")
+//        }
+        UploadIntegral.create(7758258,"717",5)
+          .onComplete {
+              case Failure(exception) =>
+                  exception.printStackTrace()
+              case Success(value) =>
+                  println(value)
+          }
         scala.io.StdIn.readLine()
         //    DownloadRecord.create("","123",123,"12313",LocalDateTime.now()).onComplete {
         //      case Failure(exception) =>

@@ -17,6 +17,7 @@ import EditShareAlbum from "../views/EditShareAlbum";
 import LenovoDirSelector from "@/components/LenovoDirSelector";
 import MyUpload from "@/views/MyUpload";
 import ChangePwd from "@/views/ChangePwd";
+import Leaderboard from "../views/Leaderboard";
 
 Vue.use(Router);
 
@@ -91,6 +92,15 @@ export default new Router({
             path: '/album',
             name: '我的清单',
             component: AlbumList,
+            meta: {
+                allowBack: true,
+                allowHome: true
+            }
+        },
+        {
+            path: '/leaderboard',
+            name: '排行榜',
+            component: Leaderboard,
             meta: {
                 allowBack: true,
                 allowHome: true

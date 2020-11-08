@@ -14,6 +14,7 @@
         </van-cell>
         <van-divider/>
         <van-cell-group title="功能">
+            <van-cell title="排行榜" is-link @click="handleClickLeaderboard"/>
             <van-cell title="素材上传" is-link @click="handleClickUpload"/>
             <van-cell title="我的上传" is-link @click="handleClickMyUpload"/>
             <van-cell title="我的清单" is-link @click="handleClickMyList"/>
@@ -79,6 +80,9 @@ export default {
         },
         handleClickChangePwd() {
             this.$router.push("/user/changePwd")
+        },
+        handleClickLeaderboard(){
+            this.$router.push("/leaderboard")
         },
         handleClickUpload() {
             this.$router.push("/upload/index")
