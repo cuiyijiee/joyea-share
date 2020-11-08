@@ -15,7 +15,7 @@ import AlbumList from "../views/AlbumList";
 
 import EditShareAlbum from "../views/EditShareAlbum";
 import LenovoDirSelector from "@/components/LenovoDirSelector";
-import MyUpload from "@/views/MyUpload";
+import MyUpload from "@/views/upload/MyUpload";
 import ChangePwd from "@/views/ChangePwd";
 import Leaderboard from "../views/Leaderboard";
 

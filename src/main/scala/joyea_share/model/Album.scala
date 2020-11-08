@@ -6,11 +6,9 @@ import java.time.{LocalDate, OffsetDateTime, OffsetTime}
 import scalikejdbc._
 import async._
 import com.json.JsonObject
-import joyea_share.util.SUtil
 import joyea_share.vo.req.AlbumSortType
-import joyea_share.vo.req.AlbumSortType.AlbumSortType
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 case class Album(
                   albumId: Long,
@@ -32,7 +30,8 @@ case class Album(
                   jixingTagId: Int = -1,
                   jieduanTagId: Int = -1,
                   shichangTagId: Int = -1,
-                  copyFrom: Option[Long] = None
+                  copyFrom: Option[Long] = None,
+                  menuId: Option[Long]
                 ) extends ShortenedNames {
 
     def save(): Future[Album] = Album.save(this)
@@ -63,16 +62,13 @@ case class Album(
 
 object Album extends SQLSyntaxSupport[Album] with ShortenedNames {
 
+    implicit val ctx: EC = ExecutionContext.Implicits.global
+
     lazy val a: scalikejdbc.QuerySQLSyntaxProvider[scalikejdbc.SQLSyntaxSupport[Album], Album] = Album.syntax("a")
 
-    lazy val ju = JoyeaUser.ju
+    lazy val ju: scalikejdbc.QuerySQLSyntaxProvider[scalikejdbc.SQLSyntaxSupport[JoyeaUser], JoyeaUser] = JoyeaUser.ju
 
-    override def columnNames: Seq[String] = Seq("album_id", "user_id", "user_name", "album_name", "album_desc", "shared",
-        "share_cover_neid", "share_local_cover_id",
-        "share_desc", "created_at", "refer_num", "download_num", "like_num", "updated_at",
-        "hangye_tag_id", "xianbie_tag_id", "jixing_tag_id", "jieduan_tag_id", "shichang_tag_id",
-        "copy_from"
-    )
+    override lazy val columns: Seq[String] = autoColumns[Album]()
 
     def apply(a: SyntaxProvider[Album])(rs: WrappedResultSet): Album = apply(a.resultName)(rs)
 
@@ -120,7 +116,7 @@ object Album extends SQLSyntaxSupport[Album] with ShortenedNames {
     def create(userId: String, userName: String, albumName: String, albumDesc: Option[String],
                shared: Boolean = false, referNum: Long = 0, downloadNum: Int = 0, likeNum: Int = 0,
                hangyeTagId: Int = -1, xianbieTagId: Int = -1, jixingTagId: Int = -1, jieduanTagId: Int = -1, shichangTagId: Int = -1,
-               createdAt: OffsetDateTime = OffsetDateTime.now(), updatedAt: Option[OffsetDateTime] = None, copyFrom: Option[Long] = None)
+               createdAt: OffsetDateTime = OffsetDateTime.now(), updatedAt: Option[OffsetDateTime] = None, copyFrom: Option[Long] = None, menuId: Option[Long] = Some(0))
               (implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[Album] = {
         for {
             albumId <- withSQL {
@@ -141,12 +137,14 @@ object Album extends SQLSyntaxSupport[Album] with ShortenedNames {
                     column.createdAt -> createdAt,
                     column.updatedAt -> updatedAt,
                     column.copyFrom -> copyFrom,
+                    column.menuId -> menuId,
                 )
             }.updateAndReturnGeneratedKey().future()
         } yield new Album(albumId = albumId, userId = userId, userName = userName, albumName = albumName,
             albumDesc = albumDesc, shared = shared, shareCoverNeid = None, shareLocalCoverId = None, shareDesc = None,
             createdAt = createdAt, updatedAt = updatedAt,
-            hangyeTagId = hangyeTagId, xianbieTagId = xianbieTagId, jixingTagId = jixingTagId, jieduanTagId = jieduanTagId, shichangTagId = shichangTagId
+            hangyeTagId = hangyeTagId, xianbieTagId = xianbieTagId, jixingTagId = jixingTagId, jieduanTagId = jieduanTagId, shichangTagId = shichangTagId,
+            menuId = menuId
         )
     }
 
@@ -195,7 +193,7 @@ object Album extends SQLSyntaxSupport[Album] with ShortenedNames {
     }.map(Album(a)).list().future()
 
     //hangyeTagId = hangyeTagId, xianbieTagId = xianbieTagId, jixingTagId = jixingTagId, jieduanTagId = jieduanTagId, shichangId = shichangId
-    def pageListAlbum(curPage: Int, pageSize: Int, shared: Option[Boolean], sortType: AlbumSortType,
+    def pageListAlbum(curPage: Int, pageSize: Int, shared: Option[Boolean], sortType: AlbumSortType.AlbumSortType,
                       hangyeTagId: Int = -1, xianbieTagId: Int = -1, jixingTagId: Int = -1, jieduanTagId: Int = -1, shichangTagId: Int = -1)
                      (implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[List[Album]] = {
 
@@ -214,7 +212,7 @@ object Album extends SQLSyntaxSupport[Album] with ShortenedNames {
         } else {
             withSQL {
                 selectFrom(Album as a)
-                  .where.le(column.albumId, 0)
+                  .where.ge(column.albumId, 0)
                   .append(if (hangyeTagId == -1) sqls.empty else sqls.and(sqls.eq(column.hangyeTagId, hangyeTagId)))
                   .append(if (xianbieTagId == -1) sqls.empty else sqls.and(sqls.eq(column.xianbieTagId, xianbieTagId)))
                   .append(if (jixingTagId == -1) sqls.empty else sqls.and(sqls.eq(column.jixingTagId, jixingTagId)))
@@ -271,6 +269,15 @@ object Album extends SQLSyntaxSupport[Album] with ShortenedNames {
           .map((user, record) => {
               (user, record.length.toLong)
           }).list().future()
+    }
+
+    def setMenu(albumId: Long, menuId: Long)
+               (implicit session: AsyncDBSession = AsyncDB.sharedSession): Future[Boolean] = {
+        withSQL {
+            update(Album as a).set(
+                column.menuId -> menuId
+            ).where.eq(column.albumId, albumId)
+        }.update().future().map(_ > 0)
     }
 }
 
