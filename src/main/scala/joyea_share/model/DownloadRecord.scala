@@ -1,6 +1,6 @@
 package joyea_share.model
 
-import java.time.OffsetDateTime
+import java.time.{LocalDate, OffsetDateTime}
 
 import scalikejdbc._
 import scalikejdbc.async._
@@ -30,11 +30,16 @@ object DownloadRecord extends SQLSyntaxSupport[DownloadRecord] with ShortenedNam
 
     lazy val dr: scalikejdbc.QuerySQLSyntaxProvider[scalikejdbc.SQLSyntaxSupport[DownloadRecord], DownloadRecord] = DownloadRecord.syntax("dr")
 
+    lazy val ju: scalikejdbc.QuerySQLSyntaxProvider[scalikejdbc.SQLSyntaxSupport[JoyeaUser], JoyeaUser] = JoyeaUser.ju
+
     override lazy val columns: Seq[String] = autoColumns[DownloadRecord]("index", "rev", "pathType")
 
     def apply(sc: SyntaxProvider[DownloadRecord])(rs: WrappedResultSet): DownloadRecord = apply(sc.resultName)(rs)
 
     def apply(p: ResultName[DownloadRecord])(rs: WrappedResultSet): DownloadRecord = autoConstruct(rs, p)
+
+    def opt(s: SyntaxProvider[DownloadRecord])(rs: WrappedResultSet): Option[DownloadRecord] =
+        rs.longOpt(s.resultName.id).map(_ => apply(s.resultName)(rs))
 
     def create(joyeaUserId: String, filePath: String, neid: Long, fileName: String, createdAt: OffsetDateTime = OffsetDateTime.now())
               (implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[Long] = {
@@ -67,12 +72,23 @@ object DownloadRecord extends SQLSyntaxSupport[DownloadRecord] with ShortenedNam
         }.map(DownloadRecord(dr)).single().future()
     }
 
-//    def finish(taskId: Long)
-//              (implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[Boolean] = {
+//    def findWithDateLimit(startDate: LocalDate, endDate: LocalDate): Future[List[(JoyeaUser, Long)]] = {
 //        withSQL {
-//            update(DownloadRecord).set(
-//                dr.finishedAt -> sqls.currentTimestamp
-//            ).where.eq(dr.id, taskId)
-//        }.update().future().map(_ > 0)
+//            select.from[JoyeaUser](JoyeaUser as ju)
+//              .leftJoin(DownloadRecord as dr).on(sqls.and.ge(dr.createdAt, startDate).and.le(dr.createdAt, endDate))
+//        }.one(JoyeaUser(ju))
+//          .toMany(DownloadRecord.opt(dr))
+//          .map((user, record) => {
+//              (user, record.length.toLong)
+//          }).list().future()
 //    }
+
+    //    def finish(taskId: Long)
+    //              (implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[Boolean] = {
+    //        withSQL {
+    //            update(DownloadRecord).set(
+    //                dr.finishedAt -> sqls.currentTimestamp
+    //            ).where.eq(dr.id, taskId)
+    //        }.update().future().map(_ > 0)
+    //    }
 }

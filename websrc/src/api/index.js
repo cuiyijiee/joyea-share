@@ -57,7 +57,7 @@ export function findUploadRecord(curPage, pageSize) {
     })
 }
 
-export function uploadRecordManage(recordId, allow, refuseReason, uploadPath, uploadPathNeid, srcName, needCount) {
+export function uploadRecordManage(recordId, allow, refuseReason, uploadPath, uploadPathNeid, srcName, needCount,integral) {
     return service.post('api/v1/upload/manage', {
         recordId,
         allow: allow,
@@ -65,7 +65,8 @@ export function uploadRecordManage(recordId, allow, refuseReason, uploadPath, up
         uploadPath: uploadPath,
         uploadPathNeid: uploadPathNeid,
         srcName: srcName,
-        needCount: needCount
+        needCount: needCount,
+        integral:integral
     }).then(res => {
         return res.data;
     })

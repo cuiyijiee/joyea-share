@@ -4,8 +4,12 @@ import java.io.{File, FileFilter}
 import java.util.concurrent.{ExecutorService, Executors, TimeUnit}
 
 import com.utils.CommonUtil
+import joyea_share.model.{SrcQuote, UploadRecord}
 import joyea_share.util.{CommonListener, LenovoUtil, SUtil}
 import xitrum.{Config, Log}
+
+import scala.concurrent.ExecutionContext
+import scala.util.{Failure, Success}
 
 trait DownloadManager {
     DownloadManager.init()
@@ -55,8 +59,17 @@ object DownloadManager extends Log {
                     }
 
                     override def onFinish(taskId: String, success: Int, failed: Int, total: Int): Unit = {
+                        implicit val ctx: ExecutionContext = ExecutionContext.Implicits.global
                         task.downloadFile.foreach(record => {
                             record.recordToDb()
+                            UploadRecord.findByNeid(record.neid)
+                              .foreach(recordOpt => {
+                                  if (recordOpt.isDefined) {
+                                      SrcQuote.create(record.neid, recordOpt.get.uploader, record.joyeaUserId)
+                                  } else {
+                                      log.info(s"record ${record.neid} is not upload by server, no need to record src quote!")
+                                  }
+                              })
                         })
                     }
                 })

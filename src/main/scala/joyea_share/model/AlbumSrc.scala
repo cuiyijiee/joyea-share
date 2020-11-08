@@ -140,4 +140,5 @@ object AlbumSrc extends SQLSyntaxSupport[AlbumSrc] with ShortenedNames {
         select(sqls.count).from(AlbumSrc as albums).where.eq(albums.srcNeid, srcNeid)
     }.map(_.long(1)).single().future().map(_.get)
 
+
 }

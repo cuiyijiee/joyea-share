@@ -112,9 +112,9 @@ export function getMyUploadRecord() {
     })
 }
 
-export function latestUpload(num){
-    return service.post("api/v1/upload/latest",{
-        num:num
+export function latestUpload(num) {
+    return service.post("api/v1/upload/latest", {
+        num: num
     }).then(res => {
         return res.data;
     })
@@ -137,10 +137,46 @@ export function changePwd(curPwd, newPwd) {
     })
 }
 
-export function createAlbum(name,fileList){
-    return service.post('/api/v1/album/collect/save',{
-        name:name,
-        src:fileList
+export function createAlbum(name, fileList) {
+    return service.post('/api/v1/album/collect/save', {
+        name: name,
+        src: fileList
+    }).then(resp => {
+        return resp.data;
+    })
+}
+
+export function uploadIntegralLeaderboard(year, month) {
+    return service.post('api/v1/leaderboard/uploadIntegral', {
+        year: year,
+        month: month
+    }).then(resp => {
+        return resp.data;
+    })
+}
+
+export function srcQuoteLeaderboard(year, month) {
+    return service.post('api/v1/leaderboard/srcQuote', {
+        year: year,
+        month: month
+    }).then(resp => {
+        return resp.data;
+    })
+}
+
+export function albumShareLeaderboard(year, month) {
+    return service.post('api/v1/leaderboard/albumShare', {
+        year: year,
+        month: month
+    }).then(resp => {
+        return resp.data;
+    })
+}
+
+export function albumQuoteLeaderboard(year, month) {
+    return service.post('api/v1/leaderboard/albumQuote', {
+        year: year,
+        month: month
     }).then(resp => {
         return resp.data;
     })
