@@ -24,46 +24,74 @@
                 </van-tabs>
             </div>
         </div>
-        <div style="height: 120px;text-align: center;" v-if="leaderObjType === 0">
-            <div style="font-size: 20px;color: #eb7808">我的排名</div>
-            <div style="font-size: 50px;color: #cf9236">{{ myIndex }}</div>
-            <div style="font-size: 20px;color: #eb7808">我的得分: {{ myScore }}</div>
+        <div style="height: 120px;text-align: center;color: #ffffff;"
+             :style="{background: 'url('+bg_leaderboard+')'}"
+             v-if="leaderObjType === 0">
+            <div style="font-size: 20px;">我的排名</div>
+            <div style="font-size: 50px;" v-if="myScore > 0">{{ myIndex }}</div>
+            <div style="font-size: 50px;" v-else> -</div>
+            <div style="font-size: 20px;">我的得分: {{ myScore }}</div>
         </div>
+        <van-row style="text-align: center;color: #8c939d;padding: 8px 0">
+            <van-col span="4">名次</van-col>
+            <van-col span="16">名称</van-col>
+            <van-col span="4">得分</van-col>
+        </van-row>
         <div v-if="leaderObjType === 0">
-            <div v-for="(item,index) in leaderboardList">
-                <van-card
-                    :title="item.user.joyeaName"
-                    :desc="item.user.department + ' | ' + item.user.position">
-                    <template #thumb>
-                        <avatars backgroundColor="#eb7808" color="#ffffff" :size="80"
-                                 :username="item.user.joyeaName"></avatars>
-                    </template>
-                    <template #price>
-                        积分: {{ item.value }}
-                    </template>
-                    <template #num>
-                        名次: {{ index + 1 }}
-                    </template>
-                </van-card>
-                <div style="height: 1px;background: #8c939d"/>
+            <div v-for="(item,index) in leaderboardList.slice(0,10)">
+                <van-row style="text-align: center">
+                    <van-col span="4">
+                        <div style="margin-top: 10px" v-if="index < 3">
+                            <van-image v-if="index === 0" width="30" height="30" :src="medal_gold"/>
+                            <van-image v-if="index === 1" width="30" height="30" :src="medal_silver"/>
+                            <van-image v-if="index === 2" width="30" height="30" :src="medal_bronze"/>
+                        </div>
+                        <div v-else style="margin-top: 10px">
+                            {{ index + 1 }}
+                        </div>
+                    </van-col>
+                    <van-col span="16" style="height: 50px">
+                        <div v-if="item.value > 0">
+                            <div>{{ item.user.joyeaName }}</div>
+                            <div style="color: #8c939d">{{ item.user.department + ' | ' + item.user.position }}</div>
+                        </div>
+                        <div v-else style="margin-top: 10px;color: #99a9bf">
+                            -- 虚位以待 --
+                        </div>
+                    </van-col>
+                    <van-col span="4">
+                        <div style="margin-top: 15px">{{ item.value }}</div>
+                    </van-col>
+                </van-row>
+                <div style="height: 1px;background: #99a9bf"/>
             </div>
         </div>
         <div v-else>
-            <div v-for="(item,index) in leaderboardDepartmentList">
-                <van-card
-                    :title="item.department">
-                    <template #thumb>
-                        <avatars backgroundColor="#eb7808" color="#ffffff" :size="80"
-                                 :username="item.department.substring(0,2)"></avatars>
-                    </template>
-                    <template #price>
-                        积分: {{ item.value }}
-                    </template>
-                    <template #num>
-                        名次: {{ index + 1 }}
-                    </template>
-                </van-card>
-                <div style="height: 1px;background: #8c939d"/>
+            <div v-for="(item,index) in leaderboardDepartmentList.slice(0,10)">
+                <van-row style="text-align: center">
+                    <van-col span="4">
+                        <div style="margin-top: 10px" v-if="index < 3">
+                            <van-image v-if="index === 0" width="30" height="30" :src="medal_gold"/>
+                            <van-image v-if="index === 1" width="30" height="30" :src="medal_silver"/>
+                            <van-image v-if="index === 2" width="30" height="30" :src="medal_bronze"/>
+                        </div>
+                        <div v-else style="margin-top: 10px">
+                            {{ index + 1 }}
+                        </div>
+                    </van-col>
+                    <van-col span="16" style="height: 50px">
+                        <div v-if="item.value > 0" style="margin-top: 10px;">
+                            <div>{{ item.department }}</div>
+                        </div>
+                        <div v-else style="margin-top: 10px;color: #99a9bf">
+                            -- 虚位以待 --
+                        </div>
+                    </van-col>
+                    <van-col span="4">
+                        <div style="margin-top: 15px">{{ item.value }}</div>
+                    </van-col>
+                </van-row>
+                <div style="height: 1px;background: #99a9bf"/>
             </div>
         </div>
     </div>
@@ -83,6 +111,10 @@ export default {
     },
     data() {
         return {
+            medal_gold: require('../assets/medal-gold.png'),
+            medal_silver: require('../assets/medal-silver.png'),
+            medal_bronze: require('../assets/medal-bronze.png'),
+            bg_leaderboard: require('../assets/bg-leaderboard.jpeg'),
             option: {
                 year: [],
                 month: []
@@ -120,12 +152,13 @@ export default {
         handleGenerateDateOption() {
             this.option.month.push({text: '全年', value: 0})
             for (let index = 1; index < 13; index++) {
-                this.option.month.push({text: index + '月', value: index})
+                this.option.month.push({text: index + '月', value: index});
             }
             let currentYear = Number(moment(new Date()).format('YYYY'));
             for (let index = 2020; index <= currentYear; index++) {
                 this.option.year.push({text: index + '年', value: index});
             }
+            this.month = Number(moment(new Date()).format('MM'));
         },
         handleGetAlbumShare() {
             const toast = Toast.loading({

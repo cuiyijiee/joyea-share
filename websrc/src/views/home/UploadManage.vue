@@ -92,8 +92,7 @@ export default {
         return {
             manageDialogVisible: false,
             recordList: [],
-            toManageRecord: {
-            },
+            toManageRecord: {},
             integral: 1,
             selectPathVisible: false,
             toPlayVideo: {
@@ -118,7 +117,7 @@ export default {
                 uploadRecordManage(this.toManageRecord.id, true, null,
                     this.toManageRecord.uploadPath, this.toManageRecord.uploadPathNeid,
                     this.toManageRecord.srcName + "." + this.toManageRecord.suffix,
-                    this.toManageRecord.needCount
+                    this.toManageRecord.needCount, this.integral
                 ).then(resp => {
                     if (resp.data) {
                         this.$message.success("审核成功！");

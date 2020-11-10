@@ -19,7 +19,7 @@ const store = new Vuex.Store({
         imagePreviewShow: false,
         imagePreviewImages: [],
         imagePreviewStartIndex: 0,
-        latestReadUploadSrcId: 0
+        latestReadUploadSrcId: 76
     },
     getters: {
         getStateOrderList: function (state) {

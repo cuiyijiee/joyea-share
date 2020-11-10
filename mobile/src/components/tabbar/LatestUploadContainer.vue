@@ -11,7 +11,7 @@
                     </van-divider>
                 </div>
                 <div v-else-if="item.lastReadFlag">
-                    <div style="height: 50px" class="lastReadFlag">
+                    <div style="height: 50px;padding-top: 46px" class="lastReadFlag">
                         <van-divider content-position="left"
                                      :style="{ color: '#000000', borderColor: '#000000', padding: '0 16px' }">
                             上次更新到此 👇👇👇
@@ -77,7 +77,6 @@ export default {
                 for (let index = 0; index < resp.data.length; index++) {
                     let item = resp.data[index];
                     if (item.uploadPath) {  //过滤未审核文件
-
                         if (index + 1 < resp.data.length && this.latestReadUploadSrcId !== 0) {
                             if (resp.data[index + 1].id === this.latestReadUploadSrcId) {
                                 itemList.push({

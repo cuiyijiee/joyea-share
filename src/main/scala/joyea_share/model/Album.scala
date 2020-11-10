@@ -1,12 +1,12 @@
 package joyea_share.model
 
 import java.sql.Timestamp
-import java.time.{LocalDate, OffsetDateTime, OffsetTime}
+import java.time.{LocalDate, OffsetDateTime}
 
-import scalikejdbc._
-import async._
 import com.json.JsonObject
 import joyea_share.vo.req.AlbumSortType
+import scalikejdbc._
+import scalikejdbc.async._
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -61,8 +61,6 @@ case class Album(
 
 
 object Album extends SQLSyntaxSupport[Album] with ShortenedNames {
-
-    implicit val ctx: EC = ExecutionContext.Implicits.global
 
     lazy val a: scalikejdbc.QuerySQLSyntaxProvider[scalikejdbc.SQLSyntaxSupport[Album], Album] = Album.syntax("a")
 
@@ -277,7 +275,7 @@ object Album extends SQLSyntaxSupport[Album] with ShortenedNames {
             update(Album as a).set(
                 column.menuId -> menuId
             ).where.eq(column.albumId, albumId)
-        }.update().future().map(_ > 0)
+        }.update().future().map(_ > 0)(ExecutionContext.Implicits.global)
     }
 }
 

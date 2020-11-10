@@ -10,6 +10,7 @@
   "dependencies": {
     "axios": "^0.19.2",
     "core-js": "^3.6.4",
+    "mathjax": "^3.1.2",
     "moment": "^2.29.1",
     "scss": "^0.2.4",
     "sortablejs": "^1.12.0",
