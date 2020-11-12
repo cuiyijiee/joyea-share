@@ -20,7 +20,7 @@
         </van-popup>
         <van-divider/>
         <van-cell-group title="功能">
-            <van-cell v-if="userInfo.email === '717'" title="排行榜" is-link @click="handleClickLeaderboard"/>
+            <van-cell title="排行榜" is-link @click="handleClickLeaderboard"/>
             <van-cell title="素材上传" is-link @click="handleClickUpload"/>
             <van-cell title="我的清单" is-link @click="handleClickMyList"/>
 

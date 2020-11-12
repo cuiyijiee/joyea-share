@@ -16,6 +16,22 @@
                 </van-tabs>
             </div>
         </div>
+        <div
+            style="height: 120px;text-align: center;color: #ffffff;"
+            :style="{background: 'url('+bg_leaderboard+')','background-size':'cover','background-repeat': 'no-repeat'}"
+            v-if="leaderObjType === 0">
+            <div style="font-size: 20px; padding-top: 20px">
+                <span>我的排名  </span>
+                <span style="padding-top: 5px">
+                    <van-icon name="question" @click="tipVisible = true" size="15"/>
+                </span>
+            </div>
+            <div v-if="myScore > 0">
+                <span style="font-size: 40px;">第{{ myIndex }}名</span>
+                <span> ( 积分: {{ myScore }}分 )</span>
+            </div>
+            <div style="font-size: 50px;" v-else> -</div>
+        </div>
         <div class="obj-selector">
             <div>
                 <van-tabs v-model="leaderObjType" @change="handleConditionChanged">
@@ -24,28 +40,16 @@
                 </van-tabs>
             </div>
         </div>
-        <div
-            style="height: 120px;text-align: center;color: #ffffff;"
-            :style="{background: 'url('+bg_leaderboard+')','background-size':'cover','background-repeat': 'no-repeat'}"
-            v-if="leaderObjType === 0">
-            <div style="font-size: 20px; padding-top: 20px">我的排名
-                <van-icon style="margin-top: 2px" name="question" @click="tipVisible = true"/>
-            </div>
-            <div v-if="myScore > 0">
-                <span style="font-size: 40px;">第{{ myIndex }}名</span>
-                <span> ( 积分: {{ myScore }}分 )</span>
-            </div>
-            <div style="font-size: 50px;" v-else> -</div>
-        </div>
+
         <div v-if="leaderObjType === 0">
-            <van-row style="text-align: center;color: #8c939d;padding: 8px 0">
-                <van-col span="6">排名</van-col>
-                <van-col span="12">用户名</van-col>
-                <van-col span="6">积分</van-col>
+            <van-row style="text-align: center;color: #8c939d;padding: 8px 0;font-size: 14px;">
+                <van-col span="8">排名</van-col>
+                <van-col span="8">用户名</van-col>
+                <van-col span="8">积分</van-col>
             </van-row>
             <div v-for="(item,index) in leaderboardList.slice(0,10)" style="margin: 10px 0">
                 <van-row>
-                    <van-col span="6" style="text-align: center">
+                    <van-col span="8" style="text-align: center">
                         <div style="margin-top: 10px" v-if="index < 3">
                             <van-image v-if="index === 0" width="30" height="30" :src="medal_gold"/>
                             <van-image v-if="index === 1" width="30" height="30" :src="medal_silver"/>
@@ -55,31 +59,31 @@
                             {{ index + 1 }}
                         </div>
                     </van-col>
-                    <van-col span="12" style="height: 50px">
+                    <van-col span="8" style="height: 50px;font-size: 14px;text-align: center;padding-left: 2px">
                         <div v-if="item.value > 0">
-                            <div>{{ item.user.joyeaName }}</div>
-                            <div style="color: #8c939d">{{ item.user.department + ' | ' + item.user.position }}</div>
+                            <div style="text-align: left">{{ item.user.joyeaName }}</div>
+                            <div style="color: #8c939d;text-align: left">{{ item.user.department + ' | ' + item.user.position }}</div>
                         </div>
                         <div v-else style="margin-top: 10px;color: #99a9bf">
                             -- 虚位以待 --
                         </div>
                     </van-col>
-                    <van-col span="6" style="text-align: center">
+                    <van-col span="8" style="text-align: center">
                         <div style="margin-top: 15px">{{ item.value }}</div>
                     </van-col>
                 </van-row>
-                <div style="height: 1px;background: #eeeeee"/>
+                <div style="height: 1px;background: #efefef"/>
             </div>
         </div>
         <div v-else>
-            <van-row style="text-align: center;color: #8c939d;padding: 8px 0">
-                <van-col span="6">排名</van-col>
-                <van-col span="12">部门</van-col>
-                <van-col span="6">积分</van-col>
+            <van-row style="text-align: center;color: #8c939d;padding: 8px 0;font-size: 14px;">
+                <van-col span="8">排名</van-col>
+                <van-col span="8">部门</van-col>
+                <van-col span="8">积分</van-col>
             </van-row>
             <div v-for="(item,index) in leaderboardDepartmentList.slice(0,10)" style="margin: 10px 0">
                 <van-row>
-                    <van-col span="6" style="text-align: center">
+                    <van-col span="8" style="text-align: center">
                         <div style="margin-top: 10px" v-if="index < 3">
                             <van-image v-if="index === 0" width="30" height="30" :src="medal_gold"/>
                             <van-image v-if="index === 1" width="30" height="30" :src="medal_silver"/>
@@ -89,7 +93,7 @@
                             {{ index + 1 }}
                         </div>
                     </van-col>
-                    <van-col span="12" style="height: 50px">
+                    <van-col span="8" style="height: 50px;font-size: 14px;text-align: center">
                         <div v-if="item.value > 0" style="margin-top: 10px;">
                             <div>{{ item.department }}</div>
                         </div>
@@ -97,11 +101,11 @@
                             -- 虚位以待 --
                         </div>
                     </van-col>
-                    <van-col span="6" style="text-align: center">
+                    <van-col span="8" style="text-align: center">
                         <div style="margin-top: 15px">{{ item.value }}</div>
                     </van-col>
                 </van-row>
-                <div style="height: 1px;background: #eeeeee"/>
+                <div style="height: 1px;background: #efefef"/>
             </div>
         </div>
         <van-dialog v-model="tipVisible" :title="tipTitle" show-cancel-button theme="round" :showCancelButton="false">
@@ -161,7 +165,7 @@ export default {
         }
     },
     computed: {
-        tipTitle:function () {
+        tipTitle: function () {
             if (this.leaderBoardType === 0) {
                 return "素材采纳排名规则";
             } else if (this.leaderBoardType === 1) {
