@@ -19,14 +19,14 @@ class AlbumCollectAddAction extends BaseAction[SaveAlbumCollectReq] {
                   //如果没有创建过则使用事务创建该记录
                   AsyncDB.localTx { implicit session => {
                       for {
-                          createdAlbum <- Album.create(myUid, userName = myName, albumName = req.name, albumDesc = None)
+                          createdAlbumId <- Album.create(myUid, userName = myName, albumName = req.name, albumDesc = None)
                           createdAlbumSrcNum <- AlbumSrc.createMany(req.src.map(srcReq => {
-                              AlbumSrc(albumId = createdAlbum.albumId, id = 0, srcNeid = srcReq.neid, srcHash = srcReq.hash, srcRev = srcReq.rev, srcSize = srcReq.size, srcPath = srcReq.path, srcType = srcReq.mime_type, srcDesc = srcReq.joyeaDesc, srcFileName = srcReq.filename, srcBytes = srcReq.bytes)
+                              AlbumSrc(albumId = createdAlbumId, id = 0, srcNeid = srcReq.neid, srcHash = srcReq.hash, srcRev = srcReq.rev, srcSize = srcReq.size, srcPath = srcReq.path, srcType = srcReq.mime_type, srcDesc = srcReq.joyeaDesc, srcFileName = srcReq.filename, srcBytes = srcReq.bytes)
                           }))
-                      } yield createdAlbum
+                      } yield createdAlbumId
                   }
-                  }.onComplete(safeResponse[Album](_, createdAlbum => {
-                      baseResponseSuccess(createdAlbum.albumId)
+                  }.onComplete(safeResponse[Long](_, createdAlbumId => {
+                      baseResponseSuccess(createdAlbumId)
                       req.src.foreach(src => {
                           UploadRecord.findByNeid(src.neid)
                             .foreach(recordOpt => {

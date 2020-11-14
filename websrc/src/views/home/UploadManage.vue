@@ -2,7 +2,7 @@
     <div style="padding: 10px 150px 0 150px;">
         <h1 v-if="recordList.length === 0">暂时没有需要审核的上传文件！</h1>
         <el-row>
-            <el-col :span="6" v-for="(record, index) in recordList" :key="index">
+            <el-col :span="8" v-for="(record, index) in recordList" :key="index">
                 <el-card style="margin: 20px">
                     <div @click="handleGoToPreview(record)">
                         <img v-if="record.srcType.startsWith('image')"
@@ -17,7 +17,7 @@
                         <div>
                             <div>上传者:{{ record.uploaderName }}</div>
                             <div style="height:60px;line-height:20px">上传文件说明:{{ record.srcDesc }}</div>
-                            <time class="time">{{ record.createdAt }}</time>
+                            <time class="time">{{ record.createdAt | dateFormat }}</time>
                         </div>
                         <div class="bottom clearfix">
                             <el-button type="danger" @click="handleRefuseUpload(record)">不通过</el-button>

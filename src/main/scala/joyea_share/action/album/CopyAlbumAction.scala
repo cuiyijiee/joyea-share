@@ -14,10 +14,10 @@ class CopyAlbum extends BaseAction[CopyAlbumReq] {
                     hangyeTagId = album.hangyeTagId, xianbieTagId = album.xianbieTagId, jixingTagId = album.jixingTagId, jieduanTagId = album.jieduanTagId, shichangTagId = album.shichangTagId,
                     copyFrom = Some(album.albumId)
                 )
-                  .onComplete(safeResponse[Album](_, newAlbum => {
+                  .onComplete(safeResponse[Long](_, newAlbumId => {
                       AlbumSrc.findByAlbumId(album.albumId).onComplete(safeResponse[List[AlbumSrc]](_, srcList => {
                           srcList.foreach(src => {
-                              AlbumSrc.create(src.srcNeid, newAlbum.albumId, src.srcPath, src.srcType, src.srcHash, src.srcRev, src.srcSize, src.srcDesc, src.srcFileName, srcBytes = src.srcBytes)
+                              AlbumSrc.create(src.srcNeid, newAlbumId, src.srcPath, src.srcType, src.srcHash, src.srcRev, src.srcSize, src.srcDesc, src.srcFileName, srcBytes = src.srcBytes)
                           })
                       }))
                       Album.addLike(albumId = album.albumId).onComplete(safeResponse[Int](_, result => {

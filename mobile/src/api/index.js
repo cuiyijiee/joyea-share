@@ -53,8 +53,10 @@ export function pageListAlbum(curPage, pageSize, shared, sortType,
     })
 }
 
-export function listMineAlbum() {
-    return service.post("api/v1/album/list/mine", {}).then(res => {
+export function listMineAlbum(menuId) {
+    return service.post("api/v1/album/listMine", {
+        menuId: menuId
+    }).then(res => {
         return res.data;
     })
 }
@@ -180,4 +182,38 @@ export function albumQuoteLeaderboard(year, month) {
     }).then(resp => {
         return resp.data;
     })
+}
+
+export function createAlbumMenu(menuName) {
+    return service.post('api/v1/album/createMenu', {
+        menuName: menuName
+    }).then(resp => {
+        return resp.data;
+    })
+}
+
+export function listMyAlbumMenu() {
+    return service.post('api/v1/album/menuList', {}).then(resp => {
+        return resp.data;
+    })
+}
+
+export function renameAlbumMenu(menuId, newName) {
+    return service.post('api/v1/album/renameMenu', {
+        menuId: menuId,
+        name: newName
+    }).then(resp => resp.data);
+}
+
+export function deleteAlbumMenu(menuId) {
+    return service.post('api/v1/album/deleteMenu', {
+        menuId: menuId
+    }).then(resp => resp.data);
+}
+
+export function moveAlbumMenu(albumId, menuId) {
+    return service.post('api/v1/album/moveMenu', {
+        albumId: albumId,
+        menuId: menuId
+    }).then(resp => resp.data);
 }

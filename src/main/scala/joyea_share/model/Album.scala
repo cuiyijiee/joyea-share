@@ -31,7 +31,10 @@ case class Album(
                   jieduanTagId: Int = -1,
                   shichangTagId: Int = -1,
                   copyFrom: Option[Long] = None,
-                  menuId: Option[Long]
+                  menuId: Option[Long],
+
+                  menu: Option[AlbumMenu] = None,
+                  src: Seq[AlbumSrc] = Seq()
                 ) extends ShortenedNames {
 
     def save(): Future[Album] = Album.save(this)
@@ -62,21 +65,27 @@ case class Album(
 
 object Album extends SQLSyntaxSupport[Album] with ShortenedNames {
 
+    implicit val ctx: EC = ExecutionContext.Implicits.global
+
     lazy val a: scalikejdbc.QuerySQLSyntaxProvider[scalikejdbc.SQLSyntaxSupport[Album], Album] = Album.syntax("a")
 
     lazy val ju: scalikejdbc.QuerySQLSyntaxProvider[scalikejdbc.SQLSyntaxSupport[JoyeaUser], JoyeaUser] = JoyeaUser.ju
 
-    override lazy val columns: Seq[String] = autoColumns[Album]()
+    lazy val as: scalikejdbc.QuerySQLSyntaxProvider[scalikejdbc.SQLSyntaxSupport[AlbumSrc], AlbumSrc] = AlbumSrc.as
+
+    lazy val am: scalikejdbc.QuerySQLSyntaxProvider[scalikejdbc.SQLSyntaxSupport[AlbumMenu], AlbumMenu] = AlbumMenu.am
+
+    override lazy val columns: Seq[String] = autoColumns[Album]("menu", "src")
 
     def apply(a: SyntaxProvider[Album])(rs: WrappedResultSet): Album = apply(a.resultName)(rs)
 
-    def apply(a: ResultName[Album])(rs: WrappedResultSet): Album = autoConstruct(rs, a)
+    def apply(a: ResultName[Album])(rs: WrappedResultSet): Album = autoConstruct(rs, a, "menu", "src")
 
     def opt(s: SyntaxProvider[Album])(rs: WrappedResultSet): Option[Album] =
         rs.longOpt(s.resultName.userId).map(_ => apply(s.resultName)(rs))
 
     def save(album: Album, updateAt: Option[Timestamp] = Some(new Timestamp(System.currentTimeMillis())))
-            (implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[Album] = withSQL {
+            (implicit session: AsyncDBSession = AsyncDB.sharedSession): Future[Album] = withSQL {
         update(Album).set(
             column.userId -> album.userId,
             column.userName -> album.userName,
@@ -97,17 +106,68 @@ object Album extends SQLSyntaxSupport[Album] with ShortenedNames {
         ).where.eq(column.albumId, album.albumId)
     }.update().future().map(_ => album)
 
+    def moveMenu(id: Long, newMenuId: Option[Long])
+                (implicit session: AsyncDBSession = AsyncDB.sharedSession): Future[Boolean] = {
+        withSQL {
+            update(Album as a)
+              .set(a.menuId -> newMenuId)
+              .where.eq(a.albumId, id)
+        }.update().future().map(_ > 0)
+    }
+
+    def countByMenu(menuId: Long)
+                   (implicit session: AsyncDBSession = AsyncDB.sharedSession): Future[Long] = {
+        withSQL {
+            select(sqls.count).from(Album as a)
+              .where.eq(a.menuId, menuId)
+        }.map(_.long(1)).single().future().map(_.get)
+    }
+
+    def findByUserAndMenu(joyeaId: String, menuId: Long)
+                         (implicit session: AsyncDBSession = AsyncDB.sharedSession): Future[Seq[Album]] = {
+        val sql = withSQL {
+            selectFrom[Album](Album as a)
+              .leftJoin(AlbumMenu as am).on(a.menuId, am.id)
+              .leftJoin(AlbumSrc as as).on(a.albumId, as.albumId)
+              .where.eq(a.userId, joyeaId)
+              .and.append(
+                if (menuId == -1) {
+                    sqls.isNull(a.menuId)
+                } else {
+                    sqls.eq(a.menuId, menuId)
+                }
+            ).orderBy(a.albumId).desc
+        }.one(Album(a))
+          .toManies(AlbumMenu.opt(am), AlbumSrc.opt(as))
+          .map((album, albumMenuSeq, albumSrcSeq) => {
+              album.copy(menu = albumMenuSeq.headOption).copy(src = albumSrcSeq)
+          }).list()
+        scalikejdbc.async.makeOneToManies2SQLToListAsync(sql).future()
+    }
+
     //查找该用户的所有清单
-    def findByUserId(userId: String)(implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[List[Album]] = withSQL {
-        selectFrom(Album as a).where.eq(column.userId, userId).orderBy(column.albumId).desc
-    }.map(Album(a)).list().future()
+    def findByUserId(userId: String)(implicit session: AsyncDBSession = AsyncDB.sharedSession): Future[List[Album]] = {
+        val sql = withSQL {
+            selectFrom[Album](Album as a)
+              .leftJoin(AlbumMenu as am).on(a.menuId, am.id)
+              .leftJoin(AlbumSrc as as).on(a.albumId, as.albumId)
+              .where
+              .eq(a.userId, userId)
+              .orderBy(a.albumId).desc
+        }.one(Album(a))
+          .toManies(AlbumMenu.opt(am), AlbumSrc.opt(as))
+          .map((album, albumMenuSeq, albumSrcSeq) => {
+              album.copy(menu = albumMenuSeq.headOption).copy(src = albumSrcSeq)
+          }).list()
+        scalikejdbc.async.makeOneToManies2SQLToListAsync(sql).future()
+    }
 
     //查找是否存在同名的
-    def findByUserIdAndName(userId: String, albumName: String)(implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[Option[Album]] = withSQL {
+    def findByUserIdAndName(userId: String, albumName: String)(implicit session: AsyncDBSession = AsyncDB.sharedSession): Future[Option[Album]] = withSQL {
         selectFrom(Album as a).where.eq(column.userId, userId).and.eq(column.albumName, albumName)
     }.map(Album(a)).single().future()
 
-    def findByAlbumId(albumId: Long)(implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[Option[Album]] = withSQL {
+    def findByAlbumId(albumId: Long)(implicit session: AsyncDBSession = AsyncDB.sharedSession): Future[Option[Album]] = withSQL {
         selectFrom(Album as a).where.eq(column.albumId, albumId)
     }.map(Album(a)).single().future()
 
@@ -115,43 +175,36 @@ object Album extends SQLSyntaxSupport[Album] with ShortenedNames {
                shared: Boolean = false, referNum: Long = 0, downloadNum: Int = 0, likeNum: Int = 0,
                hangyeTagId: Int = -1, xianbieTagId: Int = -1, jixingTagId: Int = -1, jieduanTagId: Int = -1, shichangTagId: Int = -1,
                createdAt: OffsetDateTime = OffsetDateTime.now(), updatedAt: Option[OffsetDateTime] = None, copyFrom: Option[Long] = None, menuId: Option[Long] = Some(0))
-              (implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[Album] = {
-        for {
-            albumId <- withSQL {
-                insertInto(Album).namedValues(
-                    column.userId -> userId,
-                    column.userName -> userName,
-                    column.albumName -> albumName,
-                    column.albumDesc -> albumDesc,
-                    column.shared -> shared,
-                    column.downloadNum -> downloadNum,
-                    column.likeNum -> likeNum,
-                    column.referNum -> referNum,
-                    column.hangyeTagId -> hangyeTagId,
-                    column.xianbieTagId -> xianbieTagId,
-                    column.jixingTagId -> jixingTagId,
-                    column.jieduanTagId -> jieduanTagId,
-                    column.shichangTagId -> shichangTagId,
-                    column.createdAt -> createdAt,
-                    column.updatedAt -> updatedAt,
-                    column.copyFrom -> copyFrom,
-                    column.menuId -> menuId,
-                )
-            }.updateAndReturnGeneratedKey().future()
-        } yield new Album(albumId = albumId, userId = userId, userName = userName, albumName = albumName,
-            albumDesc = albumDesc, shared = shared, shareCoverNeid = None, shareLocalCoverId = None, shareDesc = None,
-            createdAt = createdAt, updatedAt = updatedAt,
-            hangyeTagId = hangyeTagId, xianbieTagId = xianbieTagId, jixingTagId = jixingTagId, jieduanTagId = jieduanTagId, shichangTagId = shichangTagId,
-            menuId = menuId
-        )
+              (implicit session: AsyncDBSession = AsyncDB.sharedSession): Future[Long] = {
+        withSQL {
+            insertInto(Album).namedValues(
+                column.userId -> userId,
+                column.userName -> userName,
+                column.albumName -> albumName,
+                column.albumDesc -> albumDesc,
+                column.shared -> shared,
+                column.downloadNum -> downloadNum,
+                column.likeNum -> likeNum,
+                column.referNum -> referNum,
+                column.hangyeTagId -> hangyeTagId,
+                column.xianbieTagId -> xianbieTagId,
+                column.jixingTagId -> jixingTagId,
+                column.jieduanTagId -> jieduanTagId,
+                column.shichangTagId -> shichangTagId,
+                column.createdAt -> createdAt,
+                column.updatedAt -> updatedAt,
+                column.copyFrom -> copyFrom,
+                column.menuId -> menuId,
+            )
+        }.updateAndReturnGeneratedKey().future()
     }
 
-    def delete(albumId: Long)(implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[Int] = withSQL {
+    def delete(albumId: Long)(implicit session: AsyncDBSession = AsyncDB.sharedSession): Future[Int] = withSQL {
         deleteFrom(Album).where.eq(column.albumId, albumId)
     }.update().future()
 
     def shareAlbum(albumId: Long, updatedAt: Option[Timestamp] = Option(new Timestamp(System.currentTimeMillis())))
-                  (implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[Int] = withSQL {
+                  (implicit session: AsyncDBSession = AsyncDB.sharedSession): Future[Int] = withSQL {
         update(Album).set(
             column.shared -> true,
             column.updatedAt -> updatedAt
@@ -159,42 +212,41 @@ object Album extends SQLSyntaxSupport[Album] with ShortenedNames {
     }.update().future()
 
     def unShared(albumId: Long, updatedAt: Option[Timestamp] = Option(new Timestamp(System.currentTimeMillis())))
-                (implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[Int] = withSQL {
+                (implicit session: AsyncDBSession = AsyncDB.sharedSession): Future[Int] = withSQL {
         update(Album).set(
             column.shared -> false,
             column.updatedAt -> updatedAt
         ).where.eq(column.albumId, albumId)
     }.update().future()
 
-    def addRefer(albumId: Long)(implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[Int] = this.synchronized {
+    def addRefer(albumId: Long)(implicit session: AsyncDBSession = AsyncDB.sharedSession): Future[Int] = this.synchronized {
         withSQL {
             update(Album).set(sqls"""${Album.column.referNum} = ${Album.column.referNum} + 1""").where.eq(column.albumId, albumId)
         }.update().future()
     }
 
-    def addLike(albumId: Long)(implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[Int] = this.synchronized {
+    def addLike(albumId: Long)(implicit session: AsyncDBSession = AsyncDB.sharedSession): Future[Int] = this.synchronized {
         withSQL {
             update(Album).set(sqls"""${Album.column.likeNum} = ${Album.column.likeNum} + 1""").where.eq(column.albumId, albumId)
         }.update().future()
     }
 
-    def removeRefer(albumId: Long)(implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[Int] = withSQL {
+    def removeRefer(albumId: Long)(implicit session: AsyncDBSession = AsyncDB.sharedSession): Future[Int] = withSQL {
         update(Album).set(sqls"""${Album.column.referNum} = ${Album.column.referNum} - 1""").where.eq(column.albumId, albumId)
     }.update().future()
 
-    def addDownload(albumId: Long)(implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[Boolean] = withSQL {
+    def addDownload(albumId: Long)(implicit session: AsyncDBSession = AsyncDB.sharedSession): Future[Boolean] = withSQL {
         update(Album).set(sqls"""${Album.column.downloadNum} = ${Album.column.downloadNum} + 1""").where.eq(column.albumId, albumId)
     }.update().future().map(_ >= 1)
 
-    def searchByName(keyword: String)(implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[List[Album]] = withSQL {
+    def searchByName(keyword: String)(implicit session: AsyncDBSession = AsyncDB.sharedSession): Future[List[Album]] = withSQL {
         selectFrom(Album as a).where.like(column.albumName, s"%$keyword%")
     }.map(Album(a)).list().future()
 
     //hangyeTagId = hangyeTagId, xianbieTagId = xianbieTagId, jixingTagId = jixingTagId, jieduanTagId = jieduanTagId, shichangId = shichangId
     def pageListAlbum(curPage: Int, pageSize: Int, shared: Option[Boolean], sortType: AlbumSortType.AlbumSortType,
                       hangyeTagId: Int = -1, xianbieTagId: Int = -1, jixingTagId: Int = -1, jieduanTagId: Int = -1, shichangTagId: Int = -1)
-                     (implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[List[Album]] = {
-
+                     (implicit session: AsyncDBSession = AsyncDB.sharedSession): Future[List[Album]] = {
         if (shared.isDefined) {
             withSQL {
                 selectFrom(Album as a).where.eq(column.shared, shared.get)
@@ -225,7 +277,7 @@ object Album extends SQLSyntaxSupport[Album] with ShortenedNames {
 
     def switchShare(albumName: String, coverId: Option[Long], localCoverId: Option[String], shareDesc: Option[String], share: Boolean, albumId: Long,
                     hangyeTagId: Int = -1, xianbieTagId: Int = -1, jixingTagId: Int = -1, jieduanTagId: Int = -1, shichangTagId: Int = -1)
-                   (implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[Boolean] = withSQL {
+                   (implicit session: AsyncDBSession = AsyncDB.sharedSession): Future[Boolean] = withSQL {
         if (share) {
             update(Album).set(
                 column.albumName -> albumName,
@@ -248,7 +300,7 @@ object Album extends SQLSyntaxSupport[Album] with ShortenedNames {
 
 
     def findAllCopied(userId: String)
-                     (implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[List[Album]] = {
+                     (implicit session: AsyncDBSession = AsyncDB.sharedSession): Future[List[Album]] = {
         withSQL {
             selectFrom(Album as a)
               .where.eq(column.userId, userId).and.append(sqls.isNotNull(column.copyFrom))

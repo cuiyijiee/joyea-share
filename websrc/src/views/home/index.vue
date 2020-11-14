@@ -30,7 +30,7 @@
                     <el-popover
                         style="margin-right: 20px"
                         placement="bottom-start"
-                        width="550"
+                        width="600"
                         @show="handleOpenDownload"
                         @hide="handleCloseDownload"
                         trigger="click">
@@ -39,13 +39,19 @@
                             <el-table-column width="300" label="任务名称"
                                              show-overflow-tooltip>
                                 <template slot-scope="scope">
-                                    <div v-if="scope.row.opened" style="color: #888888"> {{ scope.row.firstSrcName + ".zip" }}
+                                    <div v-if="scope.row.opened" style="color: #888888">
+                                        {{ scope.row.firstSrcName + ".zip" }}
                                     </div>
-                                    <div v-else="scope.row.opened" style="color: #000000"> {{ scope.row.firstSrcName + ".zip" }}
+                                    <div v-else="scope.row.opened" style="color: #000000">
+                                        {{ scope.row.firstSrcName + ".zip" }}
                                     </div>
                                 </template>
                             </el-table-column>
-                            <el-table-column width="200" property="startTime" label="下载时间"></el-table-column>
+                            <el-table-column width="200" label="下载时间">
+                                <template slot-scope="scope">
+                                    {{ scope.row.startTime | dateFormat }}
+                                </template>
+                            </el-table-column>
                             <el-table-column width="100" label="状态">
                                 <template slot-scope="scope">
                                     <el-button :type="scope.row.status?'success':'danger'" size="mini"

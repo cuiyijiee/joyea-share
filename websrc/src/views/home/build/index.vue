@@ -151,7 +151,7 @@
                         </el-col>
                         <el-col :span="8">
                             <el-button type="info" @click.stop="handleDownloadSrc(true)" class="load_more_bt"
-                                       v-loading.fullscreen.lock="loading.fullscreenLoading"
+                                       v-loading="loading.downloadLoading"
                                        icon="el-icon-suitcase">下载准备
                             </el-button>
                         </el-col>
@@ -311,7 +311,7 @@ export default {
                 searchMore: false,
                 searchList: false,
                 saveList: false,
-                fullscreenLoading: false,
+                downloadLoading: false,
                 listDetailLoading: false,
             },
             menuPath: joyeaMenuPath,
@@ -794,7 +794,7 @@ export default {
                     cancelButtonText: '取消',
                     type: totalMb > warnMb ? "danger" : "primary"
                 }).then(() => {
-                //this.loading.fullscreenLoading = true;
+                this.loading.downloadLoading = true;
                 prepareDownloadFile(toDownloadList).then(resp => {
                     let taskId = resp.data;
                     console.log("获取到下载ID：" + taskId);
@@ -821,7 +821,9 @@ export default {
                         type: 'info',
                         message: '已取消下载'
                     });
-                });
+                }).finally(() => {
+                    this.loading.downloadLoading = false;
+                })
             })
         },
         handleClickDirPath(item, index) {

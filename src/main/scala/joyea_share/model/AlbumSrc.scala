@@ -41,9 +41,9 @@ case class AlbumSrc(
 
 object AlbumSrc extends SQLSyntaxSupport[AlbumSrc] with ShortenedNames {
 
-    lazy val albums: scalikejdbc.QuerySQLSyntaxProvider[scalikejdbc.SQLSyntaxSupport[AlbumSrc], AlbumSrc] = AlbumSrc.syntax("albums")
+    lazy val as: scalikejdbc.QuerySQLSyntaxProvider[scalikejdbc.SQLSyntaxSupport[AlbumSrc], AlbumSrc] = AlbumSrc.syntax("_as")
 
-    override def columnNames: Seq[String] = Seq("id", "album_id", "src_neid", "src_path", "src_type", "src_hash", "src_rev", "src_size", "src_file_name", "src_bytes", "src_desc", "created_at")
+    override lazy val columns: Seq[String] = autoColumns[AlbumSrc]()
 
     def apply(as: SyntaxProvider[AlbumSrc])(rs: WrappedResultSet): AlbumSrc = apply(as.resultName)(rs)
 
@@ -129,15 +129,15 @@ object AlbumSrc extends SQLSyntaxSupport[AlbumSrc] with ShortenedNames {
     }.update().future()
 
     def findByAlbumId(albumId: Long)(implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[List[AlbumSrc]] = withSQL {
-        selectFrom(AlbumSrc as albums).where.eq(albums.albumId, albumId)
-    }.map(AlbumSrc(albums)).list().future()
+        selectFrom(AlbumSrc as as).where.eq(as.albumId, albumId)
+    }.map(AlbumSrc(as)).list().future()
 
     def findByNeid(srcNeid: Long)(implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[List[AlbumSrc]] = withSQL {
-        selectFrom(AlbumSrc as albums).where.eq(albums.srcNeid, srcNeid)
-    }.map(AlbumSrc(albums)).list().future()
+        selectFrom(AlbumSrc as as).where.eq(as.srcNeid, srcNeid)
+    }.map(AlbumSrc(as)).list().future()
 
     def countByNeid(srcNeid: Long)(implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[Long] = withSQL {
-        select(sqls.count).from(AlbumSrc as albums).where.eq(albums.srcNeid, srcNeid)
+        select(sqls.count).from(AlbumSrc as as).where.eq(as.srcNeid, srcNeid)
     }.map(_.long(1)).single().future().map(_.get)
 
 

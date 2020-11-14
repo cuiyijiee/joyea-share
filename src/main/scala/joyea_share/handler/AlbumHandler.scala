@@ -24,13 +24,13 @@ class AlbumHandler extends IAction {
             if (albumSelectTry.get.isEmpty) {
               Album.create(userId = sessionUserId, userName = SessionUtil.getUserName(context), albumName = listName, albumDesc = Option("")).onComplete(albumTry => {
                 if (albumTry.isSuccess) {
-                  val album = albumTry.get
+                  val albumId = albumTry.get
                   var hasError = false
                   listSrc.forEach(srcValue => {
                     if (!hasError) {
                       val src = srcValue.asObject()
                       AlbumSrc.create(
-                        albumId = album.albumId,
+                        albumId = albumId,
                         srcNeid = src.getLong("neid", -1L),
                         srcPath = src.getString("path", ""),
                         srcSize = src.getString("size", ""),
@@ -48,13 +48,13 @@ class AlbumHandler extends IAction {
                     }
                   })
                   if (hasError) {
-                    Album.delete(album.albumId).onComplete(delTry => {
-                      AlbumSrc.delete(album.albumId).onComplete(delTry => {
+                    Album.delete(albumId).onComplete(delTry => {
+                      AlbumSrc.delete(albumId).onComplete(delTry => {
                         listener.onError("创建清单失败!")
                       })
                     })
                   } else {
-                    listener.onSuccess(respJson = resJson.add("alnumId", album.albumId))
+                    listener.onSuccess(respJson = resJson.add("alnumId",albumId))
                   }
                 } else {
                   listener.onError("创建清单失败:" + SUtil.convertExceptionToStr(albumTry.failed.get))

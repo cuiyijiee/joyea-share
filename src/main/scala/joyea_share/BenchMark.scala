@@ -38,15 +38,14 @@ object BenchMark extends MySQLSettings {
         //              case Success(value) =>
         //                  println(value)
         //          }
-        val dateRange = LeaderboardUtil.generateDateRange(2020, 0)
-        Album.findSharedWithDateLimit(dateRange._1, dateRange._2)
-          .onComplete {
-              case Failure(exception) =>
-                  exception.printStackTrace()
-              case Success(value) =>
-                  println(value)
-          }
-
+//        val dateRange = LeaderboardUtil.generateDateRange(2020, 0)
+//        Album.findSharedWithDateLimit(dateRange._1, dateRange._2)
+//          .onComplete {
+//              case Failure(exception) =>
+//                  exception.printStackTrace()
+//              case Success(value) =>
+//                  println(value)
+//          }
         scala.io.StdIn.readLine()
         //    DownloadRecord.create("","123",123,"12313",LocalDateTime.now()).onComplete {
         //      case Failure(exception) =>

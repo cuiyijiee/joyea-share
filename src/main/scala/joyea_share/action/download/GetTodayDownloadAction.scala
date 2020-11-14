@@ -6,13 +6,12 @@ import joyea_share.action.BaseAction
 import joyea_share.module.download.{DownloadManager, DownloadStatus}
 import xitrum.annotation.POST
 
-import scala.collection.JavaConverters._
-
 @POST("/api/v1/download/today")
 class GetTodayDownloadAction extends BaseAction[GetTodayDownloadReq] {
     override def safeExecute(req: GetTodayDownloadReq): Unit = {
         baseResponseSuccess(
-            DownloadManager.getTodayTaskMap.values().asScala.map(task => {
+            DownloadManager.getTodayTaskMap.map(entry => {
+                val task = entry._2
                 DownloadTaskResp(
                     id = task.id,
                     startTime = task.startTime,

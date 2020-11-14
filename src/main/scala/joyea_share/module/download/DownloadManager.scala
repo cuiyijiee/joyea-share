@@ -1,29 +1,32 @@
 package joyea_share.module.download
 
 import java.io.{File, FileFilter}
+import java.time.LocalDate
+import java.time.chrono.ChronoLocalDate
 import java.util.concurrent.{ExecutorService, Executors, TimeUnit}
 
 import com.utils.CommonUtil
 import joyea_share.model.{SrcQuote, UploadRecord}
-import joyea_share.util.{CommonListener, LenovoUtil, SUtil}
+import joyea_share.util.{BaseJsonFormat, CommonListener, LenovoUtil, SUtil}
 import xitrum.{Config, Log}
 
 import scala.concurrent.ExecutionContext
-import scala.util.{Failure, Success}
 
 trait DownloadManager {
     DownloadManager.init()
 }
 
 
-object DownloadManager extends Log {
+object DownloadManager extends Log with BaseJsonFormat {
 
     private var adminSessionId: String = ""
     private val getAdminTokenExecutor = Executors.newScheduledThreadPool(1)
     private val executor: ExecutorService = Executors.newFixedThreadPool(Runtime.getRuntime.availableProcessors())
 
     //用来存放所有的任务，每天清除一次
-    private val downloadTaskMap: java.util.Map[String, DownloadTask] = new java.util.HashMap[String, DownloadTask]()
+    //private val downloadTaskMap: java.util.Map[String, DownloadTask] = new java.util.HashMap[String, DownloadTask]()
+
+    private var newDownloadTaskMap: Map[String, DownloadTask] = Map()
 
     def init(): Unit = {
 
@@ -33,18 +36,21 @@ object DownloadManager extends Log {
                 genNewSession()
                 getTodayDownloadDir(true)
                 getTodayDownloadDir(false)
+                filterNotTodayTask()
             } catch {
                 case e: Exception =>
                     log.error("gen new admin session error: ", e)
             }
 
         }, 0, 30, TimeUnit.MINUTES)
+
+
     }
 
 
     //传入ID,返回一个任务的ID，并开始下载
     def doDownload(task: DownloadTask): Unit = {
-        downloadTaskMap.put(task.id, task)
+        newDownloadTaskMap = newDownloadTaskMap ++ Map(task.id -> task)
         executor.execute(() => {
             task.execute(sessionId = adminSessionId,
                 baseSavePath = getTodayDownloadDir(false).getAbsolutePath,
@@ -76,6 +82,13 @@ object DownloadManager extends Log {
         })
     }
 
+    //过滤掉不属于今天的任务
+    def filterNotTodayTask(): Unit = {
+        newDownloadTaskMap = newDownloadTaskMap.filter(entry => {
+            entry._2.startTime.toLocalDate.isAfter(ChronoLocalDate.from(LocalDate.now().atStartOfDay()))
+        })
+    }
+
     def getTodayDownloadDir(isCompressed: Boolean): File = {
         val filePath = if (isCompressed) {
             "download/compressed/" + SUtil.genDateString(formatString = "yy-MM-dd")
@@ -95,8 +108,7 @@ object DownloadManager extends Log {
     }
 
     def queryTask(taskId: String): DownloadStatus.Value = {
-        val task = downloadTaskMap.get(taskId)
-        if (task == null) DownloadStatus.NONE else task.queryStatus()
+        newDownloadTaskMap.get(taskId).map(_.queryStatus()).getOrElse(DownloadStatus.NONE)
     }
 
     def genNewSession(): Unit = {
@@ -113,8 +125,8 @@ object DownloadManager extends Log {
         })
     }
 
-    def getTodayTaskMap: java.util.Map[String, DownloadTask] = {
-        downloadTaskMap
+    def getTodayTaskMap: Map[String, DownloadTask] = {
+        newDownloadTaskMap
     }
 
     def getAdminToken: String = {

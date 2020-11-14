@@ -2,7 +2,7 @@ package joyea_share.vo.resp
 
 import java.time.OffsetDateTime
 
-import joyea_share.model.AlbumSrc
+import joyea_share.model.{AlbumMenu, AlbumSrc}
 
 case class AlbumDetailResp(
                             albumId: Long,
@@ -24,5 +24,6 @@ case class AlbumDetailResp(
                             shichangTagId: Int = -1,
                             updatedAt: Option[OffsetDateTime],
                             srcList: List[AlbumSrc],
-                            isCopied: Boolean = false
+                            isCopied: Boolean = false,
+                            menu:Option[AlbumMenu] = None
                           )
