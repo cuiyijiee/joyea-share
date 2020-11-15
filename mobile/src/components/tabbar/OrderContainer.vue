@@ -2,11 +2,15 @@
     <div id="order">
         <van-empty v-if="orderList.length === 0" description="素材车空空如也"/>
         <div style="margin-bottom: 100px" id="toSortTable">
-            <van-swipe-cell v-for="item in orderList" :key="item.path">
+            <van-swipe-cell v-for="(item,index) in orderList" :key="item.path">
                 <van-card @click="handleClickOrderItem(item)"
                           :desc="item.joyeaDesc !== undefined && item.joyeaDesc.length > 0 ? item.joyeaDesc :'暂未设置解说词'"
                           :title="item.path.substr(item.path.lastIndexOf('/')+1)"
-                          :thumb="item.mime_type.startsWith('image') ? genPreviewUrl(item.neid,item.hash,item.rev,item.mime_type):getDocumentImage(item.mime_type)"/>
+                          :thumb="item.mime_type.startsWith('image') ? genPreviewUrl(item.neid,item.hash,item.rev,item.mime_type):getDocumentImage(item.mime_type)">
+                    <template #footer>
+                        <van-button icon="arrow-up" type="primary" size="mini" @click="handleMoveUpIndex(index)"/>
+                    </template>
+                </van-card>
                 <template #right>
                     <van-button square text="删除" type="danger" class="delete-button"
                                 @click="handleDeleteOrderList(item)"/>
@@ -53,7 +57,6 @@
 <script>
 
 import {mapState, mapActions, mapGetters} from "vuex"
-import Sortable from "sortablejs"
 import {genSrcPreviewSrc, getDocumentImage} from "../../util/JoyeaUtil";
 import api from "../../api";
 import {createAlbum} from "../../api/"
@@ -86,6 +89,12 @@ export default {
         },
         handleDeleteOrderList(item) {
             this.removeFunc(item.neid);
+        },
+        handleMoveUpIndex(index) {
+            event.stopPropagation();
+            if(index > 0){
+                this.swapOrderItemFunc(index, index - 1);
+            }
         },
         handleSaveList() {
             if (this.orderList.length === 0) {
@@ -169,13 +178,6 @@ export default {
     activated() {
     },
     mounted() {
-        const table = document.querySelector('#toSortTable');
-        const _this = this;
-        Sortable.create(table, {
-            onEnd({newIndex, oldIndex}) {
-                _this.swapOrderItemFunc(newIndex, oldIndex);
-            }
-        });
     }
 }
 </script>

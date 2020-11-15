@@ -352,7 +352,10 @@ export default {
         },
         listMyAlbumMenu() {
             listMyAlbumMenu().then(resp => {
-                this.albumMenuList = resp.data;
+                let data = resp.data.sort(function (a, b) {
+                    return a.name.localeCompare(b.name, 'zh-Hans-CN');
+                });
+                this.albumMenuList = data;
             });
         },
         handleAddMenu() {

@@ -96,7 +96,7 @@ export default {
         }
         this.checkLogin();
         document.oncontextmenu = function (event) {
-            event.preventDefault();
+            event.stopPropagation();
         };
     },
     computed: {
