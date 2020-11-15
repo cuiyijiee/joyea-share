@@ -1,7 +1,5 @@
 <template>
     <div id="album">
-        <van-card style="margin: 2px 0 0 0" @click="handleListMenuAlbum(-1)"
-                  :title="defaultMenuName" :thumb="folderImg"/>
         <div v-for="menu in albumMenuList">
             <van-swipe-cell :key="menu.id">
                 <van-card style="margin: 2px 0 0 0" @click="handleListMenuAlbum(menu.id)"
@@ -11,6 +9,23 @@
                                 @click="showRenameAlbumMenuDialog(menu)"/>
                     <van-button square text="删除" type="danger" class="delete-button"
                                 @click="handleDeleteAlbumMenu(menu)"/>
+                </template>
+            </van-swipe-cell>
+        </div>
+        <div class="default-album">
+            <van-swipe-cell v-for="item in defaultAlbumList" :key="item.path">
+                <van-card style="margin: 2px 0 2px 0" :num="item.srcList.length" @click="handleShowAlbum(item)"
+                          :title="item.albumName" :thumb="item.cover"/>
+                <template #right>
+                    <van-button square :text="item.shared ? '取消分享' : '分享'"
+                                :type="item.shared ? 'warning' : 'info'" class="delete-button"
+                                @click="handleShareAlbum(item)"/>
+                    <van-button square text="编辑" type="primary" class="delete-button"
+                                @click="handleEditAlbum(item)"/>
+                    <van-button square text="移动" type="warning" class="delete-button"
+                                @click="showMoveMenuDialog(item)"/>
+                    <van-button square text="删除" type="danger" class="delete-button"
+                                @click="handleDeleteAlbum(item)"/>
                 </template>
             </van-swipe-cell>
         </div>
@@ -104,6 +119,7 @@ export default {
             active: 1,
             albumItem: {},
             albumList: [],
+            defaultAlbumList: [],
             albumMenuList: [],
 
             newMenuName: "",
@@ -143,7 +159,7 @@ export default {
             let menuPickerSelected = this.$refs.menuPicker.getValues();
             if (menuPickerSelected.length > 0) {
                 let toMoveMenu = this.albumMenuList.find(item => item.name === menuPickerSelected[0]);
-                let toMoveAlbum = this.albumList.find(item => item.albumId = this.selectedToMoveAlbumId);
+                let toMoveAlbum = this.albumList.concat(this.defaultAlbumList).find(item => item.albumId = this.selectedToMoveAlbumId);
                 if (toMoveMenu && toMoveAlbum.menu && toMoveAlbum.menu.id === toMoveMenu.id) {
                     this.$notify({
                         type: "danger",
@@ -153,7 +169,12 @@ export default {
                 }
                 moveAlbumMenu(toMoveAlbum.albumId, toMoveMenu ? toMoveMenu.id : -1).then(resp => {
                     if (resp.code === 2000) {
-                        this.albumList = this.albumList.filter(item => item.albumId !== toMoveAlbum.albumId);
+                        if (toMoveAlbum.menu) {
+                            this.albumList = this.albumList.filter(item => item.albumId !== toMoveAlbum.albumId);
+                        } else {
+                            this.defaultAlbumList = this.defaultAlbumList.filter(item => item.albumId !== toMoveAlbum.albumId);
+                        }
+                        this.handleListDefaultMenuAlbum();
                         this.$notify({
                             type: "success",
                             message: `成功移至文件夹【${toMoveMenu ? toMoveMenu.name : this.defaultMenuName}】!`
@@ -218,9 +239,23 @@ export default {
         ...mapActions([
             'clearFunc', 'addFunc', 'setOrderEditInfoFunc'
         ]),
+        handleListDefaultMenuAlbum() {
+            this.defaultAlbumList = [];
+            listMineAlbum(-1).then(response => {
+                response.data.forEach(album => {
+                    album.srcList.forEach(src => {
+                        src.url = genSrcPreviewSrc(src.srcNeid, src.srcHash, src.srcRev, 'pic', this.userInfo.session)
+                    })
+                    let images = album.srcList.filter(item => {
+                        return item.srcType.startsWith("image")
+                    })
+                    album.cover = images.length > 0 ? images[0].url : 'cover.png';
+                });
+                this.defaultAlbumList = response.data;
+            })
+        },
         handleListMenuAlbum(menuId) {
-            this.currentSelectedMenuName = menuId === -1 ?
-                "默认清单合集" : this.albumMenuList.find(item => item.id === menuId).name;
+            this.currentSelectedMenuName = this.albumMenuList.find(item => item.id === menuId).name;
             this.albumList = [];
             this.albumMenuVisible = true;
             this.albumLoading = true;
@@ -257,9 +292,6 @@ export default {
                 };
                 this.$router.replace(route);
             }
-        },
-        handleMoveAlbum(album) {
-
         },
         handleEditAlbum(item) {
             this.$dialog.confirm({
@@ -321,7 +353,7 @@ export default {
         listMyAlbumMenu() {
             listMyAlbumMenu().then(resp => {
                 this.albumMenuList = resp.data;
-            })
+            });
         },
         handleAddMenu() {
             createAlbumMenu(this.newMenuName).then(resp => {
@@ -346,8 +378,8 @@ export default {
         ])
     },
     created() {
-        //this.listAlbum();
         this.listMyAlbumMenu();
+        this.handleListDefaultMenuAlbum();
     }
 }
 </script>

@@ -3,7 +3,6 @@ package joyea_share.action.album
 import joyea_share.action.BaseAction
 import joyea_share.define.ErrorCode
 import joyea_share.model.{Album, AlbumSrc, SrcQuote, UploadRecord}
-import joyea_share.module.download.DownloadManager.log
 import scalikejdbc.async.AsyncDB
 import xitrum.annotation.POST
 
@@ -47,19 +46,6 @@ case class SaveAlbumCollectReq(
                                 name: String,
                                 src: Seq[AlbumSrcReq]
                               )
-
-
-/*
-srcNeid = src.getLong("neid", -1L),
-                        srcPath = src.getString("path", ""),
-                        srcSize = src.getString("size", ""),
-                        srcHash = src.getString("hash", ""),
-                        srcRev = src.getString("rev", ""),
-                        srcDesc = src.getString("joyeaDesc", ""),
-                        srcFileName = src.getString("filename", ""),
-                        srcBytes = src.getLong("bytes", 0),
-                        srcType = src.getString("mime_type", ""),
- */
 
 case class AlbumSrcReq(
                         neid: Long,

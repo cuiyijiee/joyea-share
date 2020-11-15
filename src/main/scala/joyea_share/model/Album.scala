@@ -174,7 +174,7 @@ object Album extends SQLSyntaxSupport[Album] with ShortenedNames {
     def create(userId: String, userName: String, albumName: String, albumDesc: Option[String],
                shared: Boolean = false, referNum: Long = 0, downloadNum: Int = 0, likeNum: Int = 0,
                hangyeTagId: Int = -1, xianbieTagId: Int = -1, jixingTagId: Int = -1, jieduanTagId: Int = -1, shichangTagId: Int = -1,
-               createdAt: OffsetDateTime = OffsetDateTime.now(), updatedAt: Option[OffsetDateTime] = None, copyFrom: Option[Long] = None, menuId: Option[Long] = Some(0))
+               createdAt: OffsetDateTime = OffsetDateTime.now(), updatedAt: Option[OffsetDateTime] = None, copyFrom: Option[Long] = None, menuId: Option[Long] = None)
               (implicit session: AsyncDBSession = AsyncDB.sharedSession): Future[Long] = {
         withSQL {
             insertInto(Album).namedValues(

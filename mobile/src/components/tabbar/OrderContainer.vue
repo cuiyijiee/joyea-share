@@ -115,6 +115,7 @@ export default {
                 return;
             }
             if (!this.editMode) {  //创建新的清单
+                this.orderList = this.orderList.map(item => item.filename = item.path.substr(item.path.lastIndexOf('/') + 1));
                 createAlbum(this.newAlbumName, this.orderList).then(resp => {
                     if (resp.code === 2000) {
                         this.$notify({type: 'success', message: '保存成功'});
