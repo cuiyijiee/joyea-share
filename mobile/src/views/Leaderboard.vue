@@ -225,7 +225,7 @@ export default {
                 forbidClick: true,
                 message: '拼命加载中...',
             });
-            albumShareLeaderboard(this.year, this.month).then(resp => {
+            albumQuoteLeaderboard(this.year, this.month).then(resp => {
                 this.handleParseResp(resp);
             }).finally(() => {
                 toast.clear();
