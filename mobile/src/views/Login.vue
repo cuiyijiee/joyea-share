@@ -42,7 +42,7 @@ export default {
     },
     methods: {
         ...mapActions([
-            'updateUserInfoFunc'
+            'updateUserInfoFunc','clearFunc'
         ]),
         switchPasswordType() {
             this.passwordType = this.passwordType === 'password' ? 'text' : 'password'
@@ -57,6 +57,7 @@ export default {
                         session: resp.data['session'], name: resp.data['userName'], email: this.loginForm.user
                     }).then(() => {
                     })
+                    _this.clearFunc();
                     this.$router.replace({
                         name: "/",
                         params: {checked: true}

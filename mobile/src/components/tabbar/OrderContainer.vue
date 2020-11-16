@@ -2,20 +2,21 @@
     <div id="order">
         <van-empty v-if="orderList.length === 0" description="素材车空空如也"/>
         <div style="margin-bottom: 100px" id="toSortTable">
-            <van-swipe-cell v-for="(item,index) in orderList" :key="item.path">
-                <van-card @click="handleClickOrderItem(item)"
-                          :desc="item.joyeaDesc !== undefined && item.joyeaDesc.length > 0 ? item.joyeaDesc :'暂未设置解说词'"
-                          :title="item.path.substr(item.path.lastIndexOf('/')+1)"
-                          :thumb="item.mime_type.startsWith('image') ? genPreviewUrl(item.neid,item.hash,item.rev,item.mime_type):getDocumentImage(item.mime_type)">
-                    <template #footer>
-                        <van-button icon="arrow-up" type="primary" size="mini" @click="handleMoveUpIndex(index)"/>
-                    </template>
-                </van-card>
-                <template #right>
-                    <van-button square text="删除" type="danger" class="delete-button"
-                                @click="handleDeleteOrderList(item)"/>
-                </template>
-            </van-swipe-cell>
+            <draggable v-model="orderList" :options="options">
+                <transition-group>
+                    <van-swipe-cell v-for="(item,index) in orderList" :key="item.path">
+                        <van-card @click="handleClickOrderItem(item)"
+                                  :desc="item.joyeaDesc !== undefined && item.joyeaDesc.length > 0 ? item.joyeaDesc :'暂未设置解说词'"
+                                  :title="item.path.substr(item.path.lastIndexOf('/')+1)"
+                                  :thumb="item.mime_type.startsWith('image') ? genPreviewUrl(item.neid,item.hash,item.rev,item.mime_type):getDocumentImage(item.mime_type)">
+                        </van-card>
+                        <template #right>
+                            <van-button square text="删除" type="danger" class="delete-button"
+                                        @click="handleDeleteOrderList(item)"/>
+                        </template>
+                    </van-swipe-cell>
+                </transition-group>
+            </draggable>
         </div>
         <!-- 底部占位 -->
         <van-submit-bar style="margin-bottom: 50px" :button-text="getOrderEditInfo.name ? '重新保存':'提交清单'"
@@ -56,15 +57,26 @@
 
 <script>
 
-import {mapState, mapActions, mapGetters} from "vuex"
+import draggable from 'vuedraggable'
+import {mapActions, mapGetters} from "vuex"
 import {genSrcPreviewSrc, getDocumentImage} from "../../util/JoyeaUtil";
 import api from "../../api";
 import {createAlbum} from "../../api/"
 
 export default {
     name: "OrderContainer",
+    components: {
+        draggable
+    },
     data() {
         return {
+            options: {
+                delayOnTouchOnly: true,  //开启触摸延时
+                direction: 'vertical',   //拖动方向
+                delay: 500,              //延时时长
+                touchStartThreshold: 1,  //防止某些手机过于敏感(3~5 效果最好)
+                chosenClass: 'chosen'    //选中之后拖拽项添加的class名(用于选中时候添加样式)
+            },
             newAlbumName: "",
             submitDialogVisible: false,
             orderItemEdit: {
@@ -92,7 +104,7 @@ export default {
         },
         handleMoveUpIndex(index) {
             event.stopPropagation();
-            if(index > 0){
+            if (index > 0) {
                 this.swapOrderItemFunc(index, index - 1);
             }
         },
@@ -123,17 +135,25 @@ export default {
                 this.$notify({type: 'warning', message: '清单名称不能为空，请先设置！'});
                 return;
             }
+            console.log(this.orderList);
             if (!this.editMode) {  //创建新的清单
-                this.orderList = this.orderList.map(item => item.filename = item.path.substr(item.path.lastIndexOf('/') + 1));
-                createAlbum(this.newAlbumName, this.orderList).then(resp => {
-                    if (resp.code === 2000) {
-                        this.$notify({type: 'success', message: '保存成功'});
-                        this.$store.dispatch("clearFunc");
-                        this.setOrderEditInfoFunc({})
-                    } else {
-                        this.$notify({type: 'warning', message: '保存失败'});
-                    }
-                })
+                try {
+                    let toSaveAlbum = this.orderList.map(item => {
+                        item.filename = item.path.substr(item.path.lastIndexOf('/') + 1);
+                        return item;
+                    });
+                    createAlbum(this.newAlbumName, toSaveAlbum).then(resp => {
+                        if (resp.code === 2000) {
+                            this.$notify({type: 'success', message: '保存成功'});
+                            this.$store.dispatch("clearFunc");
+                            this.setOrderEditInfoFunc({})
+                        } else {
+                            this.$notify({type: 'warning', message: '保存失败'});
+                        }
+                    })
+                } catch (err) {
+                    console.log(err)
+                }
             } else {  //保存编辑之后的清单
                 api({
                     action: 'album',
@@ -165,12 +185,17 @@ export default {
         }
     },
     computed: {
-        ...mapState({
-            orderList: state => state.orderList
-        }),
         ...mapGetters([
             'userInfo', 'getOrderEditInfo'
         ]),
+        orderList: {
+            get() {
+                return this.$store.state.orderList;
+            },
+            set(val) {
+                this.$store.state.orderList = val;
+            }
+        },
         editMode: function () {
             return this.getOrderEditInfo.name && this.getOrderEditInfo.name.length > 0;
         }

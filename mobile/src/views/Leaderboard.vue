@@ -62,7 +62,9 @@
                     <van-col span="8" style="height: 50px;font-size: 14px;text-align: center;padding-left: 2px">
                         <div v-if="item.value > 0">
                             <div style="text-align: left">{{ item.user.joyeaName }}</div>
-                            <div style="color: #8c939d;text-align: left">{{ item.user.department + ' | ' + item.user.position }}</div>
+                            <div style="color: #8c939d;text-align: left">
+                                {{ item.user.department + ' | ' + item.user.position }}
+                            </div>
                         </div>
                         <div v-else style="margin-top: 10px;color: #99a9bf">
                             -- 虚位以待 --
@@ -254,6 +256,7 @@ export default {
             });
         },
         handleParseResp(resp) {
+            resp.data = resp.data.filter(item => item.user.id !== 717);
             if (this.leaderObjType === 0) {
                 resp.data.sort(function (pre, next) {
                     return next.value - pre.value;

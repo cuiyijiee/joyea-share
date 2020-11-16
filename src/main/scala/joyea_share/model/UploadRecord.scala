@@ -159,14 +159,15 @@ object UploadRecord extends SQLSyntaxSupport[UploadRecord] with ShortenedNames {
           .orderBy(ur.createdAt).limit(pageSize).offset((curPage - 1) * pageSize)
     }.map(UploadRecord(ur)).list().future()
 
-    def latestUploadRecord(num:Int): Future[List[UploadRecord]] = {
+    def latestUploadRecord(num: Int): Future[List[UploadRecord]] = {
         withSQL {
             select.from[UploadRecord](UploadRecord as ur)
               .leftJoin(JoyeaUser as ju).on(ju.joyeaId, ur.uploader)
               .where.isNotNull(ur.checkedAt)
               .and.isNull(ur.refuseReason)
               .and.eq(ur.finished, true)
-              .orderBy(ur.checkedAt).desc  //以审核时间倒叙展示
+              .and.eq(ur.checked, true)
+              .orderBy(ur.checkedAt).desc //以审核时间倒叙展示
               .limit(num)
         }.one(UploadRecord(ur))
           .toOne(JoyeaUser.opt(ju))

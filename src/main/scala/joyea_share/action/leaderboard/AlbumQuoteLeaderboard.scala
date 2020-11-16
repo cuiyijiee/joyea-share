@@ -10,7 +10,7 @@ import xitrum.annotation.POST
 class AlbumQuoteLeaderboard extends BaseAction[LeaderboardReq] {
     override def safeExecute(req: LeaderboardReq): Unit = {
         val dateRange = LeaderboardUtil.generateDateRange(req.year, req.month)
-        AlbumQuote.findWithDateLimit(dateRange._1,dateRange._2)
+        AlbumQuote.findWithDateLimit(dateRange._1, dateRange._2)
           .onComplete(safeResponse[List[(JoyeaUser, Long)]](_, result => {
               val leaderboardResult = result.map(item => {
                   LeaderboardResp(user = item._1, value = item._2)

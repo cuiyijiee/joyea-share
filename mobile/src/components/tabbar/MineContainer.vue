@@ -110,6 +110,7 @@ export default {
         handleTestMoment() {
         },
         handleGetHasNewUpload() {
+            console.log("last record read record id: " + this.latestReadUploadSrcId);
             latestUpload(1).then(resp => {
                 if (resp.code === 2000 && resp.data.length > 0) {
                     if (resp.data[0].id > this.latestReadUploadSrcId) {

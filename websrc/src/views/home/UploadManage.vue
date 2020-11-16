@@ -47,10 +47,11 @@
                     <el-input disabled v-model="toManageRecord.uploadPath"></el-input>
                 </el-form-item>
                 <el-form-item label="文件积分">
-                    <el-input-number v-model="integral" :min="1" :max="99"
+                    <el-input-number v-model="integral" :min="0" :max="99"
                                      label="文件积分"></el-input-number>
                 </el-form-item>
                 <el-form-item label="常用积分">
+                    <el-button @click="integral = 0">+ 0</el-button>
                     <el-button @click="integral = 1">+ 1</el-button>
                     <el-button @click="integral = 5">+ 5</el-button>
                 </el-form-item>
