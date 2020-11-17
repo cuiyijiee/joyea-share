@@ -20,17 +20,31 @@
             style="height: 120px;text-align: center;color: #ffffff;"
             :style="{background: 'url('+bg_leaderboard+')','background-size':'cover','background-repeat': 'no-repeat'}"
             v-if="leaderObjType === 0">
-            <div style="font-size: 20px; padding-top: 20px">
-                <span>我的排名  </span>
-                <span style="padding-top: 5px">
+            <van-row>
+                <van-col span="4">
+                    <div style="padding-top: 30px;text-align: left">
+                        <img :src="pre_month" height="60" @click="handleSwitchMonth(false)">
+                    </div>
+                </van-col>
+                <van-col span="16">
+                    <div style="font-size: 20px; padding-top: 20px">
+                        <span>我的排名  </span>
+                        <span style="padding-top: 5px">
                     <van-icon name="question" @click="tipVisible = true" size="15"/>
                 </span>
-            </div>
-            <div v-if="myScore > 0">
-                <span style="font-size: 40px;">第{{ myIndex }}名</span>
-                <span> ( 积分: {{ myScore }}分 )</span>
-            </div>
-            <div style="font-size: 50px;" v-else> -</div>
+                    </div>
+                    <div v-if="myScore > 0">
+                        <span style="font-size: 40px;">第{{ myIndex }}名</span>
+                        <span> ( 积分: {{ myScore }}分 )</span>
+                    </div>
+                    <div style="font-size: 50px;" v-else> -</div>
+                </van-col>
+                <van-col span="4">
+                    <div style="padding-top: 30px;text-align: right">
+                        <img :src="next_month" height="60" @click="handleSwitchMonth(true)">
+                    </div>
+                </van-col>
+            </van-row>
         </div>
         <div class="obj-selector">
             <div>
@@ -62,7 +76,7 @@
                     <van-col span="8" style="height: 50px;font-size: 14px;text-align: center;padding-left: 2px">
                         <div v-if="item.value > 0">
                             <div style="text-align: left">{{ item.user.joyeaName }}</div>
-                            <div style="color: #8c939d;text-align: left">
+                            <div style="color: #8c939d;text-align: left" class="van-ellipsis">
                                 {{ item.user.department + ' | ' + item.user.position }}
                             </div>
                         </div>
@@ -148,6 +162,8 @@ export default {
             medal_silver: require('../assets/medal-silver.png'),
             medal_bronze: require('../assets/medal-bronze.png'),
             bg_leaderboard: require('../assets/bg-leaderboard.jpeg'),
+            pre_month: require('../assets/pre-month.jpg'),
+            next_month: require('../assets/next-month.jpg'),
             option: {
                 year: [],
                 month: []
@@ -183,6 +199,34 @@ export default {
         ])
     },
     methods: {
+        handleSwitchMonth(isNext) {
+            if (isNext) {
+                if (this.month === 12) {
+                    let hasNextYear = this.option.year.map(item => item.value).indexOf(this.year) !== this.option.year.length - 1;
+                    if (hasNextYear) {
+                        this.year++;
+                        this.month = 1;
+                    } else {
+                        return ;
+                    }
+                } else {
+                    this.month++;
+                }
+            } else {
+                if (this.month === 1) {
+                    let hasPreYear = this.option.year.map(item => item.value).indexOf(this.year) !== 0;
+                    if (hasPreYear) {
+                        this.year--;
+                        this.month = 12;
+                    } else {
+                        return ;
+                    }
+                } else {
+                    this.month--;
+                }
+            }
+            this.handleConditionChanged();
+        },
         handleConditionChanged() {
             console.log(`year: ${this.year},month: ${this.month},board: ${this.leaderBoardType},obj: ${this.leaderObjType}`);
             if (this.leaderBoardType === 0) {

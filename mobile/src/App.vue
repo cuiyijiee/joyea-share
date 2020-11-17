@@ -13,7 +13,7 @@
                            :images="imagePreviewImages.map(item => item.url)" @change="onChange">
             <template v-slot:cover>
                 <div>
-                    <p>解说词:{{ currentJoyeaDesc.length === 0 ? '暂未设置' : currentJoyeaDesc }}</p>
+<!--                    <p>解说词:{{ currentJoyeaDesc.length === 0 ? '暂未设置' : currentJoyeaDesc }}</p>-->
                     <!--          <van-button>显示原图</van-button>-->
                 </div>
             </template>
