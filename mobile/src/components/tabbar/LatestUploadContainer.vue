@@ -2,6 +2,12 @@
     <div id="latest-upload">
         <ul>
             <li v-for="item in latestUploadRecordList">
+                <div v-if="item.lastReadFlag">
+                    <van-divider content-position="center" :class="{lastReadFlag:item.lastReadFlag}"
+                                 :style="{ color: '#bbbbbb', borderColor: '#bbbbbb', padding: '0 16px' }">
+                        上次看到这里
+                    </van-divider>
+                </div>
                 <van-card>
                     <template #thumb>
                         <div @click="handlePreview(item)">
@@ -21,11 +27,6 @@
                         <van-button icon="plus" size="small" type="danger" plain
                                     style="border: #ffffff;background: #fafafa"
                                     @click="handleAddToOrderList(item)"/>
-                        <div v-if="item.lastReadFlag">
-                            <van-divider content-position="left" :class="{lastReadFlag:item.lastReadFlag}"
-                                         :style="{ color: '#000000', borderColor: '#000000', padding: '0 16px' }">
-                            </van-divider>
-                        </div>
                     </template>
                 </van-card>
             </li>

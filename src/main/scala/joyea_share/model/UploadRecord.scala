@@ -149,7 +149,6 @@ object UploadRecord extends SQLSyntaxSupport[UploadRecord] with ShortenedNames {
         selectFrom(UploadRecord as ur)
           .where.isNull(column.checkedAt)
           .and.isNotNull(column.srcNeid)
-          .and.eq(column.finished, true)
           .orderBy(ur.createdAt).limit(pageSize).offset((curPage - 1) * pageSize)
     }.map(UploadRecord(ur)).list().future()
 
