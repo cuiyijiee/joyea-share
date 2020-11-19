@@ -24,10 +24,11 @@
             <van-cell title="素材上传" is-link @click="handleClickUpload"/>
             <van-cell title="我的清单" is-link @click="handleClickMyList"/>
 
+            <!--解决视图不更新的问题-->
             <van-cell is-link @click="handleClickLatestUpload">
                 <template #title>
                     <span class="custom-title">最新素材</span>
-                    <van-tag v-if="hasNewUpload" type="danger" style="margin-left: 5px">NEW</van-tag>
+                    <van-tag v-if="showNew" type="danger" style="margin-left: 5px">NEW</van-tag>
                 </template>
             </van-cell>
         </van-cell-group>
@@ -60,6 +61,9 @@ export default {
         }
     },
     computed: {
+        showNew: function () {
+            return this.hasNewUpload;
+        },
         showRealImage: {
             get: function () {
                 return this.$store.state.showRealImage;
@@ -110,12 +114,11 @@ export default {
         handleTestMoment() {
         },
         handleGetHasNewUpload() {
-            console.log("last record read record id: " + this.latestReadUploadSrcId);
+
             latestUpload(1).then(resp => {
                 if (resp.code === 2000 && resp.data.length > 0) {
-                    if (resp.data[0].id > this.latestReadUploadSrcId) {
-                        this.hasNewUpload = true;
-                    }
+                    console.log("local record: " + this.latestReadUploadSrcId + ",remote record: " + resp.data[0].id);
+                    this.hasNewUpload = resp.data[0].id > this.latestReadUploadSrcId;
                 }
             })
         }

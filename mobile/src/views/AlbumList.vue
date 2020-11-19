@@ -322,6 +322,9 @@ export default {
                     album_id: item.albumId
                 }).then(response => {
                     if (response.result) {
+                        this.defaultAlbumList =  this.defaultAlbumList.filter(album => {
+                            return album.albumId !== item.albumId;
+                        });
                         this.albumList = this.albumList.filter(album => {
                             return album.albumId !== item.albumId;
                         });

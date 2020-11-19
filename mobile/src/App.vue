@@ -75,12 +75,13 @@ export default {
             this.$store.replaceState(Object.assign({}, this.$store.state, JSON.parse(localStorage.getItem("store"))))
         }
         setInterval(() => {
+            console.log("save store info")
             localStorage.setItem("store", JSON.stringify(this.$store.state))
         }, 2000)
         //在页面刷新时将vuex里的信息保存到sessionStorage里
-        window.addEventListener("beforeunload", () => {
-            localStorage.setItem("store", JSON.stringify(this.$store.state))
-        });
+        // window.addEventListener("beforeunload", () => {
+        //     localStorage.setItem("store", JSON.stringify(this.$store.state))
+        // });
         this.$store.state.imagePreviewShow = false;
         if (this.$route.path !== '/login') {        //不在登陆界面
             if (this.userInfo.session.length === 0) {
