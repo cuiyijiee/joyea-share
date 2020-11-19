@@ -17,6 +17,7 @@ case class Album(
                   albumName: String,
                   albumDesc: Option[String],
                   shared: Boolean,
+                  shareAt:Option[OffsetDateTime] = None,
                   shareCoverNeid: Option[Long],
                   shareLocalCoverId: Option[String],
                   shareDesc: Option[String],
@@ -172,9 +173,10 @@ object Album extends SQLSyntaxSupport[Album] with ShortenedNames {
     }.map(Album(a)).single().future()
 
     def create(userId: String, userName: String, albumName: String, albumDesc: Option[String],
-               shared: Boolean = false, referNum: Long = 0, downloadNum: Int = 0, likeNum: Int = 0,
+               shared: Boolean = false, shareAt:Option[OffsetDateTime] = None , referNum: Long = 0, downloadNum: Int = 0, likeNum: Int = 0,
                hangyeTagId: Int = -1, xianbieTagId: Int = -1, jixingTagId: Int = -1, jieduanTagId: Int = -1, shichangTagId: Int = -1,
-               createdAt: OffsetDateTime = OffsetDateTime.now(), updatedAt: Option[OffsetDateTime] = None, copyFrom: Option[Long] = None, menuId: Option[Long] = None)
+               createdAt: OffsetDateTime = OffsetDateTime.now(), updatedAt: Option[OffsetDateTime] = None,
+               copyFrom: Option[Long] = None,menuId: Option[Long] = None)
               (implicit session: AsyncDBSession = AsyncDB.sharedSession): Future[Long] = {
         withSQL {
             insertInto(Album).namedValues(
@@ -194,6 +196,7 @@ object Album extends SQLSyntaxSupport[Album] with ShortenedNames {
                 column.createdAt -> createdAt,
                 column.updatedAt -> updatedAt,
                 column.copyFrom -> copyFrom,
+                column.shareAt -> shareAt,
                 column.menuId -> menuId,
             )
         }.updateAndReturnGeneratedKey().future()
@@ -285,6 +288,7 @@ object Album extends SQLSyntaxSupport[Album] with ShortenedNames {
                 column.shareLocalCoverId -> localCoverId,
                 column.shareDesc -> shareDesc,
                 column.shared -> share,
+                column.shareAt -> sqls.currentTimestamp,
                 column.hangyeTagId -> hangyeTagId,
                 column.xianbieTagId -> xianbieTagId,
                 column.jixingTagId -> jixingTagId,
@@ -294,6 +298,7 @@ object Album extends SQLSyntaxSupport[Album] with ShortenedNames {
         } else {
             update(Album).set(
                 column.shared -> share,
+                column.shareAt -> null
             ).where.eq(column.albumId, albumId)
         }
     }.update().future().map(_ => true)
@@ -312,7 +317,7 @@ object Album extends SQLSyntaxSupport[Album] with ShortenedNames {
         withSQL {
             select.from[JoyeaUser](JoyeaUser as ju)
               .leftJoin(Album as a).on(ju.joyeaId, a.userId).append(
-                sqls.and.ge(a.createdAt, startDate).and.le(a.createdAt, endDate).and.eq(a.shared, true)
+                sqls.and.ge(a.shareAt, startDate).and.le(a.shareAt, endDate).and.eq(a.shared, true)
             )
         }.one(JoyeaUser(ju))
           .toMany(Album.opt(a))
