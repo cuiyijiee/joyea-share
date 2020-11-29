@@ -18,8 +18,7 @@ const store = new Vuex.Store({
         showRealImage: false, //是否显示原图,
         imagePreviewShow: false,
         imagePreviewImages: [],
-        imagePreviewStartIndex: 0,
-        latestReadUploadSrcId: 76
+        imagePreviewStartIndex: 0
     },
     getters: {
         getStateOrderList: function (state) {
@@ -46,9 +45,6 @@ const store = new Vuex.Store({
         imagePreviewStartIndex: function (state) {
             return state.imagePreviewStartIndex;
         },
-        latestReadUploadSrcId: function (state) {
-            return state.latestReadUploadSrcId;
-        }
     },
     mutations: {
         switchRealImage(state, isOn) {
@@ -81,9 +77,6 @@ const store = new Vuex.Store({
         setEditInfo(state, albumInfo) {
             state.orderEditInfo = albumInfo;
         },
-        setLatestReadUploadSrcId(state, id) {
-            state.latestReadUploadSrcId = id;
-        },
         swapOrderItem(state, newIndex, oldIndex) {
             let targetRow = state.orderList.splice(oldIndex, 1)[0];
             state.orderList.splice(newIndex, 0, targetRow);
@@ -113,9 +106,6 @@ const store = new Vuex.Store({
         },
         setOrderEditInfoFunc(state, albumInfo) {
             state.commit("setEditInfo", albumInfo)
-        },
-        setLatestReadUploadSrcIdFunc(state, id) {
-            state.commit("setLatestReadUploadSrcId", id);
         },
         swapOrderItemFunc(state, newIndex, oldIndex) {
             state.commit("swapOrderItem", newIndex, oldIndex);

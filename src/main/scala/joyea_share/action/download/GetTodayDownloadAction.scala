@@ -10,13 +10,13 @@ import xitrum.annotation.POST
 class GetTodayDownloadAction extends BaseAction[GetTodayDownloadReq] {
     override def safeExecute(req: GetTodayDownloadReq): Unit = {
         baseResponseSuccess(
-            DownloadManager.getTodayTaskMap.map(entry => {
+            DownloadManager.getTodayTaskMap(myUid).map(entry => {
                 val task = entry._2
                 DownloadTaskResp(
                     id = task.id,
                     startTime = task.startTime,
-                    firstSrcName = task.downloadFile.head.fileName,
-                    status = DownloadManager.queryTask(task.id) == DownloadStatus.FINISH
+                    firstSrcName = task.downloadFile.headOption.map(_.fileName).getOrElse(""),
+                    status = task.queryStatus() == DownloadStatus.FINISH
                 )
             })
         )

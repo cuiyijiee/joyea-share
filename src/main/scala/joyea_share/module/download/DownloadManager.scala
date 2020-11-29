@@ -107,8 +107,8 @@ object DownloadManager extends Log with BaseJsonFormat {
         saveDir
     }
 
-    def queryTask(taskId: String): DownloadStatus.Value = {
-        newDownloadTaskMap.get(taskId).map(_.queryStatus()).getOrElse(DownloadStatus.NONE)
+    def queryTask(taskId: String): Option[DownloadTask] = {
+        newDownloadTaskMap.get(taskId)
     }
 
     def genNewSession(): Unit = {
@@ -125,8 +125,8 @@ object DownloadManager extends Log with BaseJsonFormat {
         })
     }
 
-    def getTodayTaskMap: Map[String, DownloadTask] = {
-        newDownloadTaskMap
+    def getTodayTaskMap(uid: String): Map[String, DownloadTask] = {
+        newDownloadTaskMap.filter(_._2.downloadRoleId.equals(uid))
     }
 
     def getAdminToken: String = {

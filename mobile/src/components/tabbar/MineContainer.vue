@@ -47,6 +47,7 @@ import {mapGetters, mapActions} from "vuex";
 import avatars from 'vue-avatars'
 import {logout} from "@/api";
 import {latestUpload} from "../../api";
+import {getLastReadUploadRecordId} from "../../util/JoyeaUtil";
 
 export default {
     components: {
@@ -73,7 +74,7 @@ export default {
             }
         },
         ...mapGetters([
-            'userInfo', 'latestReadUploadSrcId'
+            'userInfo'
         ])
     },
     methods: {
@@ -114,11 +115,9 @@ export default {
         handleTestMoment() {
         },
         handleGetHasNewUpload() {
-
             latestUpload(1).then(resp => {
                 if (resp.code === 2000 && resp.data.length > 0) {
-                    console.log("local record: " + this.latestReadUploadSrcId + ",remote record: " + resp.data[0].id);
-                    this.hasNewUpload = resp.data[0].id > this.latestReadUploadSrcId;
+                    this.hasNewUpload = resp.data[0].id > getLastReadUploadRecordId(this.userInfo.email);
                 }
             })
         }

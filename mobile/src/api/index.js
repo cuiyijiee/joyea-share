@@ -148,6 +148,16 @@ export function createAlbum(name, fileList) {
     })
 }
 
+export function updateAlbum(id,name, fileList) {
+    return service.post('/api/v1/album/collect/update', {
+        id:id,
+        name: name,
+        src: fileList
+    }).then(resp => {
+        return resp.data;
+    })
+}
+
 export function uploadIntegralLeaderboard(year, month) {
     return service.post('api/v1/leaderboard/uploadIntegral', {
         year: year,

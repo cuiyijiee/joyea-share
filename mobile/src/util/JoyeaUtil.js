@@ -88,3 +88,12 @@ export function genFileName(fullPath) {
 export function filterDirList(fileList) {
     return fileList.filter(item => item['is_dir']);
 }
+
+export function getLastReadUploadRecordId(myUid) {
+    let lastReadId = localStorage.getItem("last_read_upload_record_id_" + myUid);
+    return lastReadId ? parseInt(lastReadId) : 0;
+}
+
+export function setLastReadUploadRecordId(myUid, readId) {
+    localStorage.setItem("last_read_upload_record_id_" + myUid, readId + "");
+}

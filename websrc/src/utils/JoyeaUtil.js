@@ -53,6 +53,11 @@ export function genFileName(fileName) {
     return fileName.substring(fileName.lastIndexOf("/") + 1);
 }
 
+export function getFileNameWithoutExtension(fileName){
+    let dotIndex = fileName.lastIndexOf(".");
+    return fileName.substring(0,dotIndex);
+}
+
 export function filterDirList(dir) {
     console.log(dir)
     return dir.filter(item => {

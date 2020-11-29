@@ -60,7 +60,7 @@
 import draggable from 'vuedraggable'
 import {mapActions, mapGetters} from "vuex"
 import {genSrcPreviewSrc, getDocumentImage} from "../../util/JoyeaUtil";
-import api from "../../api";
+import api, {updateAlbum} from "../../api";
 import {createAlbum} from "../../api/"
 
 export default {
@@ -155,14 +155,8 @@ export default {
                     console.log(err)
                 }
             } else {  //保存编辑之后的清单
-                api({
-                    action: 'album',
-                    method: this.editMode ? 'reSave' : 'save',
-                    id: this.getOrderEditInfo.id,
-                    name: this.newAlbumName,
-                    src: this.orderList
-                }).then(response => {
-                    if (response.result) {
+                updateAlbum(this.getOrderEditInfo.id,this.newAlbumName,this.orderList).then(response => {
+                    if (response.data) {
                         this.$notify({type: 'success', message: this.editMode ? '重新编辑成功' : '保存成功'});
                         this.$store.dispatch("clearFunc");
                         this.setOrderEditInfoFunc({}).then(() => {
@@ -171,7 +165,7 @@ export default {
                     } else {
                         this.$notify({type: 'warning', message: this.editMode ? '重新编辑失败' : '保存失败'});
                     }
-                });
+                })
             }
         },
         genPreviewUrl(neid, hash, rev, mime_type) {

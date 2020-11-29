@@ -18,16 +18,19 @@ case class DownloadTask(
                          downloadRoleName: String,
                          downloadRoleId: String,
                          startTime: OffsetDateTime = OffsetDateTime.now,
+                         finishedTime: Option[OffsetDateTime] = None
                        ) extends Log {
 
     private var status: DownloadStatus.Value = DownloadStatus.READY
-    private var finishDate: LocalDateTime = _
+    var finishDate: OffsetDateTime = _
     private var saveFilePath: String = ""
     private var saveCompressPath: String = ""
     private var downloadListener: DownloadListener = _
     private var downloadProgress: Int = 0
     private var successNum: Int = 0
     private var failNum: Int = 0
+
+    private val DOWNLOAD_PREFIX = "[download log prefix]: "
 
     def execute(sessionId: String, baseSavePath: String, baseCompressSavePath: String, listener: DownloadListener): Unit = {
         downloadListener = listener
@@ -38,16 +41,31 @@ case class DownloadTask(
 
         downloadListener.onStart(id, downloadFile.length)
         status = DownloadStatus.DOWNLOAD
+        log.info(s"${DOWNLOAD_PREFIX}${id} start download file:${downloadFile.length}")
         downloadFile.foreach(item => {
             RedisService.recordFileDownload(item.neid.toString).foreach(resp => {
                 log.error(s"record download ${item.neid} with result : $resp")
             })
             LenovoUtil.downloadFileV2(sessionId, item.filePath, item.neid, item.rev, "ent",
                 saveFilePath + "/" + item.index + "--" + item.fileName, new CommonListener[File] {
-                    override def onSuccess(obj: File): Unit = {
+                    override def onSuccess(file: File): Unit = {
+                        log.info(s"下载文件【$item】成功:${file.getAbsolutePath}")
+                        log.info(s"${DOWNLOAD_PREFIX}${id} specific file download success:${file.getName}")
+                        if (xitrum.Config.productionMode) { //没有测试的加解密环境，顾先关闭
+                            log.info(s"${DOWNLOAD_PREFIX}${id} specific file start upload to ftp server:${file.getName}")
+                            //先上传文件到ftp服务器进行加密再下载下来
+                            val ftpUtil = getFtpUtil
+                            ftpUtil.login()
+                            ftpUtil.uploadFileToRemoteDir(file.getAbsolutePath, "/download/" + id)
+                            file.delete()
+                            val maxWaitSeconds = Config.application.getConfig("download").getInt("max_wait_seconds") * 1000
+                            ftpUtil.downloadFile("/download/" + id + "/" + file.getName, file.getAbsolutePath,
+                                true, true, maxWaitSeconds)
+                            ftpUtil.logout()
+                            log.info(s"${DOWNLOAD_PREFIX}${id} specific file end download from ftp server:${file.getName}")
+                        }
                         successNum = successNum + 1
                         downloadProgress = downloadProgress + 1
-                        log.info(s"下载文件【$item】成功:${obj.getAbsolutePath}")
                         checkFinish()
                     }
 
@@ -56,6 +74,7 @@ case class DownloadTask(
                             failNum = failNum + 1
                             downloadProgress = downloadProgress + 1
                             log.error(s"下载文件【$item】失败:$error")
+                            log.info(s"${DOWNLOAD_PREFIX}${id} specific file download error:${error}")
                             checkFinish()
                         } catch {
                             case e: Exception =>
@@ -66,40 +85,34 @@ case class DownloadTask(
         })
     }
 
+
+    def getFtpUtil: FtpUtil = {
+        new FtpUtil(
+            Config.application.getConfig("download").getString("ftp_ip"),
+            Config.application.getConfig("download").getInt("ftp_port"),
+            Config.application.getConfig("download").getString("ftp_name"),
+            Config.application.getConfig("download").getString("ftp_pass")
+        )
+    }
+
     def checkFinish(): Unit = this.synchronized {
         //下载完成
         downloadListener.onNext(id, downloadProgress, downloadFile.length)
         if (downloadProgress >= downloadFile.length) {
-            //线程等待2秒，避免加密软件冲突
-            CommonUtil.writeFile(s"$saveFilePath/请勿外泄.txt", "仅一公司内部资料，请勿外泄！")
 
-            if (xitrum.Config.productionMode) { //没有测试的加解密环境，顾先关闭
-                //先上传文件到ftp服务器进行加密再下载下来
-                val ftpUtil = new FtpUtil(
-                    Config.application.getConfig("download").getString("ftp_ip"),
-                    Config.application.getConfig("download").getInt("ftp_port"),
-                    Config.application.getConfig("download").getString("ftp_name"),
-                    Config.application.getConfig("download").getString("ftp_pass")
-                )
+            log.info(s"${DOWNLOAD_PREFIX}${id} finish download file:${id}")
+
+            if (xitrum.Config.productionMode) {
+                val ftpUtil = getFtpUtil
                 ftpUtil.login()
-                val fileList = new File(saveFilePath).listFiles(new FileFilter {
-                    override def accept(file: File): Boolean = file.isFile
-                })
-                fileList.foreach(file => {
-                    ftpUtil.uploadFileToRemoteDir(file.getAbsolutePath, "/download/" + id)
-                    file.delete()
-                })
-                val maxWaitSeconds = Config.application.getConfig("download").getInt("max_wait_seconds") * 1000
-                fileList.foreach(file => {
-                    ftpUtil.downloadFile("/download/" + id + "/" + file.getName, file.getAbsolutePath,
-                        true, true, maxWaitSeconds)
-                })
                 ftpUtil.deleteDir("/download/" + id)
                 ftpUtil.logout()
             }
-
+            log.info(s"${DOWNLOAD_PREFIX}${id} start compress dir to zip:${saveCompressPath}.zip")
+            CommonUtil.writeFile(s"$saveFilePath/请勿外泄.txt", "仅一公司内部资料，请勿外泄！")
             ZipUtils.compressZip(Array(saveFilePath), saveCompressPath + ".zip")
-            finishDate = LocalDateTime.now()
+            log.info(s"${DOWNLOAD_PREFIX}${id} finish compress dir to zip:${saveCompressPath}.zip")
+            finishDate = OffsetDateTime.now()
             status = DownloadStatus.FINISH
             downloadListener.onFinish(taskId = id, successNum, failNum, downloadFile.length)
         }
@@ -112,5 +125,4 @@ case class DownloadTask(
     def queryStatus(): DownloadStatus.Value = {
         this.status
     }
-
 }

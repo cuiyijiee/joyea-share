@@ -39,7 +39,7 @@ import {latestUpload} from "@/api";
 import {genSrcPreviewSrc, getDocumentImage} from "@/util/JoyeaUtil";
 import {mapActions, mapGetters} from "vuex";
 import {convertItem} from "@/util/ImageViewUtil";
-import {handleGoToPreview} from "../../util/JoyeaUtil";
+import {getLastReadUploadRecordId, handleGoToPreview, setLastReadUploadRecordId} from "../../util/JoyeaUtil";
 import moment from 'moment';
 
 export default {
@@ -51,13 +51,13 @@ export default {
     },
     computed: {
         ...mapGetters([
-            'userInfo', 'latestReadUploadSrcId'
+            'userInfo'
         ])
     },
     methods: {
         getDocumentImage,
         ...mapActions([
-            'clearFunc', 'addFunc', 'setOrderEditInfoFunc', 'setLatestReadUploadSrcIdFunc'
+            'clearFunc', 'addFunc', 'setOrderEditInfoFunc'
         ]),
         handleGetLatestUploadList() {
             latestUpload(1000).then(resp => {
@@ -65,7 +65,7 @@ export default {
                 for (let index = 0; index < resp.data.length; index++) {
                     let item = resp.data[index];
                     if (item.uploadPath) {  //过滤未审核文件
-                        if (item.id === this.latestReadUploadSrcId) {
+                        if (item.id === getLastReadUploadRecordId(this.userInfo.session)) {
                             // if (item.id === 200) {
                             item.lastReadFlag = true;
                         }
@@ -86,10 +86,9 @@ export default {
                             }
                         })
                     } else {
-                        console.log("lastReadEleList length:" + lastReadEleList.length)
                     }
                     if (this.latestUploadRecordList.length > 0) {
-                        this.setLatestReadUploadSrcIdFunc(this.latestUploadRecordList[0].id);
+                        setLastReadUploadRecordId(this.userInfo.email,this.latestUploadRecordList[0].id);
                     }
                 })
             })

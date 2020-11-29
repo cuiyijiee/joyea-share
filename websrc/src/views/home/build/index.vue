@@ -285,9 +285,8 @@ import api, {getTopSearchKey, prepareDownloadFile, queryDownload} from "../../..
 import genSrcPreviewSrc from "../../../utils"
 import Sortable from 'sortablejs';
 import videojs from 'video.js'
-import {getDocumentImage} from "../../../utils/JoyeaUtil";
+import {getDocumentImage, joyeaMenuPath, getFileNameWithoutExtension} from "@/utils/JoyeaUtil";
 import {mapGetters} from "vuex";
-import {joyeaMenuPath} from "../../../utils/JoyeaUtil";
 
 export default {
     name: "index",
@@ -797,7 +796,6 @@ export default {
                 this.loading.downloadLoading = true;
                 prepareDownloadFile(toDownloadList).then(resp => {
                     let taskId = resp.data;
-                    console.log("获取到下载ID：" + taskId);
                     this.$store.dispatch('downloadStatus/setVisible', true);
                     this.$notify.success({
                         title: "提示",
@@ -806,10 +804,10 @@ export default {
                     let timer = 0;
                     timer = setInterval(function () {
                         queryDownload(taskId).then(resp => {
-                            if (resp.data) {
+                            if (resp.data && resp.data.status) {
                                 _this.$notify.success({
                                     title: "任务下载提示",
-                                    message: "您有一个下载任务【" + taskId + "】已准备好！"
+                                    message: "您有一个下载任务【" + getFileNameWithoutExtension(resp.data.firstSrcName) + ".zip】已准备好！"
                                 });
                                 clearInterval(timer);
                                 _this.$store.dispatch('downloadStatus/setVisible', false);
