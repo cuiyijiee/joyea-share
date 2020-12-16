@@ -209,18 +209,18 @@ export default {
                 {
                     name: "听装线", path: "听装线", icon: "menu-icon/2.png"
                 },
-                {
-                    name: "软双铝线", path: "软双铝线", icon: "menu-icon/3.png"
-                },
+                // {
+                //     name: "软双铝线", path: "软双铝线", icon: "menu-icon/3.png"
+                // },
                 {
                     name: "制粒线", path: "制粒线", icon: "menu-icon/4.png"
                 },
                 {
                     name: "泡罩线", path: "泡罩线", icon: "menu-icon/5.png"
                 },
-                {
-                    name: "其他生产线", path: "其他生产线", icon: "menu-icon/8.png"
-                },
+                // {
+                //     name: "其他生产线", path: "其他生产线", icon: "menu-icon/8.png"
+                // },
                 {
                     name: "公司介绍", path: "公司介绍", icon: "menu-icon/6.png"
                 },

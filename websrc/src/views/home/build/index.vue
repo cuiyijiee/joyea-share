@@ -20,7 +20,7 @@
                  element-loading-background="rgba(209, 209, 209)"
             >
                 <el-row :gutter="10" justify="center" align="middle">
-                    <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6" v-for="menu in menuPath">
+                    <el-col :xs="24" :sm="12" :md="8" :lg="8" :xl="8" v-for="menu in menuPath">
                         <div class="menu-content" style="border: #000000 3px" @click="handleClickRootMenu(menu)">
                             <img :src="menu.icon" style=""/>
                         </div>
