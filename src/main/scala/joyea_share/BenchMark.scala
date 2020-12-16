@@ -1,11 +1,15 @@
 package joyea_share
 
-import joyea_share.action.leaderboard.util.LeaderboardUtil
 import joyea_share.db.MySQLSettings
-import joyea_share.model.Album
+import joyea_share.util.LenovoUtil
+import joyea_share.vo.lenovo.{FtsSearchContent, FtsSearchResp}
+import org.cuje.lib.net.HttpUtil
 import org.json4s.DefaultFormats
+import org.json4s.jackson.{JsonMethods, Serialization}
 
+import scala.concurrent.{Await, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration.Duration
 import scala.util.{Failure, Success}
 
 object BenchMark extends MySQLSettings {
@@ -13,64 +17,50 @@ object BenchMark extends MySQLSettings {
     def main(args: Array[String]): Unit = {
 
         implicit val format: DefaultFormats.type = DefaultFormats
-        implicit val session: String = "3d27985df21c42f182e8cc0fbd56ca1e_346341_696047_meta"
 
-        //        UploadRecord.latestUploadRecord(10).onComplete {
-        //            case Failure(exception) =>
-        //                exception.printStackTrace()
-        //            case Success(value) =>
-        //                println(value)
-        //        }
+        val value =  Await.result(LenovoUtil.login_("phdycn@joyea.cn","1234567890@joyea"),Duration.Inf)
+        val resp = JsonMethods.parse(value)
+        val respSession = resp \ "X-LENOVO-SESS-ID"
+        implicit val session: String = respSession.values.toString
 
-        //        LenovoUtil.ftsSearch(
-        //            "听装", "", 202
-        //        ).onComplete {
-        //            case Failure(exception) =>
-        //                exception.printStackTrace()
-        //            case Success(value) =>
-        //                val resp = Serialization.read[FtsSearchResp](value)
-        //                println(s"current find file: ${resp.content.length},and has more: ${resp.has_more},and next_offset is: ${resp.next_offset}")
-        //        }
-        //        UploadIntegral.create(7758258,"717",5)
-        //          .onComplete {
-        //              case Failure(exception) =>
-        //                  exception.printStackTrace()
-        //              case Success(value) =>
-        //                  println(value)
-        //          }
-//        val dateRange = LeaderboardUtil.generateDateRange(2020, 0)
-//        Album.findSharedWithDateLimit(dateRange._1, dateRange._2)
-//          .onComplete {
-//              case Failure(exception) =>
-//                  exception.printStackTrace()
-//              case Success(value) =>
-//                  println(value)
-//          }
-        scala.io.StdIn.readLine()
-        //    DownloadRecord.create("","123",123,"12313",LocalDateTime.now()).onComplete {
-        //      case Failure(exception) =>
-        //        exception.printStackTrace()
-        //      case Success(value) =>
-        //        println(value)
-        //    }
-
-        //    val sessionId = "f8a1fa97b8ae49e8ad444761eadb5d03_346341_696047_meta"
-        //    val file = new File("/Users/cuiyijie/IdeaProjects/joyea_share/websrc/vue.config.js")
-        //    LenovoUtil.preUpload(sessionId, file)
-        //      .onComplete {
-        //        case Failure(exception) =>
-        //          exception.printStackTrace()
-        //        case Success(value) =>
-        //          val json = JsonObject.readFrom(value)
-        //          val region = json.getString("region", "")
-        //          LenovoUtil.uploadFile(sessionId, region, file).onComplete {
-        //            case Failure(exception) =>
-        //              exception.printStackTrace()
-        //            case Success(value) =>
-        //              println(value)
-        //          }
-        //      }
-
+        LenovoUtil.ftsSearch(
+            "mp4", "", 50
+        ).onComplete {
+            case Failure(exception) =>
+                exception.printStackTrace()
+            case Success(value) =>
+                val resp = Serialization.read[FtsSearchResp](value)
+                println(s"current find file: ${resp.content.length},and has more: ${resp.has_more},and next_offset is: ${resp.next_offset}")
+                resp.content.foreach(resultFile=> {
+                    LenovoUtil.getFileStartUrl(
+                        resultFile.neid,
+                        resultFile.rev.getOrElse(""),
+                        resultFile.nsid,
+                        resultFile.mime_type.getOrElse(""),
+                        resultFile.hash
+                    ).onComplete {
+                        case Failure(exception) =>
+                            exception.printStackTrace()
+                        case Success(value) =>
+                            val startUrl = (JsonMethods.parse(value) \ "stat_url").values.toString
+                            HttpUtil.get(startUrl,Map()).onComplete {
+                                case Failure(exception) =>
+                                    exception.printStackTrace()
+                                case Success(value) =>
+                                    val startUrl = (JsonMethods.parse(value) \ "stat_url").values.toString
+                                    HttpUtil.get(startUrl,Map()).onComplete {
+                                        case Failure(exception) =>
+                                            exception.printStackTrace()
+                                        case Success(value) =>
+                                            val result = (JsonMethods.parse(value) \ "result").values.toString
+                                            if(result.equals("converting")){
+                                                println(s"需要转码:${resultFile.neid} - ${resultFile.filename}")
+                                            }
+                                    }
+                            }
+                    }
+                })
+        }
     }
 
     def test(): Unit = {

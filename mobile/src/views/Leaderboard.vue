@@ -300,7 +300,7 @@ export default {
             });
         },
         handleParseResp(resp) {
-            resp.data = resp.data.filter(item => item.user.id !== '717');
+            resp.data = resp.data.filter(item => item.user.joyeaId !== '717');
             if (this.leaderObjType === 0) {
                 resp.data.sort(function (pre, next) {
                     return next.value - pre.value;

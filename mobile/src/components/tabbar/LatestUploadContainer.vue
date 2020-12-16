@@ -62,10 +62,13 @@ export default {
         handleGetLatestUploadList() {
             latestUpload(1000).then(resp => {
                 let itemList = [];
+                let localReadId = getLastReadUploadRecordId(this.userInfo.email);
+                //console.log("local id is:" + localReadId);
                 for (let index = 0; index < resp.data.length; index++) {
                     let item = resp.data[index];
                     if (item.uploadPath) {  //过滤未审核文件
-                        if (item.id === getLastReadUploadRecordId(this.userInfo.session)) {
+                        if (item.id === localReadId) {
+                            console.log("the record is last read:" + item);
                             // if (item.id === 200) {
                             item.lastReadFlag = true;
                         }
@@ -88,7 +91,9 @@ export default {
                     } else {
                     }
                     if (this.latestUploadRecordList.length > 0) {
-                        setLastReadUploadRecordId(this.userInfo.email,this.latestUploadRecordList[0].id);
+                        let latestUploadItem = this.latestUploadRecordList[0];
+                        //console.log("latest upload item is: " + JSON.stringify(latestUploadItem));
+                        setLastReadUploadRecordId(this.userInfo.email,latestUploadItem.id);
                     }
                 })
             })

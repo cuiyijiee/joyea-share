@@ -89,11 +89,14 @@ export function filterDirList(fileList) {
     return fileList.filter(item => item['is_dir']);
 }
 
+const latest_record_id_prefix = "last_read_upload_record_id_";
+
 export function getLastReadUploadRecordId(myUid) {
-    let lastReadId = localStorage.getItem("last_read_upload_record_id_" + myUid);
+    let lastReadId = localStorage.getItem(latest_record_id_prefix + myUid);
+    //console.log("uid:" + myUid + ",upload id:" + lastReadId);
     return lastReadId ? parseInt(lastReadId) : 0;
 }
 
 export function setLastReadUploadRecordId(myUid, readId) {
-    localStorage.setItem("last_read_upload_record_id_" + myUid, readId + "");
+    localStorage.setItem(latest_record_id_prefix + myUid, readId + "");
 }

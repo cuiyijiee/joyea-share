@@ -117,7 +117,10 @@ export default {
         handleGetHasNewUpload() {
             latestUpload(1).then(resp => {
                 if (resp.code === 2000 && resp.data.length > 0) {
-                    this.hasNewUpload = resp.data[0].id > getLastReadUploadRecordId(this.userInfo.email);
+                    let latestRecordId = resp.data[0].id;
+                    let localRecordId = getLastReadUploadRecordId(this.userInfo.email);
+                    //console.log("server id:" + latestRecordId + ",local id: " + localRecordId);
+                    this.hasNewUpload = latestRecordId > localRecordId;
                 }
             })
         }
