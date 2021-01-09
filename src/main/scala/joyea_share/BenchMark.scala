@@ -2,12 +2,12 @@ package joyea_share
 
 import joyea_share.db.MySQLSettings
 import joyea_share.util.LenovoUtil
-import joyea_share.vo.lenovo.{FtsSearchContent, FtsSearchResp}
+import joyea_share.vo.lenovo.FtsSearchResp
 import org.cuje.lib.net.HttpUtil
 import org.json4s.DefaultFormats
 import org.json4s.jackson.{JsonMethods, Serialization}
 
-import scala.concurrent.{Await, Future}
+import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.util.{Failure, Success}
