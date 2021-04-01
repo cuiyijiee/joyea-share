@@ -6,3 +6,4 @@ project/target
 websrc/dist
 mobile/dist
 .DS_Store
+video-transcoding
