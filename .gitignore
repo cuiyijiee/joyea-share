@@ -7,3 +7,4 @@ websrc/dist
 mobile/dist
 tmp
 .DS_Store
+/video-transcoding
