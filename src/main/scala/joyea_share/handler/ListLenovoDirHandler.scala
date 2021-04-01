@@ -34,7 +34,14 @@ class ListLenovoDirHandler extends IAction {
             val path = content.get("path").asString()
             val fileName = path.substring(path.lastIndexOf("/") + 1)
             tempMap.put(fileName, content)
-            val srcNeid = content.getLong("neid", -1)
+            val srcNeidValue = content.get("neid")
+            var srcNeid = -1L
+            if (srcNeidValue.isString){
+              srcNeid = srcNeidValue.asString().toLong
+            }else{
+              srcNeid = srcNeidValue.asLong()
+            }
+            content.set("neid",srcNeid)
             //记录neid，用于请求获取tag
             neidList.add(srcNeid)
 

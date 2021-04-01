@@ -1,19 +1,18 @@
 package joyea_share.util
 
 import com.utils.CommonUtil
+import joyea_share.module.download.DownloadManager
 import joyea_share.vo.lenovo.{FtsSearchContent, FtsSearchResp}
 import org.cuje.lib.TimeUtil
 import org.cuje.lib.net.HttpUtil
+import org.json4s.DefaultFormats
 import org.json4s.jackson.{JsonMethods, Serialization}
-import org.json4s.{DefaultFormats, JValue}
 import xitrum.Log
 
 import java.io.File
 import java.util
 import java.util.{Timer, TimerTask}
-import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration.Duration
 import scala.util.{Failure, Success}
 
 /**
@@ -24,7 +23,12 @@ import scala.util.{Failure, Success}
 object VideoTranscodeUtil {
 
   val videoSuffixArr: Array[String] = Array("mpg", "mpeg", "mp4", "wmv", "avi", "mov", "3gp", "flv", "rmvb", "webm")
+
   def startJob(): Unit = {
+    implicit val session: String = DownloadManager.getAdminToken
+    if(!new File("video.transcode").exists()){
+      return
+    }
     videoSuffixArr.foreach(videoSuffix => {
       val suffixVideo = new SuffixVideoTranscodeUtil(videoSuffix)
       suffixVideo.doJob()
@@ -40,19 +44,20 @@ class SuffixVideoTranscodeUtil(videoSuffix: String) extends Log {
   val timer = new Timer()
 
   var currentOffset = 0
-  val value: String = Await.result(LenovoUtil.login_("phdycn@joyea.cn", "1234567890@joyea"), Duration.Inf)
-  val resp: JValue = JsonMethods.parse(value)
-  val respSession: JValue = resp \ "X-LENOVO-SESS-ID"
-  implicit val session: String = respSession.values.toString
+  //  val value: String = Await.result(LenovoUtil.login_("phdycn@joyea.cn", "1234567890@joyea"), Duration.Inf)
+  //  val resp: JValue = JsonMethods.parse(value)
+  //  val respSession: JValue = resp \ "X-LENOVO-SESS-ID"
+  //  implicit val session: String = respSession.values.toString
+
 
   val fileLogSb: StringBuffer = new StringBuffer()
 
-  def doJob(): Unit = {
+  def doJob()(implicit session: String): Unit = {
     fileLogSb.append(s"neid,filename,filesize,status,date\n")
     _doJob()
   }
 
-  def _doJob(): Unit = {
+  def _doJob()(implicit session: String): Unit = {
     //implicit val session: String = DownloadManager.getAdminToken
     LenovoUtil.ftsSearch(
       videoSuffix, "", currentOffset
@@ -64,7 +69,7 @@ class SuffixVideoTranscodeUtil(videoSuffix: String) extends Log {
         log.info(s"current find file: ${resp.content.length},and has more: ${resp.has_more},and next_offset is: ${resp.next_offset}")
         if (resp.has_more) {
           resp.content.foreach(content => {
-            if(content.filename.replaceAll("<mark>","").replaceAll("</mark>","").endsWith(videoSuffix)){
+            if (content.filename.replaceAll("<mark>", "").replaceAll("</mark>", "").endsWith(videoSuffix)) {
               transcodingMap.put(content.neid, content)
             }
           })
@@ -77,7 +82,7 @@ class SuffixVideoTranscodeUtil(videoSuffix: String) extends Log {
     }
   }
 
-  def doLogFileStatus(content: FtsSearchContent, status: String): Unit = this.synchronized{
+  def doLogFileStatus(content: FtsSearchContent, status: String): Unit = this.synchronized {
     log.info(s"do log:${content} - ${status}")
     fileLogSb.append(s"${content.neid},${content.filename},${content.size},${status},${TimeUtil.getCurrentDateStr()}\n")
   }
@@ -90,7 +95,7 @@ class SuffixVideoTranscodeUtil(videoSuffix: String) extends Log {
   /**
     * 60秒检测一次是否完成
     */
-  def checkTransCodingStatus(): Unit = {
+  def checkTransCodingStatus()(implicit session: String): Unit = {
     timer.schedule(new TimerTask {
       override def run(): Unit = {
         _checkTransCodingStatus()
@@ -98,7 +103,7 @@ class SuffixVideoTranscodeUtil(videoSuffix: String) extends Log {
     }, 60 * 1000)
   }
 
-  def _checkTransCodingStatus(): Unit = {
+  def _checkTransCodingStatus()(implicit session: String): Unit = {
     if (transcodingMap.isEmpty) {
       log.info("检查完成")
       finishCheck()

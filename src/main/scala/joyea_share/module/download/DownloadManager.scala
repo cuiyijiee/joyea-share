@@ -39,10 +39,6 @@ object DownloadManager extends Log with BaseJsonFormat {
         getTodayDownloadDir(false)
         filterNotTodayTask()
 
-        if (currentIndex % 2 == 0) {
-          VideoTranscodeUtil.startJob()
-        }
-        currentIndex += 1
       } catch {
         case e: Exception =>
           log.error("gen new admin session error: ", e)
@@ -123,6 +119,14 @@ object DownloadManager extends Log with BaseJsonFormat {
       override def onSuccess(obj: (String, String, Long)): Unit = {
         log.info(s"获取到最高权限SessionId：$obj")
         adminSessionId = obj._1
+
+        if (currentIndex % 2 == 0) {
+          log.info("开始执行视频转码检查")
+          VideoTranscodeUtil.startJob()
+        } else {
+          log.info("下次执行视频转码检查")
+        }
+        currentIndex += 1
       }
 
       override def onError(error: String): Unit = {
