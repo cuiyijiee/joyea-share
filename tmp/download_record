@@ -1,0 +1,43 @@
+{
+  "9a13486b-f597-4b2c-bf63-a07fc9ee8536": {
+    "id": "9a13486b-f597-4b2c-bf63-a07fc9ee8536",
+    "downloadFile": [
+      {
+        "id": 0,
+        "index": 1,
+        "filePath": "/营销素材展示/公司介绍/005、一号园资料/001、一号园照片/000、一号园鸟瞰/一号园-鸟瞰图 (1).jpg",
+        "joyeaUserId": "717",
+        "rev": "1588f7d7447c4f85a13cbee32f8e7aeb",
+        "neid": 1084272579,
+        "fileName": "一号园-鸟瞰图 (1).jpg",
+        "pathType": "ent",
+        "createdAt": "2020-11-13T14:30:03Z"
+      },
+      {
+        "id": 0,
+        "index": 2,
+        "filePath": "/营销素材展示/公司介绍/005、一号园资料/001、一号园照片/000、一号园鸟瞰/一号园-鸟瞰图 (3).jpg",
+        "joyeaUserId": "717",
+        "rev": "ae486aed69b04f2e85f53fde2cc4ce6f",
+        "neid": 1084272879,
+        "fileName": "一号园-鸟瞰图 (3).jpg",
+        "pathType": "ent",
+        "createdAt": "2020-11-13T14:30:03Z"
+      },
+      {
+        "id": 0,
+        "index": 3,
+        "filePath": "/营销素材展示/公司介绍/005、一号园资料/001、一号园照片/000、一号园鸟瞰/一号园-鸟瞰图（2）.JPG",
+        "joyeaUserId": "717",
+        "rev": "ee0a652c90a54ad997e8dc2306722f88",
+        "neid": 2239221748,
+        "fileName": "一号园-鸟瞰图（2）.JPG",
+        "pathType": "ent",
+        "createdAt": "2020-11-13T14:30:03Z"
+      }
+    ],
+    "downloadRoleName": "窦阳阳",
+    "downloadRoleId": "717",
+    "startTime": "2020-11-13T14:30:03Z"
+  }
+}

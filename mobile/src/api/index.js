@@ -89,7 +89,7 @@ export function addUploadRecord(uid, tempSrcName, srcNeid, srcType, srcHash, src
     return service.post("/api/v1/upload/add", {
         tempSrcName: tempSrcName,
         uploader: uid,
-        srcNeid: srcNeid,
+        srcNeid: Number(srcNeidList),
         srcType: srcType,
         srcHash: srcHash,
         srcRev: srcRev,

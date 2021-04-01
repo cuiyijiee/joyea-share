@@ -63,7 +63,7 @@ export function uploadRecordManage(recordId, allow, refuseReason, uploadPath, up
         allow: allow,
         refuseReason: refuseReason,
         uploadPath: uploadPath,
-        uploadPathNeid: uploadPathNeid,
+        uploadPathNeid: Number(uploadPathNeid),
         srcName: srcName,
         needCount:needCount
     }).then(res => {
