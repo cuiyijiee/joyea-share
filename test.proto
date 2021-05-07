@@ -1,0 +1,49 @@
+enum SheetType {
+  Label = 1; //不可更改类型
+  Number = 2; //数字
+  String = 3;//字符串
+  Options = 4; //选项
+  Verify = 5; //校验
+}
+
+enum CheckType {
+  Equal = 1;
+  NotEqual = 2;
+  GreaterThan = 3;
+  GreaterThanAndEqual = 4;
+  LessThan = 5;
+  LessThanAndEqual = 6;
+  //待补充
+}
+
+//普通类型
+message NormalItem {
+  required string title = 1;
+  required string content = 2;
+}
+
+//单元格数据
+message SheetItem {
+  required SheetType itemType = 1;
+  optional string content = 2;  //如果itemType是Label,String,Number则显示此内容
+  repeated string options = 3; //如果itemType是Options，则显示此数组中的选项
+
+  optional string toCheckItemId = 4; //如果如果itemType是Verify,待检测单元格的值，2-2
+  optional CheckType checkExpression = 5; //校验表达式
+  optional string checkTargetValue = 6;//待比较value
+}
+
+//表单行数据
+message RowSheetItems {
+  repeated SheetItem rowSheetItems = 1; //行数据
+}
+
+//单据数据结构
+message Document {
+  required string ProjectId = 1; //项目编号
+  required string GenzongId = 2; //跟踪编号
+  //其他固定数据待补充
+  repeated NormalItem normalItems = 3; //待补充数据
+
+  repeated RowSheetItems rowSheetItems = 4;//二维数组，表格
+}
