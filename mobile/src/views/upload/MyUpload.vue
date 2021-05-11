@@ -13,7 +13,7 @@
                 <van-tag type="success" v-if="item.checkedAt && item.checked">通过</van-tag>
                 <van-tag type="danger" v-if="item.checkedAt && !item.checked">未通过</van-tag>
                 <div v-if="item.checkedAt && item.checked">
-                    管理员移至:{{ item.uploadPath.replace("/营销素材展示", "首页") + "/" + item.srcName }}
+                    管理员移至:{{ item.uploadPath.replace("/行政自助服务", "首页") + "/" + item.srcName }}
                 </div>
                 <div v-if="item.checkedAt && !item.checked">审核意见:{{ item.refuseReason }}</div>
                 <div>上传时间:{{ item.createdAt | dateFormat }}</div>

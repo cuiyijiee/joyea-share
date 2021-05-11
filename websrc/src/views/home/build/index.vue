@@ -13,30 +13,31 @@
                       @click="handleClickTopSearchKey(key)"><u>{{ key }}</u></span>
             </div>
         </div>
-        <div v-if="dir.currentPath.length === 1 && dir.currentPath[0] === '营销素材展示' && toCreateAlbum.list.length === 0"
-             style="height:1080px;padding: 0 150px;background: #d1d1d1;">
-            <div style="padding: 10px 10px 0 10px;height: 100%; "
-                 v-loading="dir.loadingDir || loading.search"
-                 element-loading-background="rgba(209, 209, 209)"
-            >
-                <el-row :gutter="10" justify="center" align="middle">
-                    <el-col :xs="24" :sm="12" :md="8" :lg="8" :xl="8" v-for="menu in menuPath">
-                        <div class="menu-content" style="border: #000000 3px" @click="handleClickRootMenu(menu)">
-                            <img :src="menu.icon" style=""/>
-                        </div>
-                    </el-col>
-                </el-row>
-            </div>
-        </div>
-        <el-row v-else :gutter="20" style="padding: 10px 150px 0 150px;height:1080px;">
+<!--        <div v-if="dir.currentPath.length === 1 && dir.currentPath[0] === '行政自助服务' && toCreateAlbum.list.length === 0"-->
+<!--             style="height:1080px;padding: 0 150px;background: #d1d1d1;">-->
+<!--            <div style="padding: 10px 10px 0 10px;height: 100%; "-->
+<!--                 v-loading="dir.loadingDir || loading.search"-->
+<!--                 element-loading-background="rgba(209, 209, 209)"-->
+<!--            >-->
+<!--                <el-row :gutter="10" justify="center" align="middle">-->
+<!--                    <el-col :xs="24" :sm="12" :md="8" :lg="8" :xl="8" v-for="menu in menuPath">-->
+<!--                        <div class="menu-content" style="border: #000000 3px" @click="handleClickRootMenu(menu)">-->
+<!--                            <img :src="menu.icon" style=""/>-->
+<!--                        </div>-->
+<!--                    </el-col>-->
+<!--                </el-row>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--        <el-row v-else :gutter="20" style="padding: 10px 150px 0 150px;height:1080px;">-->
+        <el-row :gutter="20" style="padding: 10px 150px 0 150px;height:1080px;">
             <el-col :span="18" class="bg-purple">
                 <!--文件路径显示-->
                 <el-row class="contentHead">
                     <el-col :span="18">
                                 <span style=" color:#000000;font-size: 15px;cursor:pointer;"
-                                      @click="handleListLenovoDir('/营销素材展示','ent')">首页</span>
+                                      @click="handleListLenovoDir('/行政自助服务','ent')">首页</span>
                         <span style="display: inline" v-for="(item,index) in dir.currentPath"
-                              v-if="item !== '营销素材展示'">
+                              v-if="item !== '行政自助服务'">
                                     /
                                     <span style=" color:#000000;font-size: 15px;cursor:pointer;"
                                           @click="handleClickDirPath(item,index)">{{ item }}</span>
@@ -361,7 +362,7 @@ export default {
     },
     methods: {
         handleClickRootMenu(menu) {
-            this.handleListLenovoDir("/营销素材展示/" + menu.path, "ent")
+            this.handleListLenovoDir("/行政自助服务/" + menu.path, "ent")
         },
         handleClickTopSearchKey(key) {
             this.handleSearch(key);
@@ -884,7 +885,7 @@ export default {
         }
     },
     mounted() {
-        this.handleListLenovoDir("/营销素材展示", "ent");
+        this.handleListLenovoDir("/行政自助服务", "ent");
         let toEditList = this.$route.params.toEditList;
         if (toEditList) {
             this.toCreateAlbum.idEditMode = true;

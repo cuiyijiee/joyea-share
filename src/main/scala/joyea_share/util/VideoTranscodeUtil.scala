@@ -20,15 +20,17 @@ import scala.util.{Failure, Success}
   * @date 2021/1/3 14:30
   */
 
-object VideoTranscodeUtil {
+object VideoTranscodeUtil extends Log {
 
   val videoSuffixArr: Array[String] = Array("mpg", "mpeg", "mp4", "wmv", "avi", "mov", "3gp", "flv", "rmvb", "webm")
 
   def startJob(): Unit = {
     implicit val session: String = DownloadManager.getAdminToken
     if(!new File("video.transcode").exists()){
+      log.info("视频转码检查:关闭")
       return
     }
+    log.info("视频转码检查:开启")
     videoSuffixArr.foreach(videoSuffix => {
       val suffixVideo = new SuffixVideoTranscodeUtil(videoSuffix)
       suffixVideo.doJob()

@@ -10,13 +10,13 @@ const service = axios.create({
 
 export function authUpload(size, session) {
     return service.get('https://console.box.lenovo.com/v2/fileops/auth_upload/databox/' +
-        '营销素材展示/素材库上传临时文件夹?path_type=ent&X-LENOVO-SESS-ID=' + session + "&bytes=" + size,).then(res => {
+        '行政自助服务/素材库上传临时文件夹?path_type=ent&X-LENOVO-SESS-ID=' + session + "&bytes=" + size,).then(res => {
         return res.data;
     })
 }
 
 export function realUpload(realUploadDomain, file,realFileName, session,) {
-    let uploadUrl = realUploadDomain + "/v2/files/databox/营销素材展示/素材库上传临时文件夹/" + realFileName +
+    let uploadUrl = realUploadDomain + "/v2/files/databox/行政自助服务/素材库上传临时文件夹/" + realFileName +
         "?X-LENOVO-SESS-ID=" + session + "&path_type=ent&bytes=" + file.size + "&filename=" + realFileName + "$overwrite=true";
 
     let formData = new FormData();

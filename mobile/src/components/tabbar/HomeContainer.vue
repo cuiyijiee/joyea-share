@@ -13,19 +13,20 @@
             <van-tag v-for="item in topSearchKey" style="margin: 5px 2px" @click="handleClickTopKey(item)">{{ item }}
             </van-tag>
         </div>
-        <div v-if="dir.currentPath.length === 1 && dir.currentPath[0] === '营销素材展示'" style="margin-bottom: 50px">
-            <van-grid :column-num="2">
-                <van-grid-item class="my_van-grid-item" v-for="menu in menuPath"
-                               @click="handleClickRootMenu(menu.path)">
-                    <div class="menu-content">
-                        <van-image :src="menu.icon" fit="contain"
-                                   style="width: 50px;height: 50px;padding: 30px 20px 10px 20px"/>
-                        <div style="padding: 20px;height: 30px;font-size: 12px">{{ menu.name }}</div>
-                    </div>
-                </van-grid-item>
-            </van-grid>
-        </div>
-        <div v-else>
+<!--        <div v-if="dir.currentPath.length === 1 && dir.currentPath[0] === '行政自助服务'" style="margin-bottom: 50px">-->
+<!--            <van-grid :column-num="2">-->
+<!--                <van-grid-item class="my_van-grid-item" v-for="menu in menuPath"-->
+<!--                               @click="handleClickRootMenu(menu.path)">-->
+<!--                    <div class="menu-content">-->
+<!--                        <van-image :src="menu.icon" fit="contain"-->
+<!--                                   style="width: 50px;height: 50px;padding: 30px 20px 10px 20px"/>-->
+<!--                        <div style="padding: 20px;height: 30px;font-size: 12px">{{ menu.name }}</div>-->
+<!--                    </div>-->
+<!--                </van-grid-item>-->
+<!--            </van-grid>-->
+<!--        </div>-->
+<!--        <div v-else>-->
+        <div>
             <van-sticky :offset-top="46">
                 <van-row style="background-color: #fff;padding: 8px 0">
                     <van-col span="3">
@@ -276,11 +277,11 @@ export default {
             }
         },
         handleClickRootDir() {
-            this.handleListLenovoDir("/营销素材展示");
+            this.handleListLenovoDir("/行政自助服务");
             this.currentTypeActive = 0;
         },
         handleClickRootMenu(path) {
-            this.handleListLenovoDir("/营销素材展示/" + path);
+            this.handleListLenovoDir("/行政自助服务/" + path);
         },
         handleClickBackDir() {
             if (this.dir.currentPath.length > 0) {
@@ -342,7 +343,7 @@ export default {
         },
     },
     mounted() {
-        this.handleListLenovoDir("/营销素材展示", "ent");
+        this.handleListLenovoDir("/行政自助服务", "ent");
     },
     activated() {
         eventBus.$on('showDir', function (data) {

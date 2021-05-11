@@ -233,7 +233,7 @@ object LenovoUtil extends Log {
   //https://console.box.lenovo.com/v2/fileops/auth_upload/databox/
   def preUpload(sessionId: String, file: File): Future[String] = {
     val promise = Promise[String]
-    val requestUrl = "https://console.box.lenovo.com/v2/fileops/auth_upload/databox/营销素材展示/素材库上传临时文件夹?path_type=ent&bytes=" + file.length()
+    val requestUrl = "https://console.box.lenovo.com/v2/fileops/auth_upload/databox/行政自助服务/素材库上传临时文件夹?path_type=ent&bytes=" + file.length()
     val request = OkHttpUtil.obtainBaseRequest(sessionId).url(requestUrl).get().build()
     OkHttpUtil.okHttpClient.newCall(request).enqueue(new Callback {
       override def onFailure(call: Call, e: IOException): Unit = {
@@ -259,7 +259,7 @@ object LenovoUtil extends Log {
       .addFormDataPart("file", file.getName, fileBody)
       .build()
 
-    val uploadUrl = uploadRegion + "/v2/files/databox/营销素材展示/素材库上传临时文件夹/" + file.getName +
+    val uploadUrl = uploadRegion + "/v2/files/databox/行政自助服务/素材库上传临时文件夹/" + file.getName +
       "?path_type=ent&bytes=" + file.length() + "&filename=" + file.getName + "$overwrite=true";
 
     val request = OkHttpUtil.obtainBaseRequest(sessionId)
