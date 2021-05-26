@@ -21,14 +21,17 @@ export let joyeaMenuPath = [
     {
         name: "听装线", path: "听装线", icon: "menu-icon/12.png"
     },
-    // {
-    //     name: "软双铝线", path: "软双铝线", icon: "menu-icon/13.png"
-    // },
+    {
+        name: "泡罩线", path: "泡罩线", icon: "menu-icon/15.png"
+    },
+    {
+        name: "软双铝线", path: "软双铝线", icon: "menu-icon/13.png"
+    },
     {
         name: "制粒线", path: "制粒线", icon: "menu-icon/14.png"
     },
     {
-        name: "泡罩线", path: "泡罩线", icon: "menu-icon/15.png"
+        name: "智能物流系统", path: "智能物流系统", icon: "menu-icon/19.png"
     },
     // {
     //     name: "其他生产线", path: "其他生产线", icon: "menu-icon/18.png"
@@ -53,9 +56,9 @@ export function genFileName(fileName) {
     return fileName.substring(fileName.lastIndexOf("/") + 1);
 }
 
-export function getFileNameWithoutExtension(fileName){
+export function getFileNameWithoutExtension(fileName) {
     let dotIndex = fileName.lastIndexOf(".");
-    return fileName.substring(0,dotIndex);
+    return fileName.substring(0, dotIndex);
 }
 
 export function filterDirList(dir) {
