@@ -35,8 +35,8 @@ export default {
             loginLoading: false,
             passwordType: "password",
             loginForm: {
-                user: "",
-                pwd: ""
+                user: "520",
+                pwd: "123456"
             }
         }
     },
@@ -79,7 +79,7 @@ export default {
         ]),
     },
     created() {
-        this.loginForm.user = this.userInfo.email;
+        //this.loginForm.user = this.userInfo.email;
     }
 }
 </script>

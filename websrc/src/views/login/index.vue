@@ -29,8 +29,8 @@ export default {
       systemTitle: "仅一素材库系统",
       loginLoading: false,
       loginForm: {
-        user: '',
-        pwd: '',
+        user: '520',
+        pwd: '123456',
         rememberPwd: true
       },
       loginRule: {
