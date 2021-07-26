@@ -196,6 +196,7 @@ public class FtpUtil {
             fileInputStream = ftpClient.retrieveFileStream(remoteFilePath);
             if (fileInputStream == null) {
                 logger.error("remote file input is null:" + remoteFilePath);
+                return false;
             }
             byte[] toReadBuf = new byte[32];
             int len = fileInputStream.read(toReadBuf, 0, 32);
@@ -233,20 +234,25 @@ public class FtpUtil {
     public boolean downloadFile(String remoteFilePath, String localFilePath,
                                 Boolean checkSwitch, Boolean needEncryptedOrNot, int maxWaitSeconds) {
         boolean encrypted = false;
-        int checkNum = 30;
+        int checkNum = 0;
         if (checkSwitch) {
             do {
-                encrypted = checkFileEncrypted(remoteFilePath);
-                logger.error(String.format("remote file is encrypted: %s, and need encrypted: %s", encrypted, needEncryptedOrNot));
-                if ((needEncryptedOrNot && !encrypted) || (!needEncryptedOrNot && encrypted)) {
-                    try {
-                        Thread.sleep(1000);
-                        checkNum++;
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+                try {
+                    encrypted = checkFileEncrypted(remoteFilePath);
+                    logger.error(String.format("remote file is encrypted: %s, and need encrypted: %s", encrypted, needEncryptedOrNot));
+                    if ((needEncryptedOrNot && !encrypted) || (!needEncryptedOrNot && encrypted)) {
+                        try {
+                            Thread.sleep(1000);
+                            checkNum++;
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                     }
-                }
-                if (checkNum > maxWaitSeconds) {
+                    if (checkNum > maxWaitSeconds) {
+                        break;
+                    }
+                } catch (Exception exception) {
+                    logger.error("download failure: ", exception);
                     break;
                 }
             } while ((needEncryptedOrNot && !encrypted) || (!needEncryptedOrNot && encrypted));
