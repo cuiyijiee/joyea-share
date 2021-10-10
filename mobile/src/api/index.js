@@ -148,9 +148,9 @@ export function createAlbum(name, fileList) {
     })
 }
 
-export function updateAlbum(id,name, fileList) {
+export function updateAlbum(id, name, fileList) {
     return service.post('/api/v1/album/collect/update', {
-        id:id,
+        id: id,
         name: name,
         src: fileList
     }).then(resp => {
@@ -226,4 +226,14 @@ export function moveAlbumMenu(albumId, menuId) {
         albumId: albumId,
         menuId: menuId
     }).then(resp => resp.data);
+}
+
+export function getLoginTicket() {
+    return service.post('api/v1/esunyun/ticket', {}).then(resp => resp.data);
+}
+
+export function getUserProfile(authCode) {
+    return service.post("api/v1/esunyun/profile", {
+        authCode: authCode
+    }).then(resp => resp.data)
 }

@@ -25,6 +25,14 @@
             console.log(result)
         })
     }
+
+    function callNextPlusLogin(ticket,callback) {
+        EsenYunJSBridge.call('oauthConfirm', {'ticket': ticket}, function (result) {
+            // alert('结果：' + JSON.stringify(result));
+            let authCode = result.data.authCode;
+            callback(authCode)
+        })
+    }
 </script>
 <!-- built files will be auto injected -->
 </body>
