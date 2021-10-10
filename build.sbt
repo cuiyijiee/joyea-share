@@ -10,7 +10,7 @@ javacOptions ++= Seq("-source", "1.8", "-target", "1.8")
 
 //------------------------------------------------------------------------------
 
-libraryDependencies += "tv.cntt" %% "xitrum" % "3.29.0"
+libraryDependencies += "tv.cntt" %% "xitrum" % "3.30.1"
 
 libraryDependencies += "org.json4s" %% "json4s-ext" % "3.6.10"
 

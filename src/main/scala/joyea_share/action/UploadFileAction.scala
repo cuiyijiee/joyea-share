@@ -29,8 +29,9 @@ class UploadFileAction extends Action with SkipCsrfCheck {
             srcNeid = None, srcDesc = srcDesc.getOrElse(""),
             srcType = None, srcRev = None, srcHash = None, tags = Seq(), isPcUpload = true).onComplete {
             case Failure(exception) =>
-                log.error("submit upload record success: ", exception)
+                log.error("submit upload record failed: ", exception)
             case Success(value) =>
+                log.info("submit upload record success: " + value.toString)
                 UploadManager.realUpload(value.id)
         }
 

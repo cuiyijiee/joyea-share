@@ -13,7 +13,7 @@ case class UploadRecord(
 
                          uploaderName: String = "",
 
-                         srcNeid: Option[Long],
+                         srcNeid: Option[String],
                          srcRev: Option[String],
                          srcType: Option[String],
                          srcHash: Option[String],
@@ -87,7 +87,7 @@ object UploadRecord extends SQLSyntaxSupport[UploadRecord] with ShortenedNames {
         }.map(UploadRecord(ur)).single().future()
     }
 
-    def create(uploader: String, srcNeid: Option[Long], srcRev: Option[String], srcType: Option[String],
+    def create(uploader: String, srcNeid: Option[String], srcRev: Option[String], srcType: Option[String],
                srcHash: Option[String], srcDesc: String,
                createdAt: OffsetDateTime = OffsetDateTime.now(),
                tempSrcName: String,
@@ -127,7 +127,7 @@ object UploadRecord extends SQLSyntaxSupport[UploadRecord] with ShortenedNames {
         }.update().future().map(_ > 0)
     }
 
-    def uploadRecord(recordId: Long, srcNeid: Long, srcRev: String, srcType: String, srcHash: String): Future[Boolean] = {
+    def uploadRecord(recordId: Long, srcNeid: String, srcRev: String, srcType: String, srcHash: String): Future[Boolean] = {
         withSQL {
             update(UploadRecord).set(
                 column.srcNeid -> srcNeid,

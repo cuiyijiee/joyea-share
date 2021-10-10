@@ -56,15 +56,17 @@ object UploadManager extends Log {
                             LenovoUtil.preUpload(DownloadManager.getAdminToken, toUploadFile).onComplete {
                                 case Failure(exception) =>
                                     log.error("pre upload file exist exception: ", exception)
-                                case Success(value) =>
-                                    val json = JsonObject.readFrom(value)
+                                case Success(tmpValue) =>
+                                    log.error("pre upload file success: " + tmpValue)
+                                    val json = JsonObject.readFrom(tmpValue)
                                     val region = json.getString("region", "")
                                     LenovoUtil.uploadFile(DownloadManager.getAdminToken, region, toUploadFile).onComplete {
                                         case Failure(exception) =>
                                             log.error("real upload file exist exception: ", exception)
                                         case Success(value) =>
+                                            log.error("real upload file success: " + value)
                                             val uploadResultJson = JsonObject.readFrom(value)
-                                            val srcNeid = uploadResultJson.getLong("neid", 0)
+                                            val srcNeid = uploadResultJson.getString("neid", "")
                                             val srcHash = uploadResultJson.getString("hash", "")
                                             val srcRev = uploadResultJson.getString("rev", "")
                                             val srcType = uploadResultJson.getString("mime_type", "")

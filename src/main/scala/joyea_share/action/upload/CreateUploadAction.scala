@@ -18,7 +18,7 @@ class CreateUploadAction extends BaseAction[CreateUploadReq] {
 
 case class CreateUploadReq(
                             uploader: String,
-                            srcNeid: Option[Long],
+                            srcNeid: Option[String],
                             srcType: Option[String],
                             srcRev: Option[String],
                             srcHash: Option[String],

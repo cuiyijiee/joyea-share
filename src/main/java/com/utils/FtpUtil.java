@@ -243,11 +243,11 @@ public class FtpUtil {
                     if ((needEncryptedOrNot && !encrypted) || (!needEncryptedOrNot && encrypted)) {
                         try {
                             Thread.sleep(1000);
-                            checkNum++;
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
                     }
+                    checkNum ++;
                     if (checkNum > maxWaitSeconds) {
                         break;
                     }

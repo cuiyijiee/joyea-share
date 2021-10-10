@@ -351,7 +351,7 @@ object LenovoUtil extends Log {
     })
   }
 
-  def renameFile(fileNeid: Long, fileName: String, session: String): Future[Boolean] = {
+  def renameFile(fileNeid: String, fileName: String, session: String): Future[Boolean] = {
     val promise = Promise[Boolean]
     val infoJson = new JsonObject()
     infoJson.add("fileName", fileName)
@@ -382,7 +382,7 @@ object LenovoUtil extends Log {
     promise.future
   }
 
-  def moveFile(toMoveFileNeid: Long, toDirPath: Long, session: String, listener: CommonListener[Boolean]): Unit = {
+  def moveFile(toMoveFileNeid: String, toDirPath: Long, session: String, listener: CommonListener[Boolean]): Unit = {
 
     val infoJson = new JsonObject()
     infoJson.add("op_info", new JsonArray().add(new JsonObject().add("neid", toMoveFileNeid)))

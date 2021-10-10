@@ -43,7 +43,7 @@ object UploadIntegral extends SQLSyntaxSupport[UploadIntegral] with ShortenedNam
     def opt(s: SyntaxProvider[UploadIntegral])(rs: WrappedResultSet): Option[UploadIntegral] =
         rs.longOpt(s.resultName.id).map(_ => apply(s.resultName)(rs))
 
-    def create(neid: Long, uploader: String, integral: Long, createdAt: OffsetDateTime = OffsetDateTime.now())
+    def create(neid: String, uploader: String, integral: Long, createdAt: OffsetDateTime = OffsetDateTime.now())
               (implicit session: AsyncDBSession = AsyncDB.sharedSession): Future[Long] = {
         withSQL {
             insert.into(UploadIntegral).namedValues(
