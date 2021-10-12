@@ -39,9 +39,9 @@
         </template>
       </van-cell>
     </van-cell-group>
-    <van-cell-group title="设置">
-      <van-cell title="测试登录" is-link @click="handleTestLogin"/>
-    </van-cell-group>
+<!--    <van-cell-group title="设置">-->
+<!--      <van-cell title="测试登录" is-link @click="handleTestLogin"/>-->
+<!--    </van-cell-group>-->
   </div>
 </template>
 

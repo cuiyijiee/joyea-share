@@ -24,18 +24,18 @@ export let joyeaMenuPath = [
     {
         name: "泡罩线", path: "泡罩线", icon: "menu-icon/15.png"
     },
-    {
-        name: "软双铝线", path: "软双铝线", icon: "menu-icon/13.png"
-    },
+    // {
+    //     name: "软双铝线", path: "软双铝线", icon: "menu-icon/13.png"
+    // },
     {
         name: "制粒线", path: "制粒线", icon: "menu-icon/14.png"
     },
     {
         name: "智能物流系统", path: "智能物流系统", icon: "menu-icon/19.png"
     },
-    // {
-    //     name: "其他生产线", path: "其他生产线", icon: "menu-icon/18.png"
-    // },
+    {
+        name: "其他生产线", path: "其他生产线", icon: "menu-icon/18.png"
+    },
     {
         name: "公司介绍", path: "公司介绍", icon: "menu-icon/16.png"
     },

@@ -36,7 +36,9 @@
         </el-image>
       </el-dialog>
       <el-button type="primary" style="margin: 20px" @click="handleUpload">开始上传
-        <i class="el-icon-upload el-icon--right"></i></el-button>
+        <i class="el-icon-upload el-icon--right"></i>
+      </el-button>
+<!--      <div style="margin: 20px"><h3 style="color: #FF0000; ">本系统支持最大单个上传文件大小为：50M</h3></div>-->
     </div>
   </div>
 </template>
