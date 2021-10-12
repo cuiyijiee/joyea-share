@@ -9,7 +9,6 @@
             <span class="logo" style="font-size: 20px;margin-left: 10px;vertical-align:bottom">仅一素材库</span>
           </div>
         </el-col>
-
         <el-col :span="12" class="userinfo">
           <el-button size="small" icon="el-icon-edit" @click="jumpToBuild"
                      :class="{'is-active':currentPath==='/build'}"> 工作台
@@ -81,7 +80,7 @@
 </template>
 
 <script>
-import api, {check, logout} from "../../api/index";
+import api, {check, getTodayDownload, logout} from "../../api/index";
 import getNowFormatDate from "../../utils/time"
 
 const localStorage = window.localStorage;
@@ -141,40 +140,34 @@ export default {
     },
     handleOpenDownload() {
       let _this = this;
-      api({
-        action: "todayDownloadList"
-      }).then(response => {
+      getTodayDownload().then(response => {
         _this.downloadTask = [];
-        response.task.forEach(task => {
+        response.data.forEach(task => {
           _this.downloadTask.push({
             id: task.id,
             startTime: task.startTime,
             firstSrcName: task.firstSrcName.substr(0, task.firstSrcName.lastIndexOf(".")),
-            status: task.finishTime && task.finishTime.length !== 0,
+            status: task.status,
             opened: _this.handleQueryRecord(task.id)
           });
         });
         _this.downloadTask.reverse();
-      });
+      })
       timer = setInterval(function () {
-        api({
-          action: "todayDownloadList"
-        }).then(response => {
+        getTodayDownload().then(response => {
           _this.downloadTask = [];
-          response.task.forEach(task => {
+          response.data.forEach(task => {
             _this.downloadTask.push({
               id: task.id,
               startTime: task.startTime,
               firstSrcName: task.firstSrcName.substr(0, task.firstSrcName.lastIndexOf(".")),
-              status: task.finishTime && task.finishTime.length !== 0,
+              status: task.status,
               opened: _this.handleQueryRecord(task.id)
             });
           });
           _this.downloadTask.reverse();
-          console.log(_this.downloadTask)
-        })
+        });
       }, 2 * 1000);
-
     },
     handleQueryRecord(taskId) {
       let todayOpenTask = localStorage.getItem(this.genTodayDownloadTaskKey());

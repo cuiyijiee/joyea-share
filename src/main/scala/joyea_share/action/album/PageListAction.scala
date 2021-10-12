@@ -25,7 +25,7 @@ class PageListAction extends BaseAction[PageListAlbumReq] {
         jieduanTagId = req.jieduanTagId,
         shichangTagId = req.shichangTagId
       ).onComplete(safeResponse[List[Album]](_, result => {
-        cyjResponseSuccess(result.map(album => {
+        baseResponseSuccess(result.map(album => {
           AlbumDetailResp(
             albumId = album.albumId,
             userId = album.userId,

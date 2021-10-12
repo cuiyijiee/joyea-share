@@ -50,20 +50,19 @@
         <van-tab title="全部">
           <van-empty v-if="dir.tableData.length === 0" description="当前路径没有文件"/>
           <van-list>
-            <van-cell v-for="item in dir.tableData" :key="item.path">
+            <van-cell v-for="item in dir.tableData" @click="handleClickItem(item)" :key="item.path">
               <van-row>
                 <van-col span="4">
                   <van-icon size="30" v-if="item['is_dir']" class="my_icon" name="credit-pay"/>
                   <van-icon size="30" v-else-if="item.mime_type.startsWith('video')" class="my_icon"
                             name="video-o"/>
                   <img v-else-if="item.mime_type.startsWith('image')" class="my_icon my_icon_size"
-                       @click="handleGotoPreviewImage(dir.tableData,item)"
                        :src="genPreviewUrl(item.neid,item.hash,item.rev,item.mime_type)"/>
                   <van-image style="width: 40px" v-else-if="item.mime_type.startsWith('doc')"
                              :src="handleGetDocumentImage(item.mime_type)"/>
                   <van-icon size="30" v-else class="my_icon" name="info-o"/>
                 </van-col>
-                <van-col span="16" @click="handleClickItem(item)">
+                <van-col span="16">
                   {{ item.path.substr(item.path.lastIndexOf('/') + 1) }}
                   <van-tag style="margin-right: 2px" mark v-for="tag in item.tags">
                     {{ tag.replace(markReg, "") }}
@@ -98,10 +97,10 @@
                  :badge="dir.tableData.filter(item => !item.is_dir && item.mime_type.startsWith('image')).length">
           <van-grid :border="false" :column-num="3">
             <van-grid-item
+                @click="handleClickItem(item)"
                 v-for="item in dir.tableData.filter(item => !item.is_dir && item.mime_type.startsWith('image'))">
               <div>
                 <img class="my_icon my_icon_size_large"
-                     @click="handleGotoPreviewImage(dir.tableData,item)"
                      :src="genPreviewUrl(item.neid,item.hash,item.rev,item.mime_type)"/>
                 <van-button @click="handleClickAddItem(item)" round plain hairline type="danger"
                             style="position: absolute; top: 0px; left: 0px; border:#ffffff" icon="plus"
@@ -123,12 +122,12 @@
           <van-list>
             <van-cell v-for="item in dir.tableData"
                       v-if="!item.is_dir && item.mime_type.startsWith('video')"
-                      :key="item.path">
+                      :key="item.path" @click="handleClickItem(item)">
               <van-row>
                 <van-col span="4">
                   <van-icon size="30" class="my_icon" name="video-o"/>
                 </van-col>
-                <van-col span="16" @click="handlePreview(item)">
+                <van-col span="16">
                   {{ item.path.substr(item.path.lastIndexOf('/') + 1) }}
                   <van-tag style="margin-right: 2px" mark v-for="tag in item.tags">
                     {{ tag.replace(markReg, "") }}
@@ -147,12 +146,12 @@
                  :badge="dir.tableData.filter(item => !item.is_dir && item.mime_type.startsWith('doc')).length">
           <van-list>
             <van-cell v-for="item in dir.tableData" v-if="!item.is_dir && item.mime_type.startsWith('doc')"
-                      :key="item.path">
+                      :key="item.path" @click="handleClickItem(item)">
               <van-row>
                 <van-col span="4">
                   <van-image style="width: 40px" :src="handleGetDocumentImage(item.mime_type)"/>
                 </van-col>
-                <van-col span="16" @click="handlePreview(item)">
+                <van-col span="16">
                   {{ item.path.substr(item.path.lastIndexOf('/') + 1) }}
                   <van-tag style="margin-right: 2px" mark v-for="tag in item.tags">
                     {{ tag.replace(markReg, "") }}
@@ -171,14 +170,12 @@
     </div>
   </div>
 </template>
-
 <script>
-import api, {getDefaultJoyeaDesc} from "../../api/";
+import api, {getDefaultJoyeaDesc, getTopSearchKey} from "../../api/";
 import {genSrcPreviewSrc, getDocumentImage, handleGoToPreview} from "../../util/JoyeaUtil"
 import {mapGetters} from "vuex"
 import eventBus from "../../service/eventbus";
 import VmBackTop from 'vue-multiple-back-top'
-import {GenImageListView} from "../../util/ImageViewUtil";
 import {Toast} from 'vant';
 
 export default {
@@ -207,25 +204,28 @@ export default {
       isFirst: true,
       menuPath: [
         {
-          name: "装配作业指导类文件", path: "装配作业指导类文件", icon: "menu-icon/2-1.png"
+          name: "装配作业指导类文件", path: "装配作业指导类文件", icon: "menu-icon/1-1.png"
         },
         {
-          name: "调试作业指导文件", path: "调试作业指导文件", icon: "menu-icon/2-2.png"
+          name: "调试作业指导文件", path: "调试作业指导文件", icon: "menu-icon/1-2.png"
         },
         {
-          name: "我司设备培训素材", path: "我司设备培训素材", icon: "menu-icon/2-3.png"
+          name: "我司设备培训素材", path: "我司设备培训素材", icon: "menu-icon/1-3.png"
+        },
+        // {
+        //   name: "软双铝线", path: "软双铝线", icon: "menu-icon/3.png"
+        // },
+        {
+          name: "外购大件类培训文件", path: "外购大件类培训文件", icon: "menu-icon/1-4.png"
         },
         {
-          name: "外购大件类培训文件", path: "外购大件类培训文件", icon: "menu-icon/2-4.png"
+          name: "通用元器件使用说明", path: "通用元器件使用说明", icon: "menu-icon/1-5.png"
         },
         {
-          name: "通用元器件使用说明", path: "通用元器件使用说明", icon: "menu-icon/2-5.png"
+          name: "新工具使用说明", path: "新工具使用说明", icon: "menu-icon/1-6.png"
         },
         {
-          name: "新工具使用说明", path: "新工具使用说明", icon: "menu-icon/2-6.png"
-        },
-        {
-          name: "实验室", path: "实验室", icon: "menu-icon/2-7.png"
+          name: "实验室", path: "实验室", icon: "menu-icon/1-7.png"
         }
       ]
     }
@@ -233,9 +233,6 @@ export default {
   methods: {
     handleGetDocumentImage(mimeType) {
       return getDocumentImage(mimeType)
-    },
-    handleGotoPreviewImage(itemList, clickItem) {
-      GenImageListView(this, itemList, this.userInfo.session, clickItem)
     },
     goBackSearch() {
       this.$router.push("/search");
@@ -252,10 +249,8 @@ export default {
       this.canGoBackSearch = true;
       this.$router.push({path: "/search", query: {searchKey: this.searchKey}});
     },
-    handlePreview(item) {
-      handleGoToPreview(this, item, this.userInfo.session)
-    },
     handleClickAddItem(item) {
+      event.stopPropagation();
       if (!this.$store.getters.exist(item['neid'])) {
         getDefaultJoyeaDesc(item['neid']).then(resp => {
           item.joyeaDesc = resp.data;
@@ -276,10 +271,8 @@ export default {
     handleClickItem(item) {
       if (item['is_dir']) {
         this.handleListLenovoDir(item.path, this.globalPathType)
-      } else if (item.mime_type.startsWith("image")) {
-        this.handleGotoPreviewImage(this.dir.tableData, item);
       } else {
-        this.handlePreview(item)
+        handleGoToPreview(this, item, this.userInfo.session, this.dir.tableData);
       }
     },
     handleClickRootDir() {
@@ -308,10 +301,8 @@ export default {
       return genSrcPreviewSrc(neid, hash, rev, previewType, this.userInfo.session);
     },
     handleGetTopSearchKey() {
-      api({
-        action: "getTopSearchKey"
-      }).then(resp => {
-        this.topSearchKey = resp["data"];
+      getTopSearchKey().then(resp => {
+        this.topSearchKey = resp['data'];
       })
     },
     handleListLenovoDir(path, pathType) {

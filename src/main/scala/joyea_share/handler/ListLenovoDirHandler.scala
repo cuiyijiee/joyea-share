@@ -1,16 +1,13 @@
 package joyea_share.handler
 
-import java.util
-
 import com.json.{JsonArray, JsonObject, WriterConfig}
-import joyea_share.db.MySQLSettings
 import joyea_share.handler.interfaces.{ExecListener, IAction}
-import joyea_share.model.{AlbumSrc, SrcCollect}
+import joyea_share.model.AlbumSrc
 import joyea_share.module.download.DownloadManager
 import joyea_share.service.RedisService
-import joyea_share.util.{CommonListener, LenovoUtil, SessionUtil}
-import scalikejdbc.async.AsyncDB
+import joyea_share.util.{CommonListener, LenovoUtil}
 
+import java.util
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
@@ -18,30 +15,35 @@ class ListLenovoDirHandler extends IAction {
   override def execute(request: JsonObject, listener: ExecListener): Unit = {
     val path = request.getString("path", "/")
     val pathType = request.getString("path_type", "ent")
-    LenovoUtil.listDir(DownloadManager.getAdminToken(), path, pathType, new CommonListener[JsonObject] {
+    LenovoUtil.listDir(DownloadManager.getAdminToken, path, pathType, new CommonListener[JsonObject] {
       override def onSuccess(obj: JsonObject): Unit = {
         val contentOpt = obj.get("content")
         val neidList = new util.ArrayList[Long]()
         val tempMap = new util.HashMap[String, JsonObject]()
         if (contentOpt != null) {
           val contentJsonArr = contentOpt.asArray()
-          contentJsonArr.forEach(value => {
+          import scala.collection.JavaConverters._
+          val filteredContent = contentJsonArr.asScala.filter(value => {
             val content = value.asObject()
-            //val srcNeid = content.getLong("neid", -1)
-            val srcNeidValue = content.get("neid")
-            var srcNeid = -1L
-            if (srcNeidValue.isString) {
-              srcNeid = srcNeidValue.asString().toLong
-            } else {
-              srcNeid = srcNeidValue.asLong()
-            }
-            content.set("neid", srcNeid)
-            //记录neid，用于请求获取tag
-            neidList.add(srcNeid)
+            val path = content.get("path").asString()
+            !path.contains("素材库上传临时文件夹")
+          })
+          filteredContent.foreach(value => {
+            val content = value.asObject()
             //创建文件名和json的映射
             val path = content.get("path").asString()
             val fileName = path.substring(path.lastIndexOf("/") + 1)
             tempMap.put(fileName, content)
+            val srcNeidValue = content.get("neid")
+            var srcNeid = -1L
+            if (srcNeidValue.isString){
+              srcNeid = srcNeidValue.asString().toLong
+            }else{
+              srcNeid = srcNeidValue.asLong()
+            }
+            content.set("neid",srcNeid)
+            //记录neid，用于请求获取tag
+            neidList.add(srcNeid)
 
             //查询数据库获取收藏次数
             val optionSrc = None;
@@ -66,10 +68,9 @@ class ListLenovoDirHandler extends IAction {
             val refNum = Await.result(AlbumSrc.countByNeid(srcNeid), Duration.Inf)
             content.add("ref_num", refNum)
           })
-
-          LenovoUtil.getExtraMeta(DownloadManager.getAdminToken(), neidList, new CommonListener[JsonObject] {
+          LenovoUtil.getExtraMeta(DownloadManager.getAdminToken, neidList, new CommonListener[JsonObject] {
             override def onSuccess(metaJson: JsonObject): Unit = {
-              contentJsonArr.forEach(contentValue => {
+              filteredContent.foreach(contentValue => {
                 val content = contentValue.asObject()
                 val srcNeid = content.getLong("neid", -1)
                 val metaData = metaJson.get(srcNeid.toString).asObject()

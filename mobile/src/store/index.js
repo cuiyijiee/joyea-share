@@ -44,7 +44,7 @@ const store = new Vuex.Store({
         },
         imagePreviewStartIndex: function (state) {
             return state.imagePreviewStartIndex;
-        }
+        },
     },
     mutations: {
         switchRealImage(state, isOn) {
@@ -76,6 +76,10 @@ const store = new Vuex.Store({
         },
         setEditInfo(state, albumInfo) {
             state.orderEditInfo = albumInfo;
+        },
+        swapOrderItem(state, newIndex, oldIndex) {
+            let targetRow = state.orderList.splice(oldIndex, 1)[0];
+            state.orderList.splice(newIndex, 0, targetRow);
         }
     },
     actions: {
@@ -103,6 +107,9 @@ const store = new Vuex.Store({
         setOrderEditInfoFunc(state, albumInfo) {
             state.commit("setEditInfo", albumInfo)
         },
+        swapOrderItemFunc(state, newIndex, oldIndex) {
+            state.commit("swapOrderItem", newIndex, oldIndex);
+        }
     }
 });
 

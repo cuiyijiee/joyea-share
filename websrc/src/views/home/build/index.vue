@@ -945,7 +945,6 @@ export default {
 
 .bg-purple {
   padding: 5px;
-
 }
 
 .grid-content {

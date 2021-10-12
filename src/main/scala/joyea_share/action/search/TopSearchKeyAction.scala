@@ -9,7 +9,7 @@ import xitrum.annotation.POST
 class TopSearchKeyAction extends BaseAction[EmptyReq] {
   override def safeExecute(req: EmptyReq): Unit = {
     RedisService.getSearchTopList(10).onComplete(safeResponse[Seq[(String, Double)]](_, resultList => {
-      cyjResponseSuccess(resultList.map(_._1))
+      baseResponseSuccess(resultList.map(_._1))
     }))
   }
 }

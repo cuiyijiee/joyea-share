@@ -24,13 +24,13 @@ class AlbumHandler extends IAction {
             if (albumSelectTry.get.isEmpty) {
               Album.create(userId = sessionUserId, userName = SessionUtil.getUserName(context), albumName = listName, albumDesc = Option("")).onComplete(albumTry => {
                 if (albumTry.isSuccess) {
-                  val album = albumTry.get
+                  val albumId = albumTry.get
                   var hasError = false
                   listSrc.forEach(srcValue => {
                     if (!hasError) {
                       val src = srcValue.asObject()
                       AlbumSrc.create(
-                        albumId = album.albumId,
+                        albumId = albumId,
                         srcNeid = src.getLong("neid", -1L),
                         srcPath = src.getString("path", ""),
                         srcSize = src.getString("size", ""),
@@ -48,13 +48,13 @@ class AlbumHandler extends IAction {
                     }
                   })
                   if (hasError) {
-                    Album.delete(album.albumId).onComplete(delTry => {
-                      AlbumSrc.delete(album.albumId).onComplete(delTry => {
+                    Album.delete(albumId).onComplete(delTry => {
+                      AlbumSrc.delete(albumId).onComplete(delTry => {
                         listener.onError("创建清单失败!")
                       })
                     })
                   } else {
-                    listener.onSuccess(respJson = resJson.add("alnumId", album.albumId))
+                    listener.onSuccess(respJson = resJson.add("alnumId",albumId))
                   }
                 } else {
                   listener.onError("创建清单失败:" + SUtil.convertExceptionToStr(albumTry.failed.get))
@@ -164,23 +164,23 @@ class AlbumHandler extends IAction {
           }
         })
       case "share" =>
-        val albumId = request.get("album_id").asLong()
-        Album.shareAlbum(albumId).onComplete(shareTry => {
-          if (shareTry.isSuccess) {
-            listener.onSuccess(respJson = resJson)
-          } else {
-            listener.onError("分享失败:" + SUtil.convertExceptionToStr(shareTry.failed.get))
-          }
-        })
+//        val albumId = request.get("album_id").asLong()
+//        Album.shareAlbum(albumId).onComplete(shareTry => {
+//          if (shareTry.isSuccess) {
+//            listener.onSuccess(respJson = resJson)
+//          } else {
+//            listener.onError("分享失败:" + SUtil.convertExceptionToStr(shareTry.failed.get))
+//          }
+//        })
       case "unShare" =>
-        val albumId = request.get("album_id").asLong()
-        Album.unShared(albumId).onComplete(shareTry => {
-          if (shareTry.isSuccess) {
-            listener.onSuccess(respJson = resJson)
-          } else {
-            listener.onError("取消分享失败:" + SUtil.convertExceptionToStr(shareTry.failed.get))
-          }
-        })
+//        val albumId = request.get("album_id").asLong()
+//        Album.unShared(albumId).onComplete(shareTry => {
+//          if (shareTry.isSuccess) {
+//            listener.onSuccess(respJson = resJson)
+//          } else {
+//            listener.onError("取消分享失败:" + SUtil.convertExceptionToStr(shareTry.failed.get))
+//          }
+//        })
       case "shareList" =>
         val albumId = request.get("album_id").asLong()
         Album.findByAlbumId(albumId).onComplete(findTry => {

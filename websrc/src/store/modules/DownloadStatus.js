@@ -8,7 +8,6 @@ const getters = {
 
 const mutations = {
     SET_VISIBLE: (state, visible) => {
-        console.log(visible);
         state.barVisible = visible
     },
 };

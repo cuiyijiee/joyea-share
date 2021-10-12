@@ -14,7 +14,7 @@ class PageGetUploadRecord extends BaseAction[PageGetUploadRecordReq] {
         Future.sequence(result.map(_.uploader).distinct.map(joyeaId => {
           JoyeaUser.findByJoyeaId(joyeaId)
         })).onComplete(safeResponse[List[Option[JoyeaUser]]](_, userList => {
-          cyjResponseSuccess(
+          baseResponseSuccess(
             UploadRecordResp(
               record = result, user = userList.filter(_.isDefined).map(_.get).map(user => {
                 user.joyeaId -> user.joyeaName

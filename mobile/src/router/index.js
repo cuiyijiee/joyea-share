@@ -4,19 +4,20 @@ import Router from 'vue-router';
 import HomeContainer from "../components/tabbar/HomeContainer";
 import OrderContainer from "../components/tabbar/OrderContainer";
 import MineContainer from "../components/tabbar/MineContainer";
-import SearchResult from "../components/tabbar/SearchContainer";
+import SearchResultContainer from "../components/tabbar/SearchResultContainer";
 import SquareContainer from "../components/tabbar/SquareContainer";
+import LatestUploadContainer from "@/components/tabbar/LatestUploadContainer";
 import UploadIndex from "../views/upload/Index";
 
 import Main from "../views/Main";
 import Login from "../views/Login"
 import AlbumList from "../views/AlbumList";
 
-import AlbumDetail from "../views/AlbumDetail";
 import EditShareAlbum from "../views/EditShareAlbum";
 import LenovoDirSelector from "@/components/LenovoDirSelector";
-import MyUpload from "@/views/MyUpload";
+import MyUpload from "@/views/upload/MyUpload";
 import ChangePwd from "@/views/ChangePwd";
+import Leaderboard from "../views/Leaderboard";
 
 Vue.use(Router);
 
@@ -68,14 +69,23 @@ export default new Router({
                     }
                 },
                 {
-                    path: '/search',
+                    path: 'search',
                     name: '搜索结果',
-                    component: SearchResult,
+                    component: SearchResultContainer,
                     meta: {
                         allowBack: true,
                         allowHome: false
                     }
-                }
+                },
+                {
+                    path: 'latestUpload',
+                    name: '最新素材',
+                    component: LatestUploadContainer,
+                    meta: {
+                        allowHome: false,
+                        allowBack: true
+                    }
+                },
             ]
         },
         {
@@ -88,9 +98,9 @@ export default new Router({
             }
         },
         {
-            path: '/albumDetail',
-            name: '清单详情',
-            component: AlbumDetail,
+            path: '/leaderboard',
+            name: '排行榜',
+            component: Leaderboard,
             meta: {
                 allowBack: true,
                 allowHome: true

@@ -8,7 +8,7 @@ import xitrum.annotation.POST
 class RecordDownloadAction extends BaseAction[RecordDownloadReq] {
     override def safeExecute(req: RecordDownloadReq): Unit = {
         Album.addDownload(req.albumId).onComplete(safeResponse[Boolean](_, result => {
-            cyjResponseSuccess(result)
+            baseResponseSuccess(result)
         }))
     }
 }

@@ -22,20 +22,20 @@ class LoginAction extends BaseAction[LoginReq] {
           if (value.get.password.equals(pwd)) {
             session("user_name") = value.get.joyeaName
             session("user_id") = value.get.joyeaId
-            cyjResponseSuccess(LoginResp(
+            baseResponseSuccess(LoginResp(
               userName = value.get.joyeaName,
-              session = DownloadManager.getAdminToken(),
+              session = DownloadManager.getAdminToken,
               isAdmin = value.get.isAdmin
             ))
           } else {
-            cyjResponseError(ErrorCode.unknownError)
+            baseResponseError(ErrorCode.unknownError)
           }
         } else {
-          cyjResponseError(ErrorCode.unknownError)
+          baseResponseError(ErrorCode.unknownError)
         }
       case Failure(exception) =>
         logError(exception)
-        cyjResponseError(ErrorCode.unknownError)
+        baseResponseError(ErrorCode.unknownError)
     }
   }
 }

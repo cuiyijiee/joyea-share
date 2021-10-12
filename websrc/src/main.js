@@ -21,6 +21,11 @@ Vue.config.productionTip = false;
 Vue.use(ElementUI);
 Vue.use(preview);
 
+import moment from "moment";
+Vue.filter('dateFormat', function (dataStr, pattern = 'YYYY-MM-DD HH:mm:ss') {
+  return moment(new Date(dataStr)).format(pattern);
+})
+
 new Vue({
   router,
   store,

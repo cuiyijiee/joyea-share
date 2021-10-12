@@ -53,8 +53,10 @@ export function pageListAlbum(curPage, pageSize, shared, sortType,
     })
 }
 
-export function listMineAlbum() {
-    return service.post("api/v1/album/list/mine", {}).then(res => {
+export function listMineAlbum(menuId) {
+    return service.post("api/v1/album/listMine", {
+        menuId: menuId
+    }).then(res => {
         return res.data;
     })
 }
@@ -77,6 +79,12 @@ export function switchShare(albumId, share, albumName, shareCoverId, shareLocalC
     })
 }
 
+export function getTopSearchKey() {
+    return service.post('api/v1/search/key/top', {}).then(res => {
+        return res.data;
+    })
+}
+
 export function copyAlbum(albumId) {
     return service.post("api/v1/album/copy", {
         albumId: albumId
@@ -89,7 +97,7 @@ export function addUploadRecord(uid, tempSrcName, srcNeid, srcType, srcHash, src
     return service.post("/api/v1/upload/add", {
         tempSrcName: tempSrcName,
         uploader: uid,
-        srcNeid: Number(srcNeidList),
+        srcNeid: Number(srcNeid),
         srcType: srcType,
         srcHash: srcHash,
         srcRev: srcRev,
@@ -102,6 +110,14 @@ export function addUploadRecord(uid, tempSrcName, srcNeid, srcType, srcHash, src
 
 export function getMyUploadRecord() {
     return service.post("api/v1/upload/mime", {}).then(res => {
+        return res.data;
+    })
+}
+
+export function latestUpload(num) {
+    return service.post("api/v1/upload/latest", {
+        num: num
+    }).then(res => {
         return res.data;
     })
 }
@@ -121,4 +137,103 @@ export function changePwd(curPwd, newPwd) {
     }).then(res => {
         return res.data;
     })
+}
+
+export function createAlbum(name, fileList) {
+    return service.post('/api/v1/album/collect/save', {
+        name: name,
+        src: fileList
+    }).then(resp => {
+        return resp.data;
+    })
+}
+
+export function updateAlbum(id, name, fileList) {
+    return service.post('/api/v1/album/collect/update', {
+        id: id,
+        name: name,
+        src: fileList
+    }).then(resp => {
+        return resp.data;
+    })
+}
+
+export function uploadIntegralLeaderboard(year, month) {
+    return service.post('api/v1/leaderboard/uploadIntegral', {
+        year: year,
+        month: month
+    }).then(resp => {
+        return resp.data;
+    })
+}
+
+export function srcQuoteLeaderboard(year, month) {
+    return service.post('api/v1/leaderboard/srcQuote', {
+        year: year,
+        month: month
+    }).then(resp => {
+        return resp.data;
+    })
+}
+
+export function albumShareLeaderboard(year, month) {
+    return service.post('api/v1/leaderboard/albumShare', {
+        year: year,
+        month: month
+    }).then(resp => {
+        return resp.data;
+    })
+}
+
+export function albumQuoteLeaderboard(year, month) {
+    return service.post('api/v1/leaderboard/albumQuote', {
+        year: year,
+        month: month
+    }).then(resp => {
+        return resp.data;
+    })
+}
+
+export function createAlbumMenu(menuName) {
+    return service.post('api/v1/album/createMenu', {
+        menuName: menuName
+    }).then(resp => {
+        return resp.data;
+    })
+}
+
+export function listMyAlbumMenu() {
+    return service.post('api/v1/album/menuList', {}).then(resp => {
+        return resp.data;
+    })
+}
+
+export function renameAlbumMenu(menuId, newName) {
+    return service.post('api/v1/album/renameMenu', {
+        menuId: menuId,
+        name: newName
+    }).then(resp => resp.data);
+}
+
+export function deleteAlbumMenu(menuId) {
+    return service.post('api/v1/album/deleteMenu', {
+        menuId: menuId
+    }).then(resp => resp.data);
+}
+
+export function moveAlbumMenu(albumId, menuId) {
+    return service.post('api/v1/album/moveMenu', {
+        albumId: albumId,
+        menuId: menuId
+    }).then(resp => resp.data);
+}
+
+export function getLoginTicket() {
+    return service.post('api/v1/esunyun/ticket', {}).then(resp => resp.data);
+}
+
+export function getUserProfile(authCode) {
+    return service.post("api/v1/esunyun/profile", {
+        authCode: authCode
+    }).then(resp => resp.data)
 }

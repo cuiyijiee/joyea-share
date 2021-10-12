@@ -24,6 +24,9 @@ export let joyeaMenuPath = [
     {
         name: "我司设备培训素材", path: "我司设备培训素材", icon: "menu-icon/2-3.png"
     },
+    // {
+    //     name: "软双铝线", path: "软双铝线", icon: "menu-icon/13.png"
+    // },
     {
         name: "外购大件类培训文件", path: "外购大件类培训文件", icon: "menu-icon/2-4.png"
     },
@@ -48,6 +51,11 @@ export function extname(filename) {
 
 export function genFileName(fileName) {
     return fileName.substring(fileName.lastIndexOf("/") + 1);
+}
+
+export function getFileNameWithoutExtension(fileName) {
+    let dotIndex = fileName.lastIndexOf(".");
+    return fileName.substring(0, dotIndex);
 }
 
 export function filterDirList(dir) {

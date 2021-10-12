@@ -57,21 +57,24 @@ export function findUploadRecord(curPage, pageSize) {
     })
 }
 
-export function uploadRecordManage(recordId, allow, refuseReason, uploadPath, uploadPathNeid, srcName,needCount) {
-    return service.post('api/v1/upload/manage', {
+export function uploadRecordManage(recordId, allow, refuseReason, uploadPath, uploadPathNeid, srcName, needCount, integral) {
+    let data = {
         recordId,
         allow: allow,
         refuseReason: refuseReason,
         uploadPath: uploadPath,
         uploadPathNeid: Number(uploadPathNeid),
         srcName: srcName,
-        needCount:needCount
-    }).then(res => {
+        needCount: needCount,
+        integral: integral
+    };
+    console.log(data);
+    return service.post('api/v1/upload/manage',data ).then(res => {
         return res.data;
     })
 }
 
-export function uploadFile(file,fileDesc) {
+export function uploadFile(file, fileDesc) {
 
     let formData = new FormData();
     formData.append('file', file)
@@ -88,5 +91,27 @@ export function uploadFile(file,fileDesc) {
 
     return service.post('upload', formData, config).then(res => {
         return res.data;
+    })
+}
+
+export function prepareDownloadFile(fileList) {
+    return service.post("api/v1/download/prepare", {
+        src: fileList
+    }).then(resp => {
+        return resp.data;
+    })
+}
+
+export function queryDownload(downloadTaskId) {
+    return service.post("api/v1/download/query", {
+        id: downloadTaskId
+    }).then(resp => {
+        return resp.data;
+    })
+}
+
+export function getTodayDownload() {
+    return service.post("api/v1/download/today", {}).then(resp => {
+        return resp.data;
     })
 }

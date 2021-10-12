@@ -9,9 +9,9 @@ class GetDefaultJoyeaDescAction extends BaseAction[GetDefaultCommentReq] {
   override def safeExecute(req: GetDefaultCommentReq): Unit = {
     UploadRecord.findByNeid(neid = req.neid).onComplete(safeResponse[Option[UploadRecord]](_, record => {
       if (record.isDefined) {
-        cyjResponseSuccess(record.get.srcDesc)
+        baseResponseSuccess(record.get.srcDesc)
       } else {
-        cyjResponseSuccess("")
+        baseResponseSuccess("")
       }
     }))
   }

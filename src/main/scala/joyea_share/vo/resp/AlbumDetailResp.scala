@@ -1,8 +1,8 @@
 package joyea_share.vo.resp
 
-import java.sql.Timestamp
+import java.time.OffsetDateTime
 
-import joyea_share.model.AlbumSrc
+import joyea_share.model.{AlbumMenu, AlbumSrc}
 
 case class AlbumDetailResp(
                             albumId: Long,
@@ -14,7 +14,7 @@ case class AlbumDetailResp(
                             shareCoverNeid: Option[Long],
                             shareLocalCoverId: Option[String],
                             shareDesc: Option[String],
-                            createdAt: Timestamp,
+                            createdAt: OffsetDateTime,
                             referNum: Long = 0,
                             likeNum: Long = 0,
                             hangyeTagId: Int = -1,
@@ -22,7 +22,8 @@ case class AlbumDetailResp(
                             jixingTagId: Int = -1,
                             jieduanTagId: Int = -1,
                             shichangTagId: Int = -1,
-                            updatedAt: Option[Timestamp],
+                            updatedAt: Option[OffsetDateTime],
                             srcList: List[AlbumSrc],
-                            isCopied: Boolean = false
+                            isCopied: Boolean = false,
+                            menu:Option[AlbumMenu] = None
                           )
