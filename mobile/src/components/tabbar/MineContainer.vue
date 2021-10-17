@@ -16,7 +16,7 @@
       <div style="text-align: center;padding: 15px 0px 5px 0px">我的功能</div>
       <van-divider/>
       <van-cell title="修改密码" is-link @click="handleClickChangePwd"/>
-      <van-cell title="注销登录" is-link @click="handleLogout"/>
+<!--      <van-cell title="注销登录" is-link @click="handleLogout"/>-->
     </van-popup>
     <van-divider/>
     <van-cell-group title="功能">
@@ -39,9 +39,9 @@
         </template>
       </van-cell>
     </van-cell-group>
-<!--    <van-cell-group title="设置">-->
-<!--      <van-cell title="测试登录" is-link @click="handleTestLogin"/>-->
-<!--    </van-cell-group>-->
+    <van-cell-group title="设置">
+      <van-cell title="测试登录" is-link @click="handleTestLogin"/>
+    </van-cell-group>
   </div>
 </template>
 

@@ -1,14 +1,65 @@
 package joyea_share.action.esenyun
 
 import joyea_share.action.BaseAction
+import joyea_share.model.NextPlusUser
+import joyea_share.module.download.DownloadManager
 import joyea_share.util.{EsenUserProfile, EsenyunUtil}
 import xitrum.annotation.POST
+
+import scala.util.{Failure, Success}
 
 @POST("api/v1/esunyun/profile")
 class GetUserProfileAction extends BaseAction[GetUserProfileReq] {
   override def safeExecute(req: GetUserProfileReq): Unit = {
-    EsenyunUtil.getUserProfile(req.authCode).onComplete(safeResponse[EsenUserProfile](_, resp => {
-      baseResponseSuccess(resp)
+    EsenyunUtil.getUserProfile(req.authCode).onComplete(safeResponse[NextPlusUser](_, resp => {
+
+      NextPlusUser.selectById(resp.id).onComplete {
+        case Failure(exception) =>
+          log.error("selectById exist error:",exception)
+        case Success(userOpt) =>
+          if (userOpt.isEmpty) {
+            //id: String,
+            //             name: String,
+            //             easUserId: String,
+            //             imgUrl: String,
+            //             phone: String,
+            //             ytmId: String,
+            //             ytmOpenId: String,
+            //             position: String,
+            //             departmentId: String,
+            //             departmentName: String,
+            //             departmentType: String,
+            //             tenantId: String,
+            //             yzjOpenId: String,
+            //             extendInfo: String
+            NextPlusUser.create(
+              resp.id,
+              resp.name,
+              resp.easUserId,
+              resp.imgUrl,
+              resp.phone,
+              resp.ytmId,
+              resp.ytmOpenId,
+              resp.position,
+              resp.departmentId,
+              resp.departmentName,
+              resp.departmentType,
+              resp.tenantId,
+              resp.yzjOpenId,
+              resp.extendInfo
+            ).onComplete {
+              case Failure(exception) =>
+                log.error("create exist error:",exception)
+              case Success(value) =>
+
+            }
+            session("user_name") = resp.name
+            session("user_id") = resp.ytmId
+            baseResponseSuccess(GetUserProfileResp(
+              profile = resp, session = DownloadManager.getAdminToken
+            ))
+          }
+      }
     }))
   }
 }
@@ -16,3 +67,8 @@ class GetUserProfileAction extends BaseAction[GetUserProfileReq] {
 case class GetUserProfileReq(
                               authCode: String
                             )
+
+case class GetUserProfileResp(
+                               profile: NextPlusUser,
+                               session: String
+                             )

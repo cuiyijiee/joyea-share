@@ -1,6 +1,7 @@
 package joyea_share.util
 
 import com.json.JsonObject
+import joyea_share.model.NextPlusUser
 import org.cuje.lib.net.HttpUtil
 import org.json4s.jackson.JsonMethods
 import xitrum.Log
@@ -41,9 +42,9 @@ object EsenyunUtil extends Log with  BaseJsonFormat {
     })
   }
 
-  def getUserProfile(authCode: String): Future[EsenUserProfile] = {
+  def getUserProfile(authCode: String): Future[NextPlusUser] = {
     HttpUtil.get(s"$URL_PROFILE$authCode", Map()).map(resp => {
-      JsonMethods.parse(resp).extract[EsenUserProfile]
+      JsonMethods.parse(resp).extract[NextPlusUser]
     })
   }
 }
