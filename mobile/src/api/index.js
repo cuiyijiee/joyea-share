@@ -237,3 +237,11 @@ export function getUserProfile(authCode) {
         authCode: authCode
     }).then(resp => resp.data)
 }
+
+export function userBindCheck(name,pwd,ytmId) {
+    return service.post("api/v1/user/bind/check", {
+        user: name,
+        pwd: pwd,
+        ytmId: ytmId,
+    }).then(resp => resp.data)
+}

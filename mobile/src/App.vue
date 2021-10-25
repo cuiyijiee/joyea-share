@@ -36,7 +36,7 @@ export default {
   },
   methods: {
     ...mapActions([
-      'refreshSessionFunc','updateUserInfoFunc','clearFunc'
+      'refreshSessionFunc', 'updateUserInfoFunc', 'clearFunc'
     ]),
     onChange(index) {
       this.index = index;
@@ -54,17 +54,21 @@ export default {
         callNextPlusLogin(resp.data, authCode => {
           console.log("auth code: " + authCode)
           getUserProfile(authCode).then(resp => {
-            alert("get user profile: " + JSON.stringify(resp));
+            //alert("get user profile: " + JSON.stringify(resp));
             this.$notify({type: 'success', message: '欢迎回来，' + resp.data.profile.name + '！'});
             _this.updateUserInfoFunc({
               session: resp.data['session'], name: resp.data.profile['name'], email: resp.data.profile['ytmId']
             }).then(() => {
             })
             _this.clearFunc();
-            this.$router.replace({
-              name: "/",
-              params: {checked: true}
-            });
+            if (!resp.joyeaUser) {
+              this.$router.push("/user/bind")
+            } else {
+              this.$router.replace({
+                name: "/",
+                params: {checked: true}
+              });
+            }
           })
         })
       }).catch(e => {
@@ -74,25 +78,25 @@ export default {
       })
     },
     _checkLogin() {
-        let _this = this;
-        check().then(resp => {
-            if (resp.code === 4001) {
-                // _this.$notify({type: 'danger', message: '登录信息已过期，请重新登陆！'});
-                // _this.$router.push("/login");
-              //_this.handleTestLogin();
-            } else {
-                _this.refreshSessionFunc(resp.data);
-            }
-        })
+      let _this = this;
+      check().then(resp => {
+        if (resp.code === 4001) {
+          // _this.$notify({type: 'danger', message: '登录信息已过期，请重新登陆！'});
+          // _this.$router.push("/login");
+          //_this.handleTestLogin();
+        } else {
+          _this.refreshSessionFunc(resp.data);
+        }
+      })
     },
     checkLogin() {
-        let _this = this;
-        this._checkLogin();
-        setInterval(() => {
-            if (_this.$route.path !== '/login') {
-                _this._checkLogin()
-            }
-        }, 2000)
+      let _this = this;
+      this._checkLogin();
+      setInterval(() => {
+        if (_this.$route.path !== '/login') {
+          _this._checkLogin()
+        }
+      }, 2000)
     }
   },
   created() {
@@ -112,7 +116,7 @@ export default {
     if (this.userInfo.session.length === 0) {
       //this.$router.push("/login");
       this.handleTestLogin();
-    }else{
+    } else {
       this.checkLogin();
     }
     // if (this.$route.path !== '/login') {        //不在登陆界面

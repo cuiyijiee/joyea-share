@@ -1,9 +1,9 @@
 package joyea_share.action.esenyun
 
 import joyea_share.action.BaseAction
-import joyea_share.model.NextPlusUser
+import joyea_share.model.{JoyeaUser, NextPlusUser}
 import joyea_share.module.download.DownloadManager
-import joyea_share.util.{EsenUserProfile, EsenyunUtil}
+import joyea_share.util.EsenyunUtil
 import xitrum.annotation.POST
 
 import scala.util.{Failure, Success}
@@ -18,20 +18,6 @@ class GetUserProfileAction extends BaseAction[GetUserProfileReq] {
           log.error("selectById exist error:",exception)
         case Success(userOpt) =>
           if (userOpt.isEmpty) {
-            //id: String,
-            //             name: String,
-            //             easUserId: String,
-            //             imgUrl: String,
-            //             phone: String,
-            //             ytmId: String,
-            //             ytmOpenId: String,
-            //             position: String,
-            //             departmentId: String,
-            //             departmentName: String,
-            //             departmentType: String,
-            //             tenantId: String,
-            //             yzjOpenId: String,
-            //             extendInfo: String
             NextPlusUser.create(
               resp.id,
               resp.name,
@@ -55,9 +41,16 @@ class GetUserProfileAction extends BaseAction[GetUserProfileReq] {
             }
             session("user_name") = resp.name
             session("user_id") = resp.ytmId
-            baseResponseSuccess(GetUserProfileResp(
-              profile = resp, session = DownloadManager.getAdminToken
-            ))
+          }else{
+            //TODO update user profile
+          }
+          JoyeaUser.findByYtmId(resp.ytmId).onComplete {
+            case Failure(exception) =>
+              log.error("findByYtmId exist error:",exception)
+            case Success(value) =>
+              baseResponseSuccess(GetUserProfileResp(
+                profile = resp, session = DownloadManager.getAdminToken,joyeaUser = value
+              ))
           }
       }
     }))
@@ -70,5 +63,6 @@ case class GetUserProfileReq(
 
 case class GetUserProfileResp(
                                profile: NextPlusUser,
-                               session: String
+                               session: String,
+                               joyeaUser: Option[JoyeaUser]
                              )

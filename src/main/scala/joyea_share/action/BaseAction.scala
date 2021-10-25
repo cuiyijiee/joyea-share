@@ -72,4 +72,8 @@ abstract class BaseAction[T: Manifest] extends Action with SkipCsrfCheck with Lo
     log.error(s"$reason error:", exception)
   }
 
+  def logErrorStr(reason: String = ""): Unit = {
+    log.error(s"exist error: ${reason}")
+  }
+
 }

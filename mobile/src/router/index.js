@@ -18,6 +18,7 @@ import LenovoDirSelector from "@/components/LenovoDirSelector";
 import MyUpload from "@/views/upload/MyUpload";
 import ChangePwd from "@/views/ChangePwd";
 import Leaderboard from "../views/Leaderboard";
+import UserBind from "@/views/UserBind"
 
 Vue.use(Router);
 
@@ -149,6 +150,15 @@ export default new Router({
             meta: {
                 allowBack: true,
                 allowHome: true
+            }
+        },
+        {
+            path: '/user/bind',
+            name: '绑定原账号',
+            component: UserBind,
+            meta: {
+                allowBack: false,
+                allowHome: false
             }
         }
     ],
