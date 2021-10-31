@@ -875,6 +875,7 @@ export default {
                     this.curDirNeid = response.data.neid;
                     console.log("current dir neid:" + this.curDirNeid);
                     this.dir.tableData = [];
+                    this.wordListSelected = [];
                     if (response.data.content) {
                         response.data.content.forEach(item => {
                             item.joyeaDesc = "";
