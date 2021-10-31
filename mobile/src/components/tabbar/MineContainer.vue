@@ -23,6 +23,7 @@
       <van-cell title="排行榜" is-link @click="handleClickLeaderboard"/>
       <van-cell title="素材上传" is-link @click="handleClickUpload"/>
       <van-cell title="我的清单" is-link @click="handleClickMyList"/>
+<!--      <van-cell title="测试小白板" is-link @click="handleTestWord"/>-->
 
       <!--解决视图不更新的问题-->
       <van-cell is-link @click="handleClickLatestUpload">
@@ -39,9 +40,9 @@
         </template>
       </van-cell>
     </van-cell-group>
-    <van-cell-group title="设置">
-      <van-cell title="测试登录" is-link @click="handleTestLogin"/>
-    </van-cell-group>
+<!--    <van-cell-group title="设置">-->
+<!--      <van-cell title="测试登录" is-link @click="handleTestLogin"/>-->
+<!--    </van-cell-group>-->
   </div>
 </template>
 
@@ -97,6 +98,9 @@ export default {
     },
     handleClickMyLike() {
       this.$notify('收藏功能开发中。。。');
+    },
+    handleTestWord(){
+      window.location.href = 'esen://word?wordId=2c9495df7ccf9b3e017cd55c937d009f';
     },
     handleClickMyList() {
       this.$router.push("/album")

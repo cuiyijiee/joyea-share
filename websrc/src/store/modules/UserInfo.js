@@ -1,7 +1,8 @@
 const state = {
     session: "",
     name: "",
-    email: ""
+    email: "",
+    isAdmin:false
 };
 
 const getters = {
@@ -10,6 +11,7 @@ const getters = {
             session:state.session,
             name:state.name,
             email:state.email,
+            isAdmin:state.isAdmin
         }
     },
 }
@@ -25,6 +27,7 @@ const mutations = {
         state.session =  userInfo.session;
         state.name =  userInfo.name;
         state.email =  userInfo.email;
+        state.isAdmin = userInfo.isAdmin
     },
 };
 

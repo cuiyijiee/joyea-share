@@ -24,6 +24,10 @@ object BenchMark extends MySQLSettings {
     val respSession = resp \ "X-LENOVO-SESS-ID"
     implicit val session: String = respSession.values.toString
 
+    EsenyunUtil.getYtmWordList("","",None).foreach(wordList => {
+      println(wordList)
+    })
+    test()
     //        LenovoUtil.preUpload(session,new File("C:\\Users\\cuiyijie\\Desktop\\2021-08-12仅一SQL确认.txt")).onComplete {
     //            case Failure(exception) =>
     //                exception.printStackTrace()
@@ -31,14 +35,14 @@ object BenchMark extends MySQLSettings {
     //                println(value)
     //        }
 
-    EsenyunUtil.getTicket().onComplete {
-      case Failure(exception) =>
-        exception.printStackTrace()
-      case Success(value) =>
-        println(value)
-    }
-
-    test()
+//    EsenyunUtil.getTicket().onComplete {
+//      case Failure(exception) =>
+//        exception.printStackTrace()
+//      case Success(value) =>
+//        println(value)
+//    }
+//
+//    test()
     //        LenovoUtil.ftsSearch(
     //            "mp4", "", 50
     //        ).onComplete {

@@ -75,7 +75,7 @@ object UploadRecord extends SQLSyntaxSupport[UploadRecord] with ShortenedNames {
         }
     }.update().future().map(_ > 0)
 
-    def findByNeid(neid: Long): Future[Option[UploadRecord]] = {
+    def findByNeid(neid: String): Future[Option[UploadRecord]] = {
         withSQL {
             selectFrom(UploadRecord as ur).where.eq(ur.srcNeid, neid)
         }.map(UploadRecord(ur)).single().future()

@@ -20,7 +20,16 @@ class AlbumCollectAddAction extends BaseAction[SaveAlbumCollectReq] {
                       for {
                           createdAlbumId <- Album.create(myUid, userName = myName, albumName = req.name, albumDesc = None)
                           createdAlbumSrcNum <- AlbumSrc.createMany(req.src.map(srcReq => {
-                              AlbumSrc(albumId = createdAlbumId, id = 0, srcNeid = srcReq.neid, srcHash = srcReq.hash, srcRev = srcReq.rev, srcSize = srcReq.size, srcPath = srcReq.path, srcType = srcReq.mime_type, srcDesc = srcReq.joyeaDesc, srcFileName = srcReq.filename, srcBytes = srcReq.bytes)
+                              AlbumSrc(albumId = createdAlbumId, id = 0,
+                                srcNeid = srcReq.neid,
+                                srcHash = srcReq.hash.getOrElse(""),
+                                srcRev = srcReq.rev.getOrElse(""),
+                                srcSize = srcReq.size.getOrElse(""),
+                                srcPath = srcReq.path,
+                                srcType = srcReq.mime_type,
+                                srcDesc = srcReq.joyeaDesc,
+                                srcFileName = srcReq.filename,
+                                srcBytes = srcReq.bytes.getOrElse(0L))
                           }))
                       } yield createdAlbumId
                   }
@@ -48,13 +57,13 @@ case class SaveAlbumCollectReq(
                               )
 
 case class AlbumSrcReq(
-                        neid: Long,
+                        neid: String,
                         path: String,
-                        size: String,
-                        hash: String,
-                        rev: String,
+                        size: Option[String],
+                        hash: Option[String],
+                        rev: Option[String],
                         joyeaDesc: String,
                         filename: String,
-                        bytes: Long,
+                        bytes: Option[Long],
                         mime_type: String
                       )

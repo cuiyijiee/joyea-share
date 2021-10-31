@@ -18,5 +18,5 @@ class GetDefaultJoyeaDescAction extends BaseAction[GetDefaultCommentReq] {
 }
 
 case class GetDefaultCommentReq(
-                                 neid: Long
+                                 neid: String
                                )

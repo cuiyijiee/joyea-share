@@ -31,7 +31,7 @@ class AlbumHandler extends IAction {
                       val src = srcValue.asObject()
                       AlbumSrc.create(
                         albumId = albumId,
-                        srcNeid = src.getLong("neid", -1L),
+                        srcNeid = src.getString("neid", ""),
                         srcPath = src.getString("path", ""),
                         srcSize = src.getString("size", ""),
                         srcHash = src.getString("hash", ""),
@@ -86,7 +86,7 @@ class AlbumHandler extends IAction {
                           val src = srcValue.asObject()
                           AlbumSrc.create(
                             albumId = album.albumId,
-                            srcNeid = src.getLong("neid", -1L),
+                            srcNeid = src.getString("neid", ""),
                             srcPath = src.getString("path", ""),
                             srcSize = src.getString("size", ""),
                             srcHash = src.getString("hash", ""),

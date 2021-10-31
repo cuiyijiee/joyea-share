@@ -46,6 +46,16 @@
                         共{{ dir.tableData.length }}个资源
                     </el-col>
                 </el-row>
+                <el-row class="contentHead" v-if="userInfo.isAdmin">
+                    <el-col :span="18">
+                        <div>&nbsp</div>
+                    </el-col>
+                    <el-col :span="3" :offset="3">
+                        <el-button class="search-button" size="small" @click="visible.addWordDialogVisible = !visible.addWordDialogVisible">
+                            管理小白板
+                        </el-button>
+                    </el-col>
+                </el-row>
                 <el-table ref="fileTable"
                           v-loading="dir.loadingDir || loading.search"
                           :data="dir.tableData"
@@ -67,6 +77,7 @@
                                      preview="dir_image_list" :preview-text="scope.row.path"
                                      :src="genPreviewUrl(scope.row.neid,scope.row.hash,scope.row.rev,scope.row.mime_type)">
                                 <i v-else-if="scope.row.mime_type.startsWith('doc')" class="el-icon-tickets"></i>
+                                <i v-else-if="scope.row.mime_type.startsWith('word')" class="el-icon-link"></i>
                                 <i v-else class="el-icon-question"></i>
                                 <span
                                     style="vertical-align:top;color: #333333"> {{
@@ -94,12 +105,12 @@
                         label="操作"
                         width="180">
                         <template slot-scope="scope">
-                            <span v-if="scope.row.is_dir">-</span>
+                            <span v-if="scope.row.is_dir||scope.row.mime_type.startsWith('word')">-</span>
                             <span v-else>
                                         <el-button circle type=""
                                                    @click.stop="handleAdd(scope.$index, scope.row)"
                                                    icon="el-icon-plus"/>
-                                    </span>
+                            </span>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -277,11 +288,28 @@
                        @click.stop="handleLoadMore">加载更多
             </el-button>
         </el-dialog>
+        <el-dialog title="小白板管理" :visible.sync="visible.addWordDialogVisible">
+            <el-row>
+                <el-col :span="12">
+                    <el-select v-model="wordListSelected" multiple placeholder="请选择">
+                        <el-option
+                            v-for="item in wordListOption"
+                            :key="item.id"
+                            :label="item.title"
+                            :value="item.id">
+                        </el-option>
+                    </el-select>
+                </el-col>
+                <el-col :span="12">
+                    <el-button class="search-button" size="small" @click="handleSaveWordToDir">保存</el-button>
+                </el-col>
+            </el-row>
+        </el-dialog>
     </section>
 </template>
 
 <script>
-import api, {getTopSearchKey, prepareDownloadFile, queryDownload} from "../../../api";
+import api, {getTopSearchKey, prepareDownloadFile, queryDownload, getMyWordList, addWordToDir} from "../../../api";
 import genSrcPreviewSrc from "../../../utils"
 import Sortable from 'sortablejs';
 import videojs from 'video.js'
@@ -340,7 +368,8 @@ export default {
                 listDetailDialogVisible: false,
                 videoDialogVisible: false,
                 imageDialogVisible: false,
-                searchDialogVisible: false
+                searchDialogVisible: false,
+                addWordDialogVisible: false
             },
             defaultImg: 'this.src="' + require('@assets/error.png') + '"', //默认图地址
             player: null,
@@ -351,7 +380,11 @@ export default {
             toPlayImage: {
                 title: '',
                 url: ''
-            }
+            },
+            wordSearchText: "",
+            wordListOption: [],
+            wordListSelected: [],
+            curDirNeid: ""
         }
     },
     computed: {
@@ -785,8 +818,8 @@ export default {
             let warnMb = 300;
             this.$confirm(
                 "您已选中【 " + toDownloadList.length + " 】个文件，" + (totalMb > warnMb
-                ? ("待准备文件列表大小为【 " + totalMb.toFixed(2) + "MB 】,文件较大，建议您分批次准备。")
-                : ("待准备文件列表大小为【 " + (totalMb > 1 ? totalMb.toFixed(2) + "MB" : totalKb.toFixed(2) + "KB") + " 】。")) + "准备完成后会在右上角提示您下载!",
+                    ? ("待准备文件列表大小为【 " + totalMb.toFixed(2) + "MB 】,文件较大，建议您分批次准备。")
+                    : ("待准备文件列表大小为【 " + (totalMb > 1 ? totalMb.toFixed(2) + "MB" : totalKb.toFixed(2) + "KB") + " 】。")) + "准备完成后会在右上角提示您下载!",
                 '提示',
                 {
                     confirmButtonText: '准备',
@@ -839,12 +872,19 @@ export default {
                 path_type: pathType === undefined ? 'ent' : pathType
             }).then(response => {
                 if (response.result) {
+                    this.curDirNeid = response.data.neid;
+                    console.log("current dir neid:" + this.curDirNeid);
                     this.dir.tableData = [];
                     if (response.data.content) {
                         response.data.content.forEach(item => {
                             item.joyeaDesc = "";
                             item.isModify = false;
                             this.dir.tableData.push(item)
+
+                            if(item.mime_type && item.mime_type.startsWith("word")){
+                                this.wordListSelected.push(item.neid);
+                            }
+
                         });
                         this.dir.currentPath = [];
                         response.data.path.split('/').forEach(item => {
@@ -881,6 +921,31 @@ export default {
             getTopSearchKey().then(resp => {
                 this.topSearchKey = resp.data;
             })
+        },
+        handleSaveWordToDir() {
+            let optionMap = {};
+            this.wordListOption.forEach(item => {
+                optionMap[item.id] = {
+                    wordId: item.id,
+                    wordName: item.title
+                }
+            })
+            let wordList = [];
+            this.wordListSelected.forEach(wordId => {
+                wordList.push(optionMap[wordId])
+            })
+            console.log("save word:" + JSON.stringify(wordList) + " to dir: " + this.curDirNeid);
+            addWordToDir(this.curDirNeid, wordList).then(resp => {
+                if (resp.code === 2000) {
+                    this.visible.addWordDialogVisible = false;
+                    this.handleClickDirPath(undefined,this.dir.currentPath.length - 1);
+                } else {
+                    this.$notify.error({
+                        title: '提示',
+                        message: '保存小白板失败！'
+                    });
+                }
+            })
         }
     },
     mounted() {
@@ -906,6 +971,9 @@ export default {
                 self.toCreateAlbum.list.splice(newIndex, 0, targetRow)
             }
         });
+        getMyWordList().then(resp => {
+            this.wordListOption = resp.data.data;
+        })
     }
 }
 </script>

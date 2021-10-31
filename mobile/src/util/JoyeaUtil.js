@@ -35,6 +35,8 @@ export function handleGoToPreview(context, row, session, itemList) {
         }
     } else if (row.mime_type.startsWith("image")) {
         GenImageListView(context, itemList, session, row);
+    }else if (row.mime_type.startsWith("word")) {
+        window.location.href = 'esen://word?wordId=' + row.neid;
     }
 }
 
@@ -50,6 +52,8 @@ export function getDocumentImage(mimeType) {
         result = "docm.png"
     } else if (mimeType.endsWith("xlsx")) {
         result = "xlsx.png"
+    }else if (mimeType.startsWith("word")) {
+        result = "word.png"
     }
     return result;
 }

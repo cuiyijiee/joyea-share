@@ -60,6 +60,8 @@
                        :src="genPreviewUrl(item.neid,item.hash,item.rev,item.mime_type)"/>
                   <van-image style="width: 40px" v-else-if="item.mime_type.startsWith('doc')"
                              :src="handleGetDocumentImage(item.mime_type)"/>
+                    <van-image style="width: 30px" v-else-if="item.mime_type.startsWith('word')"
+                               :src="handleGetDocumentImage(item.mime_type)"/>
                   <van-icon size="30" v-else class="my_icon" name="info-o"/>
                 </van-col>
                 <van-col span="16">
@@ -69,7 +71,7 @@
                   </van-tag>
                 </van-col>
                 <van-col span="4">
-                  <van-button v-if="!item['is_dir']" icon="plus" size="small" type="danger" plain
+                  <van-button v-if="!item['is_dir'] " icon="plus" size="small" type="danger" plain
                               style="border: #ffffff"
                               @click="handleClickAddItem(item)"/>
                 </van-col>

@@ -13,7 +13,8 @@ const store = new Vuex.Store({
         userInfo: {
             session: "",
             name: "",
-            email: ""
+            email: "",
+            isBind:false
         },
         showRealImage: false, //是否显示原图,
         imagePreviewShow: false,
@@ -63,7 +64,8 @@ const store = new Vuex.Store({
             state.userInfo = {
                 session: userInfo.session,
                 name: userInfo.name,
-                email: userInfo.email
+                email: userInfo.email,
+                isBind:userInfo.isBind
             }
         },
         remove(state, neid) {

@@ -13,7 +13,7 @@ case class DownloadRecord(
                            filePath: String,
                            joyeaUserId: String,
                            rev: String,
-                           neid: Long,
+                           neid: String,
                            fileName: String,
                            pathType: String = "ent",
                            createdAt: OffsetDateTime = OffsetDateTime.now()
@@ -41,7 +41,7 @@ object DownloadRecord extends SQLSyntaxSupport[DownloadRecord] with ShortenedNam
     def opt(s: SyntaxProvider[DownloadRecord])(rs: WrappedResultSet): Option[DownloadRecord] =
         rs.longOpt(s.resultName.id).map(_ => apply(s.resultName)(rs))
 
-    def create(joyeaUserId: String, filePath: String, neid: Long, fileName: String, createdAt: OffsetDateTime = OffsetDateTime.now())
+    def create(joyeaUserId: String, filePath: String, neid: String, fileName: String, createdAt: OffsetDateTime = OffsetDateTime.now())
               (implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[Long] = {
         withSQL {
             insertInto(DownloadRecord).namedValues(

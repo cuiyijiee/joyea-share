@@ -245,3 +245,11 @@ export function userBindCheck(name,pwd,ytmId) {
         ytmId: ytmId,
     }).then(resp => resp.data)
 }
+
+export function userBind(joyeaUserId,ytmId,isNew) {
+    return service.post("api/v1/user/bind", {
+        joyeaUserId: joyeaUserId,
+        ytmId: ytmId,
+        isNew: isNew,
+    }).then(resp => resp.data)
+}

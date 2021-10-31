@@ -42,7 +42,7 @@ object SrcQuote extends SQLSyntaxSupport[SrcQuote] with ShortenedNames {
     def opt(s: SyntaxProvider[SrcQuote])(rs: WrappedResultSet): Option[SrcQuote] =
         rs.longOpt(s.resultName.id).map(_ => apply(s.resultName)(rs))
 
-    def create(neid: Long, uploader: String, quoteBy: String, createdAt: OffsetDateTime = OffsetDateTime.now())
+    def create(neid: String, uploader: String, quoteBy: String, createdAt: OffsetDateTime = OffsetDateTime.now())
               (implicit session: AsyncDBSession = AsyncDB.sharedSession): Future[Long] = {
         withSQL {
             insertInto(SrcQuote)

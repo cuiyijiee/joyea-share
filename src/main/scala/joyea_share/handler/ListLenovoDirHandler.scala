@@ -2,7 +2,7 @@ package joyea_share.handler
 
 import com.json.{JsonArray, JsonObject, WriterConfig}
 import joyea_share.handler.interfaces.{ExecListener, IAction}
-import joyea_share.model.AlbumSrc
+import joyea_share.model.{AlbumSrc, DirWord}
 import joyea_share.module.download.DownloadManager
 import joyea_share.service.RedisService
 import joyea_share.util.{CommonListener, LenovoUtil}
@@ -36,12 +36,12 @@ class ListLenovoDirHandler extends IAction {
             tempMap.put(fileName, content)
             val srcNeidValue = content.get("neid")
             var srcNeid = -1L
-            if (srcNeidValue.isString){
+            if (srcNeidValue.isString) {
               srcNeid = srcNeidValue.asString().toLong
-            }else{
+            } else {
               srcNeid = srcNeidValue.asLong()
             }
-            content.set("neid",srcNeid)
+            content.set("neid", srcNeid)
             //记录neid，用于请求获取tag
             neidList.add(srcNeid)
 
@@ -89,6 +89,15 @@ class ListLenovoDirHandler extends IAction {
                 val keyArr = keySet.toArray()
                 util.Arrays.sort(keyArr)
                 val newContentArr = new JsonArray()
+                //增加小白板
+                val dirWordList = Await.result(DirWord.findByNeid(obj.get("neid").asString()),Duration.Inf)
+                dirWordList.foreach(word => {
+                  val wordJson = new JsonObject()
+                  wordJson.add("neid",word.wordId)
+                  wordJson.add("path",word.wordName)
+                  wordJson.add("mime_type","word")
+                  newContentArr.add(wordJson)
+                })
                 keyArr.foreach(key => {
                   newContentArr.add(tempMap.get(key))
                 })
@@ -96,7 +105,7 @@ class ListLenovoDirHandler extends IAction {
                 listener.onSuccess(respJson = resJson.add("data", obj))
               } catch {
                 case e: Exception => {
-                  e.printStackTrace()
+                  log.error("列出文件夹列表失败：",e)
                   listener.onSuccess(respJson = resJson.add("data", obj))
                 }
               }

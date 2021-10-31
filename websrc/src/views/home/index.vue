@@ -23,7 +23,7 @@
                                style="margin-right: 10px">素材上传
                     </el-button>
                     <el-button size="small" icon="el-icon-tickets" @click="jumpToUploadManage"
-                               v-if="userInfo.email === '717'"
+                               v-if="userInfo.isAdmin"
                                :class="{'is-active':currentPath==='/upload/manage'}"
                                style="margin-left:0;margin-right: 10px">素材审核
                     </el-button>

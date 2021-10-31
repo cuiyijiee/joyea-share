@@ -39,8 +39,6 @@ class GetUserProfileAction extends BaseAction[GetUserProfileReq] {
               case Success(value) =>
 
             }
-            session("user_name") = resp.name
-            session("user_id") = resp.ytmId
           }else{
             //TODO update user profile
           }
@@ -48,6 +46,10 @@ class GetUserProfileAction extends BaseAction[GetUserProfileReq] {
             case Failure(exception) =>
               log.error("findByYtmId exist error:",exception)
             case Success(value) =>
+              if(value.isDefined){
+                session("user_name") = value.get.joyeaName
+                session("user_id") = value.get.joyeaId
+              }
               baseResponseSuccess(GetUserProfileResp(
                 profile = resp, session = DownloadManager.getAdminToken,joyeaUser = value
               ))

@@ -20,13 +20,18 @@ class LoginAction extends BaseAction[LoginReq] {
         if (value.isDefined) {
           val pwd = if (req.see.getOrElse(false)) req.pwd else new String(Base64.getDecoder.decode(req.pwd), "utf-8")
           if (value.get.password.equals(pwd)) {
-            session("user_name") = value.get.joyeaName
-            session("user_id") = value.get.joyeaId
-            baseResponseSuccess(LoginResp(
-              userName = value.get.joyeaName,
-              session = DownloadManager.getAdminToken,
-              isAdmin = value.get.isAdmin
-            ))
+
+            if(value.get.ytmId == null){
+              baseResponseError(ErrorCode.userNotBindNextPlus)
+            }else{
+              session("user_name") = value.get.joyeaName
+              session("user_id") = value.get.joyeaId
+              baseResponseSuccess(LoginResp(
+                userName = value.get.joyeaName,
+                session = DownloadManager.getAdminToken,
+                isAdmin = value.get.isAdmin
+              ))
+            }
           } else {
             baseResponseError(ErrorCode.unknownError)
           }

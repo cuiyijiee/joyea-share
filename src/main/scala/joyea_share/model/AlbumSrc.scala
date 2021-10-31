@@ -12,7 +12,7 @@ import scala.concurrent.Future
 case class AlbumSrc(
                      id: Long,
                      albumId: Long,
-                     srcNeid: Long,
+                     srcNeid: String,
                      srcHash: String,
                      srcRev: String,
                      srcSize: String,
@@ -93,7 +93,7 @@ object AlbumSrc extends SQLSyntaxSupport[AlbumSrc] with ShortenedNames {
         }
     }
 
-    def create(srcNeid: Long, albumId: Long, srcPath: String, srcType: String, srcHash: String, srcRev: String,
+    def create(srcNeid: String, albumId: Long, srcPath: String, srcType: String, srcHash: String, srcRev: String,
                srcSize: String, srcDesc: String, srcFileName: String, srcBytes: Long, createdAt: OffsetDateTime = OffsetDateTime.now())
               (implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[AlbumSrc] = {
         for {

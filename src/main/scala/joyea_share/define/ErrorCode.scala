@@ -17,4 +17,6 @@ object ErrorCode {
     val albumMenuHasAlbumExist: Int = 4203
 
     val albumMenuNotExist: Int = 4204
+
+    val userNotBindNextPlus:Int = 4008
 }

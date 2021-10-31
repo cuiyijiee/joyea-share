@@ -6,7 +6,7 @@
                 <transition-group>
                     <van-swipe-cell v-for="(item,index) in orderList" :key="item.path">
                         <van-card @click="handleClickOrderItem(item)"
-                                  :desc="item.joyeaDesc !== undefined && item.joyeaDesc.length > 0 ? item.joyeaDesc :'暂未设置解说词'"
+                                  :desc="item.joyeaDesc && item.joyeaDesc.length > 0 ? item.joyeaDesc :'暂未设置解说词'"
                                   :title="item.path.substr(item.path.lastIndexOf('/')+1)"
                                   :thumb="item.mime_type.startsWith('image') ? genPreviewUrl(item.neid,item.hash,item.rev,item.mime_type):getDocumentImage(item.mime_type)">
                         </van-card>
@@ -96,6 +96,7 @@ export default {
             'swapOrderItemFunc'
         ]),
         handleClickOrderItem(item) {
+            console.log(item)
             this.orderItemEdit.item = item;
             this.orderItemEdit.visible = true;
         },

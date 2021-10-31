@@ -17,7 +17,17 @@ class AlbumCollectionUpdateAction extends BaseAction[UpdateAlbumReq] {
                         updateResult <- toEditAlbum.copy(albumName = req.name).save()
                         deleteResult <- AlbumSrc.deleteByAlbumId(req.id)
                         createdAlbumSrcNum <- AlbumSrc.createMany(req.src.map(srcReq => {
-                            AlbumSrc(albumId = toEditAlbum.albumId, id = 0, srcNeid = srcReq.neid, srcHash = srcReq.hash, srcRev = srcReq.rev, srcSize = srcReq.size, srcPath = srcReq.path, srcType = srcReq.mime_type, srcDesc = srcReq.joyeaDesc, srcFileName = srcReq.filename, srcBytes = srcReq.bytes)
+                            AlbumSrc(albumId = toEditAlbum.albumId,
+                              id = 0,
+                              srcNeid = srcReq.neid,
+                              srcHash = srcReq.hash.getOrElse(""),
+                              srcRev = srcReq.rev.getOrElse(""),
+                              srcSize = srcReq.size.getOrElse(""),
+                              srcPath = srcReq.path,
+                              srcType = srcReq.mime_type,
+                              srcDesc = srcReq.joyeaDesc,
+                              srcFileName = srcReq.filename,
+                              srcBytes = srcReq.bytes.getOrElse(0L))
                         }))
                     } yield updateResult
                 }

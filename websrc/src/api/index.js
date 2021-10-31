@@ -69,7 +69,7 @@ export function uploadRecordManage(recordId, allow, refuseReason, uploadPath, up
         integral: integral
     };
     console.log(data);
-    return service.post('api/v1/upload/manage',data ).then(res => {
+    return service.post('api/v1/upload/manage', data).then(res => {
         return res.data;
     })
 }
@@ -112,6 +112,23 @@ export function queryDownload(downloadTaskId) {
 
 export function getTodayDownload() {
     return service.post("api/v1/download/today", {}).then(resp => {
+        return resp.data;
+    })
+}
+
+export function getMyWordList(search) {
+    return service.post("api/v1/esunyun/myword", {
+        search: search
+    }).then(resp => {
+        return resp.data;
+    })
+}
+
+export function addWordToDir(neid, wordList) {
+    return service.post("api/v1/word/add", {
+        neid: neid,
+        word: wordList
+    }).then(resp => {
         return resp.data;
     })
 }

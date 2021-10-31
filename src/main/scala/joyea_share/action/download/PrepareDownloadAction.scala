@@ -48,6 +48,6 @@ case class DownloadSrc(
                         index: Int,
                         path: String,
                         rev: String,
-                        neid: Long,
+                        neid: String,
                         filename: String
                       )

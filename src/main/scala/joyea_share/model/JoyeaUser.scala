@@ -74,10 +74,10 @@ object JoyeaUser extends SQLSyntaxSupport[JoyeaUser] with ShortenedNames {
     }.map(JoyeaUser(ju)).single().future()
   }
 
-  def bindYtmId(uid: Long, ytmId: String)
+  def bindYtmId(uid: String, ytmId: String)
                (implicit session: AsyncDBSession = AsyncDB.sharedSession, cxt: EC = ECGlobal): Future[Boolean] = {
     withSQL {
-      update(JoyeaUser).set(column.ytmId -> ytmId).where.eq(column.id, uid)
+      update(JoyeaUser).set(column.ytmId -> ytmId).where.eq(column.joyeaId, uid)
     }.update().future().map(_ > 0)
   }
 }
