@@ -79,9 +79,13 @@
                                 <i v-else-if="scope.row.mime_type.startsWith('doc')" class="el-icon-tickets"></i>
                                 <i v-else-if="scope.row.mime_type.startsWith('word')" class="el-icon-link"></i>
                                 <i v-else class="el-icon-question"></i>
-                                <span
+                                <span v-if="scope.row.mime_type.startsWith('word')"
                                     style="vertical-align:top;color: #333333"> {{
                                         ' ' + scope.row.path.substr(scope.row.path.lastIndexOf('/') + 1)
+                                    }}</span>
+                                <span v-else
+                                    style="vertical-align:top;color: #333333">>{{
+                                        ' ' + scope.row.path
                                     }}</span>
                                 <div v-if="scope.row.tags">
                                     <el-tag style="margin-right: 2px" v-for="tag in scope.row.tags" type="info"
@@ -288,20 +292,58 @@
                        @click.stop="handleLoadMore">加载更多
             </el-button>
         </el-dialog>
-        <el-dialog title="小白板管理" :visible.sync="visible.addWordDialogVisible">
+        <el-dialog title="小白板管理" :visible.sync="visible.addWordDialogVisible" :close-on-click-modal="false" @open="handleFilterCurDirWordList">
+            <div style="text-align: right">
+                <el-button class="search-button" size="small" @click="handleSaveWordToDir">&nbsp;&nbsp;&nbsp;保 存&nbsp;&nbsp;&nbsp;</el-button>
+            </div>
             <el-row>
                 <el-col :span="12">
-                    <el-select v-model="wordListSelected" multiple placeholder="请选择">
-                        <el-option
-                            v-for="item in wordListOption"
-                            :key="item.id"
-                            :label="item.title"
-                            :value="item.id">
-                        </el-option>
-                    </el-select>
+                    <el-input placeholder="请输入关键字" style="width: auto" v-model="wordListSearchText">
+                    </el-input>
+                    <el-button icon="el-icon-search" @click="handleGetMyWordList"></el-button>
+                    <el-table
+                        v-loading="wordListLoading"
+                        :data="wordListOption"
+                        style="width: 100%">
+                        <el-table-column
+                            prop="title"
+                            label="待选小白板">
+                        </el-table-column>
+                        <el-table-column
+                            fixed="right"
+                            label="操作"
+                            width="100">
+                            <template slot-scope="scope">
+                                <el-button type="text" size="small" @click="handleAddWordListRow(scope.row)">添加</el-button>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                    <el-pagination
+                        background
+                        layout="prev, pager, next"
+                        @current-change="handleGetMyWordList"
+                        :current-page.sync="wordListPageNum"
+                        :page-size="wordListPageSize"
+                        :total=wordListTotal>
+                    </el-pagination>
                 </el-col>
                 <el-col :span="12">
-                    <el-button class="search-button" size="small" @click="handleSaveWordToDir">保存</el-button>
+                    <el-table
+                        :data="wordListSelected"
+                        style="width: 100%">
+                        <el-table-column
+                            prop="title"
+                            label="已选小白板">
+                        </el-table-column>
+                        <el-table-column
+                            fixed="right"
+                            label="操作"
+                            width="100">
+                            <template slot-scope="scope">
+                                <el-button type="text" size="small" @click="handleDeleteWordListRow(scope.row)">删除</el-button>
+                            </template>
+                        </el-table-column>
+                    </el-table>
                 </el-col>
             </el-row>
         </el-dialog>
@@ -381,9 +423,13 @@ export default {
                 title: '',
                 url: ''
             },
-            wordSearchText: "",
+            wordListLoading:false,
             wordListOption: [],
-            wordListSelected: [],
+            wordListTotal:0,
+            wordListPageSize:10,
+            wordListPageNum:1,
+            wordListSearchText:"",
+            wordListSelected:[],
             curDirNeid: ""
         }
     },
@@ -881,11 +927,6 @@ export default {
                             item.joyeaDesc = "";
                             item.isModify = false;
                             this.dir.tableData.push(item)
-
-                            if(item.mime_type && item.mime_type.startsWith("word")){
-                                this.wordListSelected.push(item.neid);
-                            }
-
                         });
                         this.dir.currentPath = [];
                         response.data.path.split('/').forEach(item => {
@@ -923,20 +964,37 @@ export default {
                 this.topSearchKey = resp.data;
             })
         },
-        handleSaveWordToDir() {
-            let optionMap = {};
-            this.wordListOption.forEach(item => {
-                optionMap[item.id] = {
-                    wordId: item.id,
-                    wordName: item.title
+        handleFilterCurDirWordList(){
+            this.handleGetMyWordList();
+            this.dir.tableData.forEach(item => {
+                if(item.mime_type && item.mime_type.startsWith("word")){
+                    this.wordListSelected.push({
+                        id:item.neid,
+                        title:item.path
+                    });
                 }
             })
-            let wordList = [];
-            this.wordListSelected.forEach(wordId => {
-                wordList.push(optionMap[wordId])
+        },
+        handleAddWordListRow(row){
+            let existedList = this.wordListSelected.filter(function (item) {
+                return item.id === row.id;
             })
-            console.log("save word:" + JSON.stringify(wordList) + " to dir: " + this.curDirNeid);
-            addWordToDir(this.curDirNeid, wordList).then(resp => {
+            if(existedList.length > 0) {
+                this.$notify.error({
+                    title: '提示',
+                    message: '请勿重复添加！'
+                });
+            }else{
+                this.wordListSelected.push(row);
+            }
+        },
+        handleDeleteWordListRow(row){
+            this.wordListSelected = this.wordListSelected.filter(function (item) {
+                return item.id !== row.id;
+            })
+        },
+        handleSaveWordToDir() {
+            addWordToDir(this.curDirNeid, this.wordListSelected).then(resp => {
                 if (resp.code === 2000) {
                     this.visible.addWordDialogVisible = false;
                     this.handleClickDirPath(undefined,this.dir.currentPath.length - 1);
@@ -946,6 +1004,17 @@ export default {
                         message: '保存小白板失败！'
                     });
                 }
+            })
+        },
+        handleGetMyWordList(){
+            this.wordListLoading = true;
+            getMyWordList(this.wordListSearchText,this.wordListPageSize,this.wordListPageNum - 1).then(resp => {
+                this.wordListOption = resp.data.data;
+                this.wordListTotal = resp.data.total;
+                //this.wordListPageSize = resp.data.pageSize;
+                this.wordListPageNum = resp.data.pageNum + 1;
+            }).finally(()=>{
+                this.wordListLoading = false;
             })
         }
     },
@@ -972,9 +1041,6 @@ export default {
                 self.toCreateAlbum.list.splice(newIndex, 0, targetRow)
             }
         });
-        getMyWordList().then(resp => {
-            this.wordListOption = resp.data.data;
-        })
     }
 }
 </script>

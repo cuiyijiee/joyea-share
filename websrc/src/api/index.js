@@ -116,9 +116,11 @@ export function getTodayDownload() {
     })
 }
 
-export function getMyWordList(search) {
+export function getMyWordList(search,pageSize,pageNum) {
     return service.post("api/v1/esunyun/myword", {
-        search: search
+        search: search,
+        pageSize:pageSize,
+        pageNum:pageNum
     }).then(resp => {
         return resp.data;
     })

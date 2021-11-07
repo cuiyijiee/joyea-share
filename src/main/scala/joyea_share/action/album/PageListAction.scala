@@ -1,7 +1,5 @@
 package joyea_share.action.album
 
-import java.sql.Timestamp
-
 import joyea_share.action.BaseAction
 import joyea_share.db.MySQLSettings
 import joyea_share.model.{Album, AlbumSrc}

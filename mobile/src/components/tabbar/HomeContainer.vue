@@ -51,8 +51,8 @@
           <van-empty v-if="dir.tableData.length === 0" description="当前路径没有文件"/>
           <van-list>
             <van-cell v-for="item in dir.tableData" @click="handleClickItem(item)" :key="item.path">
-              <van-row>
-                <van-col span="4">
+              <van-row style="display:flex; justify-content:center;align-items:center;">
+                <van-col span="4" >
                   <van-icon size="30" v-if="item['is_dir']" class="my_icon" name="credit-pay"/>
                   <van-icon size="30" v-else-if="item.mime_type.startsWith('video')" class="my_icon"
                             name="video-o"/>
@@ -60,7 +60,7 @@
                        :src="genPreviewUrl(item.neid,item.hash,item.rev,item.mime_type)"/>
                   <van-image style="width: 40px" v-else-if="item.mime_type.startsWith('doc')"
                              :src="handleGetDocumentImage(item.mime_type)"/>
-                    <van-image style="width: 30px" v-else-if="item.mime_type.startsWith('word')"
+                    <van-image style="width: 27px" v-else-if="item.mime_type.startsWith('word')"
                                :src="handleGetDocumentImage(item.mime_type)"/>
                   <van-icon size="30" v-else class="my_icon" name="info-o"/>
                 </van-col>

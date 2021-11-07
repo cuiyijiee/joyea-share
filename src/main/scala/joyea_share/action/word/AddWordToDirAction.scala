@@ -12,8 +12,8 @@ class AddWordToDirAction extends BaseAction[AddWordToDirReq] {
         DirWord(
           id = 0,
           neid = req.neid,
-          wordId = info.wordId,
-          wordName = info.wordName
+          wordId = info.id,
+          wordName = info.title
         )
       })).onComplete(safeResponse[Int](_, info => {
         baseResponseSuccess(info)
@@ -25,6 +25,6 @@ class AddWordToDirAction extends BaseAction[AddWordToDirReq] {
 case class AddWordToDirReq(neid: String, word: Seq[WordInfo])
 
 case class WordInfo(
-                     wordId: String,
-                     wordName: String
+                     id: String,
+                     title: String
                    )

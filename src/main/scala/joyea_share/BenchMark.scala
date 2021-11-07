@@ -24,7 +24,7 @@ object BenchMark extends MySQLSettings {
     val respSession = resp \ "X-LENOVO-SESS-ID"
     implicit val session: String = respSession.values.toString
 
-    EsenyunUtil.getYtmWordList("","",None).foreach(wordList => {
+    EsenyunUtil.getYtmWordList("8a9c8ff35deb9042015dee0ea0bf0011","8a9d3ed05f10a017015f28179ca40023",None).foreach(wordList => {
       println(wordList)
     })
     test()

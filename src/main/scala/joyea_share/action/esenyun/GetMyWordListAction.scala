@@ -12,24 +12,29 @@ class GetMyWordListAction extends BaseAction[GetMyWordListReq] {
       if (userOpt.isDefined && userOpt.get.ytmId.nonEmpty) {
         NextPlusUser.selectByYtmId(userOpt.get.ytmId).foreach(nextPlusUserOpt => {
           if (nextPlusUserOpt.nonEmpty) {
-            EsenyunUtil.getYtmWordList(nextPlusUserOpt.get.tenantId,nextPlusUserOpt.get.ytmId,req.search).foreach(result => {
-              baseResponseSuccess(GetMyWordListResp(data = result.words))
+            EsenyunUtil.getYtmWordList(nextPlusUserOpt.get.tenantId, nextPlusUserOpt.get.ytmId, req.search, req.pageSize, req.pageNum).foreach(result => {
+              baseResponseSuccess(GetMyWordListResp(data = result.words,total = result.total_number, pageNum = req.pageNum, pageSize = req.pageSize))
             })
           } else {
-            baseResponseSuccess(GetMyWordListResp(data = List()))
+            baseResponseSuccess(GetMyWordListResp(data = List(),total = 0, pageNum = req.pageNum, pageSize = req.pageSize))
           }
         })
       } else {
-        baseResponseSuccess(GetMyWordListResp(data = List()))
+        baseResponseSuccess(GetMyWordListResp(data = List(),total = 0, pageNum = req.pageNum, pageSize = req.pageSize))
       }
     })
   }
 }
 
 case class GetMyWordListReq(
-                             search: Option[String]
+                             search: Option[String],
+                             pageSize: Int = 10,
+                             pageNum: Int = 0
                            )
 
 case class GetMyWordListResp(
-                              data: List[EsenWord]
+                              data: List[EsenWord],
+                              total: Int,
+                              pageNum: Int,
+                              pageSize: Int
                             )
