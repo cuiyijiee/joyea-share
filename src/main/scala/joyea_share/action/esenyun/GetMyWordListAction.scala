@@ -12,7 +12,7 @@ class GetMyWordListAction extends BaseAction[GetMyWordListReq] {
       if (userOpt.isDefined && userOpt.get.ytmId.nonEmpty) {
         NextPlusUser.selectByYtmId(userOpt.get.ytmId).foreach(nextPlusUserOpt => {
           if (nextPlusUserOpt.nonEmpty) {
-            EsenyunUtil.getYtmWordList(nextPlusUserOpt.get.tenantId, nextPlusUserOpt.get.ytmId, req.search, req.pageSize, req.pageNum).foreach(result => {
+            EsenyunUtil.getYtmWordList(nextPlusUserOpt.get.tenantId, nextPlusUserOpt.get.ytmId,nextPlusUserOpt.get.ytmOpenId, req.search, req.pageSize, req.pageNum).foreach(result => {
               baseResponseSuccess(GetMyWordListResp(data = result.words,total = result.total_number, pageNum = req.pageNum, pageSize = req.pageSize))
             })
           } else {

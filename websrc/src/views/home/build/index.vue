@@ -79,13 +79,13 @@
                                 <i v-else-if="scope.row.mime_type.startsWith('doc')" class="el-icon-tickets"></i>
                                 <i v-else-if="scope.row.mime_type.startsWith('word')" class="el-icon-link"></i>
                                 <i v-else class="el-icon-question"></i>
-                                <span v-if="scope.row.mime_type.startsWith('word')"
+                                <span v-if="scope.row.mime_type && scope.row.mime_type.startsWith('word')"
                                     style="vertical-align:top;color: #333333"> {{
-                                        ' ' + scope.row.path.substr(scope.row.path.lastIndexOf('/') + 1)
+                                        ' ' + scope.row.path
                                     }}</span>
                                 <span v-else
-                                    style="vertical-align:top;color: #333333">>{{
-                                        ' ' + scope.row.path
+                                    style="vertical-align:top;color: #333333">{{
+                                        ' ' + scope.row.path.substr(scope.row.path.lastIndexOf('/') + 1)
                                     }}</span>
                                 <div v-if="scope.row.tags">
                                     <el-tag style="margin-right: 2px" v-for="tag in scope.row.tags" type="info"
@@ -109,7 +109,7 @@
                         label="操作"
                         width="180">
                         <template slot-scope="scope">
-                            <span v-if="scope.row.is_dir||scope.row.mime_type.startsWith('word')">-</span>
+                            <span v-if="scope.row.is_dir|| (scope.row.mime_type && scope.row.mime_type.startsWith('word'))">-</span>
                             <span v-else>
                                         <el-button circle type=""
                                                    @click.stop="handleAdd(scope.$index, scope.row)"

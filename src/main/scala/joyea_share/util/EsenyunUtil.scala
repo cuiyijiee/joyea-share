@@ -58,7 +58,7 @@ object EsenyunUtil extends Log with BaseJsonFormat {
     })
   }
 
-  def getYtmWordList(tenantId: String, userId: String, searchText: Option[String],pageSize:Int = 10,pageNum:Int = 0): Future[EsenWordResp] = {
+  def getYtmWordList(tenantId: String, userId: String,openId: String, searchText: Option[String],pageSize:Int = 10,pageNum:Int = 0): Future[EsenWordResp] = {
 
     val queryParams = s"?page=$pageNum&size=$pageSize"
 
@@ -66,7 +66,7 @@ object EsenyunUtil extends Log with BaseJsonFormat {
     val reqJson = new JsonObject()
     reqJson.add("accessToken", tokenResult)
     reqJson.add("tenantId", tenantId)
-    reqJson.add("operatorId", userId)
+    reqJson.add("operatorId", openId)
     reqJson.add("userId", userId)
     //    reqJson.add("inIds", tokenResult)
     if (searchText.isEmpty || searchText.get.isEmpty) {
