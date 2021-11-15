@@ -60,7 +60,7 @@ object EsenyunUtil extends Log with BaseJsonFormat {
 
   def getYtmWordList(tenantId: String, userId: String,openId: String, searchText: Option[String],pageSize:Int = 10,pageNum:Int = 0): Future[EsenWordResp] = {
 
-    val queryParams = s"?page=$pageNum&size=$pageSize"
+    val queryParams = s"?page=$pageNum&size=$pageSize&sort=title.keyword,asc"
 
     val tokenResult = Await.result(getAccessToken(), Duration.Inf)
     val reqJson = new JsonObject()
@@ -75,9 +75,10 @@ object EsenyunUtil extends Log with BaseJsonFormat {
       reqJson.add("text", searchText.orNull)
     }
     reqJson.add("queryType", "PARTICIPATE")
-    reqJson.add("sort", "CREATEDTIMEDESC")
-    HttpUtil.postJson(s"$WORD_LIST$queryParams", reqJson.toString(), headerMap = Map("Authorization" -> s"Bearer $tokenResult")).map(result => {
-      log.info("获取小白板请求参数：" + reqJson.toString(WriterConfig.PRETTY_PRINT) + "\n服务器返回:" + JsonObject.readFrom(result).toString(WriterConfig.PRETTY_PRINT))
+//    reqJson.add("sort", "CREATEDTIMEDESC")
+    val requestUrl = s"$WORD_LIST$queryParams"
+    HttpUtil.postJson(requestUrl, reqJson.toString(), headerMap = Map("Authorization" -> s"Bearer $tokenResult")).map(result => {
+      log.info("获取小白板请求url" +  requestUrl + "\nbody参数：" + reqJson.toString(WriterConfig.PRETTY_PRINT) + "\n服务器返回:" + JsonObject.readFrom(result).toString(WriterConfig.PRETTY_PRINT))
       JsonMethods.parse(result).extract[EsenWordResp]
     })
   }
