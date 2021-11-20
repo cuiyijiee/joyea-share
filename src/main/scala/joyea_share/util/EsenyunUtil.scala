@@ -72,7 +72,7 @@ object EsenyunUtil extends Log with BaseJsonFormat {
     if (searchText.isEmpty || searchText.get.isEmpty) {
 
     } else {
-      reqJson.add("text", searchText.orNull)
+      reqJson.add("titleText", searchText.orNull)
     }
     reqJson.add("queryType", "PARTICIPATE")
 //    reqJson.add("sort", "CREATEDTIMEDESC")

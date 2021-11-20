@@ -1,5 +1,5 @@
 <template>
-    <section>
+    <section id="build">
         <!--工具条-->
         <div style="padding: 10px 150px 0 150px;background: #1e162f;">
             <el-input placeholder="请输入关键字" v-model="search.key" class="my-input"
@@ -943,6 +943,9 @@ export default {
                     console.log('文件夹列表获取失败' + response.msg)
                 }
                 this.dir.loadingDir = false;
+            }).finally(()=>{
+                //2021.11.20-侍-要求点开文件夹回到顶部！
+                document.getElementById("build").scrollTop = 0;
             });
         },
         handleClickDirItem(row, column, event) {
