@@ -8,7 +8,7 @@
 </template>
 <script>
 import {mapGetters, mapActions} from "vuex"
-import {check} from "./api";
+import {check, previewFile} from "./api";
 
 export default {
   name: 'App',

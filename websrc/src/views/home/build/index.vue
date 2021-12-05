@@ -51,7 +51,8 @@
                         <div>&nbsp</div>
                     </el-col>
                     <el-col :span="3" :offset="3">
-                        <el-button class="search-button" size="small" @click="visible.addWordDialogVisible = !visible.addWordDialogVisible">
+                        <el-button class="search-button" size="small"
+                                   @click="visible.addWordDialogVisible = !visible.addWordDialogVisible">
                             管理小白板
                         </el-button>
                     </el-col>
@@ -80,11 +81,11 @@
                                 <i v-else-if="scope.row.mime_type.startsWith('word')" class="el-icon-link"></i>
                                 <i v-else class="el-icon-question"></i>
                                 <span v-if="scope.row.mime_type && scope.row.mime_type.startsWith('word')"
-                                    style="vertical-align:top;color: #333333"> {{
+                                      style="vertical-align:top;color: #333333"> {{
                                         ' ' + scope.row.path
                                     }}</span>
                                 <span v-else
-                                    style="vertical-align:top;color: #333333">{{
+                                      style="vertical-align:top;color: #333333">{{
                                         ' ' + scope.row.path.substr(scope.row.path.lastIndexOf('/') + 1)
                                     }}</span>
                                 <div v-if="scope.row.tags">
@@ -109,7 +110,8 @@
                         label="操作"
                         width="180">
                         <template slot-scope="scope">
-                            <span v-if="scope.row.is_dir|| (scope.row.mime_type && scope.row.mime_type.startsWith('word'))">-</span>
+                            <span
+                                v-if="scope.row.is_dir|| (scope.row.mime_type && scope.row.mime_type.startsWith('word'))">-</span>
                             <span v-else>
                                         <el-button circle type=""
                                                    @click.stop="handleAdd(scope.$index, scope.row)"
@@ -217,7 +219,8 @@
         </el-dialog>
         <el-dialog :title="toPlayVideo.title" :visible.sync="visible.videoDialogVisible" @close="handleCloseVideo"
                    @opened="playVideo()">
-            <video id="myVideo" class="video-js vjs-big-play-centered vjs-fluid" oncontextmenu="return false">
+            <video v-if="visible.videoPrepared" id="myVideo" class="video-js vjs-big-play-centered vjs-fluid"
+                   oncontextmenu="return false">
                 <p class="vjs-no-js">
                     To view this video please enable JavaScript, and consider upgrading to a
                     web browser that
@@ -226,6 +229,7 @@
                     </a>
                 </p>
             </video>
+            <el-button v-else>取消加载</el-button>
         </el-dialog>
         <el-dialog :title="toPlayImage.title" :visible.sync="visible.imageDialogVisible" @close="handleCloseImage">
             <el-image :src="toPlayImage.url">
@@ -292,7 +296,8 @@
                        @click.stop="handleLoadMore">加载更多
             </el-button>
         </el-dialog>
-        <el-dialog title="小白板管理" :visible.sync="visible.addWordDialogVisible" :close-on-click-modal="false" @open="handleFilterCurDirWordList">
+        <el-dialog title="小白板管理" :visible.sync="visible.addWordDialogVisible" :close-on-click-modal="false"
+                   @open="handleFilterCurDirWordList">
             <div style="text-align: right">
                 <el-button class="search-button" size="small" @click="handleSaveWordToDir">&nbsp;&nbsp;&nbsp;保 存&nbsp;&nbsp;&nbsp;</el-button>
             </div>
@@ -314,7 +319,8 @@
                             label="操作"
                             width="100">
                             <template slot-scope="scope">
-                                <el-button type="text" size="small" @click="handleAddWordListRow(scope.row)">添加</el-button>
+                                <el-button type="text" size="small" @click="handleAddWordListRow(scope.row)">添加
+                                </el-button>
                             </template>
                         </el-table-column>
                     </el-table>
@@ -340,7 +346,8 @@
                             label="操作"
                             width="100">
                             <template slot-scope="scope">
-                                <el-button type="text" size="small" @click="handleDeleteWordListRow(scope.row)">删除</el-button>
+                                <el-button type="text" size="small" @click="handleDeleteWordListRow(scope.row)">删除
+                                </el-button>
                             </template>
                         </el-table-column>
                     </el-table>
@@ -351,8 +358,15 @@
 </template>
 
 <script>
-import api, {getTopSearchKey, prepareDownloadFile, queryDownload, getMyWordList, addWordToDir} from "../../../api";
-import genSrcPreviewSrc from "../../../utils"
+import api, {
+    getTopSearchKey,
+    prepareDownloadFile,
+    queryDownload,
+    getMyWordList,
+    addWordToDir,
+    previewFile
+} from "../../../api";
+import genSrcPreviewSrc, {getVideoPreviewUrl} from "../../../utils"
 import Sortable from 'sortablejs';
 import videojs from 'video.js'
 import {getDocumentImage, joyeaMenuPath, getFileNameWithoutExtension} from "@/utils/JoyeaUtil";
@@ -409,6 +423,7 @@ export default {
             visible: {
                 listDetailDialogVisible: false,
                 videoDialogVisible: false,
+                videoPrepared: false,
                 imageDialogVisible: false,
                 searchDialogVisible: false,
                 addWordDialogVisible: false
@@ -423,14 +438,15 @@ export default {
                 title: '',
                 url: ''
             },
-            wordListLoading:false,
+            wordListLoading: false,
             wordListOption: [],
-            wordListTotal:0,
-            wordListPageSize:10,
-            wordListPageNum:1,
-            wordListSearchText:"",
-            wordListSelected:[],
-            curDirNeid: ""
+            wordListTotal: 0,
+            wordListPageSize: 10,
+            wordListPageNum: 1,
+            wordListSearchText: "",
+            wordListSelected: [],
+            curDirNeid: "",
+            videoPreviewPromise: Object
         }
     },
     computed: {
@@ -439,6 +455,38 @@ export default {
         })
     },
     methods: {
+        handleGoToPreview(row) {
+            let previewType = 'pic';    // if video is av
+            if (row.mime_type.startsWith("video")) {
+                previewType = 'av'
+                this.handlePlayVideo(row);
+                return
+            } else if (row.mime_type.startsWith("doc")) {
+                previewType = 'doc'
+            }
+            let url = genSrcPreviewSrc(row.neid, row.hash, row.rev, previewType, this.userInfo.session);
+            if (row.mime_type.startsWith("video")) {
+
+            } else if (row.mime_type.startsWith("image")) {
+                //this.handlePlayImage(url, row.path.substr(row.path.lastIndexOf("/") + 1),);
+            } else if (row.mime_type.startsWith("doc")) {
+                window.open(url);
+            } else {
+                this.$message.error("暂不支持的预览类型！")
+            }
+        },
+        handlePlayVideo(row) {
+            this.visible.videoDialogVisible = true;
+            this.visible.videoPrepared = true;
+            let title = row.path.substr(row.path.lastIndexOf("/") + 1);
+            this.videoPreviewPromise = getVideoPreviewUrl(row.neid, 30)
+            let _this = this;
+            this.videoPreviewPromise.then(videoUrl => {
+                _this.visible.videoPrepared = true;
+                _this.toPlayVideo.url = videoUrl;
+                _this.toPlayVideo.title = title;
+            })
+        },
         handleClickRootMenu(menu) {
             this.handleListLenovoDir("/营销素材展示/" + menu.path, "ent")
         },
@@ -447,11 +495,6 @@ export default {
         },
         handleGetDocumentImage(mimeType) {
             return getDocumentImage(mimeType)
-        },
-        handlePlayVideo(url, title) {
-            this.visible.videoDialogVisible = true;
-            this.toPlayVideo.url = url;
-            this.toPlayVideo.title = title;
         },
         handlePlayImage(url, title) {
             this.visible.imageDialogVisible = true;
@@ -816,24 +859,6 @@ export default {
                 }
             });
         },
-        handleGoToPreview(row) {
-            let previewType = 'pic';    // if video is av
-            if (row.mime_type.startsWith("doc")) {
-                previewType = 'doc'
-            } else if (row.mime_type.startsWith("video")) {
-                previewType = 'av'
-            }
-            let url = genSrcPreviewSrc(row.neid, row.hash, row.rev, previewType, this.userInfo.session);
-            if (row.mime_type.startsWith("video")) {
-                this.handlePlayVideo(url, row.path.substr(row.path.lastIndexOf("/") + 1),);
-            } else if (row.mime_type.startsWith("image")) {
-                //this.handlePlayImage(url, row.path.substr(row.path.lastIndexOf("/") + 1),);
-            } else if (row.mime_type.startsWith("doc")) {
-                window.open(url);
-            } else {
-                this.$message.error("暂不支持的预览类型！")
-            }
-        },
         handleDownloadSrc(isList, row) {
             let _this = this;
             let toDownloadList = [];
@@ -943,7 +968,7 @@ export default {
                     console.log('文件夹列表获取失败' + response.msg)
                 }
                 this.dir.loadingDir = false;
-            }).finally(()=>{
+            }).finally(() => {
                 //2021.11.20-侍-要求点开文件夹回到顶部！
                 document.getElementById("build").scrollTop = 0;
             });
@@ -967,31 +992,31 @@ export default {
                 this.topSearchKey = resp.data;
             })
         },
-        handleFilterCurDirWordList(){
+        handleFilterCurDirWordList() {
             this.handleGetMyWordList();
             this.dir.tableData.forEach(item => {
-                if(item.mime_type && item.mime_type.startsWith("word")){
+                if (item.mime_type && item.mime_type.startsWith("word")) {
                     this.wordListSelected.push({
-                        id:item.neid,
-                        title:item.path
+                        id: item.neid,
+                        title: item.path
                     });
                 }
             })
         },
-        handleAddWordListRow(row){
+        handleAddWordListRow(row) {
             let existedList = this.wordListSelected.filter(function (item) {
                 return item.id === row.id;
             })
-            if(existedList.length > 0) {
+            if (existedList.length > 0) {
                 this.$notify.error({
                     title: '提示',
                     message: '请勿重复添加！'
                 });
-            }else{
+            } else {
                 this.wordListSelected.push(row);
             }
         },
-        handleDeleteWordListRow(row){
+        handleDeleteWordListRow(row) {
             this.wordListSelected = this.wordListSelected.filter(function (item) {
                 return item.id !== row.id;
             })
@@ -1000,7 +1025,7 @@ export default {
             addWordToDir(this.curDirNeid, this.wordListSelected).then(resp => {
                 if (resp.code === 2000) {
                     this.visible.addWordDialogVisible = false;
-                    this.handleClickDirPath(undefined,this.dir.currentPath.length - 1);
+                    this.handleClickDirPath(undefined, this.dir.currentPath.length - 1);
                 } else {
                     this.$notify.error({
                         title: '提示',
@@ -1009,17 +1034,18 @@ export default {
                 }
             })
         },
-        handleGetMyWordList(){
+        handleGetMyWordList() {
             this.wordListLoading = true;
-            getMyWordList(this.wordListSearchText,this.wordListPageSize,this.wordListPageNum - 1).then(resp => {
+            getMyWordList(this.wordListSearchText, this.wordListPageSize, this.wordListPageNum - 1).then(resp => {
                 this.wordListOption = resp.data.data;
                 this.wordListTotal = resp.data.total;
                 //this.wordListPageSize = resp.data.pageSize;
                 this.wordListPageNum = resp.data.pageNum + 1;
-            }).finally(()=>{
+            }).finally(() => {
                 this.wordListLoading = false;
             })
-        }
+        },
+
     },
     mounted() {
         this.handleListLenovoDir("/营销素材展示", "ent");
