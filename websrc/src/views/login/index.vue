@@ -88,7 +88,7 @@ export default {
                                 }
                             })
                         } else if (resp.code === 4008) {
-                            _this.$message.error("该用户未绑定nextplus用户！");
+                            _this.$message.error("由于版本更新，现在首次登录需要您进行一次pc端账号绑定（通常管理员已使用您的工号注册了账号）或重新注册一个账号。绑定后就可以使用该账号登录PC端素材库了。");
                         } else {
                             _this.$message.error("登陆失败，请检查用户名密码！");
                         }

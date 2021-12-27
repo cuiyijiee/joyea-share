@@ -8,7 +8,16 @@ module.exports = {
     lintOnSave: true,
     productionSourceMap: false,
     devServer: {
-        proxy: 'http://127.0.0.1:8000',
+        proxy: {
+            'api/preview': {
+                target: 'http://localhost:8080',
+                changeOrigin: true
+            },
+            '/': {
+                target: 'http://localhost:8000',
+                changeOrigin: true
+            }
+        }
     },
     publicPath: '/mobile/',
     chainWebpack: config => {

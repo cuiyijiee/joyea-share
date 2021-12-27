@@ -11,6 +11,13 @@
         <div style="text-align: center;padding-top: 50px;text-decoration: underline ;color: #8c939d"
              @click="checkNewConfirmDialogVisible = true">我没有系统账号，直接登录
         </div>
+
+        <van-divider></van-divider>
+        <div style="padding: 50px; font-size: small;text-indent:25px; vertical-align: bottom">
+            <p style="color: #8c939d;">
+                由于版本更新，现在首次登录需要您进行一次pc端账号绑定（通常管理员已使用您的工号注册了账号）或重新注册一个账号。绑定后就可以使用该账号登录PC端素材库了。
+            </p>
+        </div>
         <van-popup
             v-model:show="checkConfirmDialogVisible"
             round

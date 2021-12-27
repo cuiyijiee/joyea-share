@@ -6,10 +6,15 @@ export default function genSrcPreviewUrl(neid, hash, rev, previewType, sessionId
 }
 
 export function getVideoPreviewUrl(neid, times) {
-    return new Promise(function (resolve, reject) {
+
+    let _res, _rej;
+    const promise = new Promise(function (resolve, reject) {
+        _res = resolve;
+        _rej = reject;
+
         function attempt() {
             previewFile(neid).then(resolve).catch(function (err) {
-                console.log("第" + times +"次尝试获取视频预览地址")
+                console.log("第" + times + "次尝试获取视频预览地址")
                 if (0 === times) {
                     reject(err)
                 } else {
@@ -20,5 +25,17 @@ export function getVideoPreviewUrl(neid, times) {
         }
 
         attempt()
-    })
+    });
+
+    return {
+        promise,
+        abort: (opt = {}) => {
+            times = 0;
+            _rej({
+                name: "abort",
+                message: "the promise is aborted",
+                aborted: true,
+            })
+        }
+    }
 }

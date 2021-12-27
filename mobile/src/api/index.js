@@ -253,3 +253,10 @@ export function userBind(joyeaUserId,ytmId,isNew) {
         isNew: isNew,
     }).then(resp => resp.data)
 }
+
+export function previewFile(neid){
+    return service.get("api/preview?neid=" + neid)
+        .then(resp => {
+            return resp.data;
+        })
+}
