@@ -219,7 +219,7 @@
         </el-dialog>
         <el-dialog :title="toPlayVideo.title" :visible.sync="visible.videoDialogVisible" @close="handleCloseVideo"
                    @opened="initVideoPlayer()">
-            <video id="myVideo" class="video-js vjs-big-play-centered vjs-fluid"
+            <video id="myVideo" class="video-js vjs-big-play-centered vjs-16-9"
                    oncontextmenu="return false">
                 <p class="vjs-no-js">
                     To view this video please enable JavaScript, and consider upgrading to a
@@ -479,7 +479,7 @@ export default {
             this.visible.videoDialogVisible = true;
             this.visible.videoPrepared = false;
             let title = row.path.substr(row.path.lastIndexOf("/") + 1);
-            const {promise,abort} = getVideoPreviewUrl(row.neid, 30)
+            const {promise, abort} = getVideoPreviewUrl(row.neid, 30)
             this.videoPreviewPromise = promise;
             this.videoPreviewAbort = abort;
             let _this = this;
@@ -487,7 +487,7 @@ export default {
                 _this.visible.videoPrepared = true;
                 _this.toPlayVideo.url = videoUrl;
                 _this.toPlayVideo.title = title;
-                if(_this.visible.videoDialogVisible) {
+                if (_this.visible.videoDialogVisible) {
                     _this.playVideo(videoUrl);
                 }
             })
@@ -506,7 +506,7 @@ export default {
             this.toPlayImage.url = url;
             this.toPlayImage.title = title;
         },
-        initVideoPlayer(){
+        initVideoPlayer() {
             let _this = this;
             if (this.player == null) {
                 videojs(document.getElementById('myVideo'), {
@@ -531,12 +531,11 @@ export default {
                             {name: 'FullscreenToggle'} // 全屏
                         ]
                     },
-                    sources: [
-                    ]
+                    sources: []
                 }, function () {
                     _this.player = this;
                 });
-            }else{
+            } else {
                 _this.player.poster("video-loading.jpg")
             }
         },
@@ -551,7 +550,7 @@ export default {
             this.player.play();
         },
         handleCloseVideo() {
-            if(this.videoPreviewAbort){
+            if (this.videoPreviewAbort) {
                 this.videoPreviewAbort();
             }
             if (this.player != null) {
