@@ -1,5 +1,7 @@
 import {convertItem, GenImageListView} from "./ImageViewUtil";
 import store from "../store";
+import {Dialog} from 'vant';
+import {previewFile} from "../api";
 
 export function genSrcPreviewSrc(neid, hash, rev, previewType, sessionId) {
     return 'https://console.box.lenovo.com/v2/preview_router?type=' + previewType + '&root=databox&path=&path_type=ent&from=&neid='
@@ -10,6 +12,8 @@ export function genSrcOriginSrc(path, neid, sessionId) {
     return 'https://console.box.lenovo.com/v2/dl_router/databox/' + path +
         '?neid=' + neid + '&rev=&_=' + new Date().getTime() + "&X-LENOVO-SESS-ID=" + sessionId;
 }
+
+let videoLoading = false;
 
 export function handleGoToPreview(context, row, session, itemList) {
     row = convertItem(row)
@@ -25,7 +29,24 @@ export function handleGoToPreview(context, row, session, itemList) {
         genSrcOriginSrc(row.path, row.neid, session) :
         genSrcPreviewSrc(row.neid, row.hash, row.rev, previewType, session);
     if (row.mime_type.startsWith("video")) {
-        callNextPlusPreview(fileName, url)
+        videoLoading = true;
+        const {promise,abort} = getVideoPreviewUrl(row.neid, 30)
+        promise.then(resp => {
+            if (videoLoading) {
+                callNextPlusPreview(fileName, resp);
+            }
+            Dialog.close();
+        });
+        Dialog.alert({
+            title: "转码中，成功后将自动播放，请耐心等待。。。",
+            message: "<img src='loading.gif' style='width: 50px;height: 50px'></img>",
+            allowHtml: true,
+            showConfirmButton: true,
+            confirmButtonText: '取消'
+        }).then(()=>{
+            abort();
+        })
+        //callNextPlusPreview(fileName, url)
     } else if (row.mime_type.startsWith("doc") && !row.mime_type.endsWith("pdf")) {
         if (row.mime_type.endsWith("pdf")) {
             //callNextPlusPreview(fileName, url)
@@ -35,6 +56,8 @@ export function handleGoToPreview(context, row, session, itemList) {
         }
     } else if (row.mime_type.startsWith("image")) {
         GenImageListView(context, itemList, session, row);
+    } else if (row.mime_type.startsWith("word")) {
+        window.location.href = 'esen://word?wordId=' + row.neid;
     }
 }
 
@@ -99,4 +122,38 @@ export function getLastReadUploadRecordId(myUid) {
 
 export function setLastReadUploadRecordId(myUid, readId) {
     localStorage.setItem(latest_record_id_prefix + myUid, readId + "");
+}
+
+export function getVideoPreviewUrl(neid, times) {
+
+    let _res, _rej;
+    const promise = new Promise(function (resolve, reject) {
+        _res = resolve;
+        _rej = reject;
+
+        function attempt() {
+            previewFile(neid).then(resolve).catch(function (err) {
+                console.log("第" + times + "次尝试获取视频预览地址")
+                if (0 === times) {
+                    reject(err)
+                } else {
+                    times--;
+                    setTimeout(attempt, 1000)
+                }
+            })
+        }
+
+        attempt()
+    });
+
+    return {
+        promise,
+        abort: (opt = {}) => {
+            _rej({
+                name: "abort",
+                message: "the promise is aborted",
+                aborted: true,
+            })
+        }
+    }
 }

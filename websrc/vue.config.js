@@ -8,7 +8,16 @@ module.exports = {
     lintOnSave: true,
     productionSourceMap: false,
     devServer: {
-        proxy: 'http://localhost:8000'
+        proxy: {
+            'api/preview': {
+                target: 'http://sck.joyea.cn:8000/',
+                changeOrigin: true
+            },
+            '/': {
+                target: 'http://localhost:8000',
+                changeOrigin: true
+            }
+        }
     },
     chainWebpack: config => {
         config.resolve.alias

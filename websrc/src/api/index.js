@@ -115,3 +115,10 @@ export function getTodayDownload() {
         return resp.data;
     })
 }
+
+export function previewFile(neid){
+    return service.get("api/preview?neid=" + neid)
+        .then(resp => {
+            return resp.data;
+        })
+}
