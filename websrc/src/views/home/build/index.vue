@@ -202,8 +202,9 @@
             </div>
         </el-dialog>
         <el-dialog :title="toPlayVideo.title" :visible.sync="visible.videoDialogVisible" @close="handleCloseVideo"
-                   @opened="playVideo()">
-            <video id="myVideo" class="video-js vjs-big-play-centered vjs-fluid" oncontextmenu="return false">
+                   @opened="initVideoPlayer()">
+            <video id="myVideo" class="video-js vjs-big-play-centered vjs-16-9"
+                   oncontextmenu="return false">
                 <p class="vjs-no-js">
                     To view this video please enable JavaScript, and consider upgrading to a
                     web browser that
@@ -283,7 +284,7 @@
 
 <script>
 import api, {getTopSearchKey, prepareDownloadFile, queryDownload} from "../../../api";
-import genSrcPreviewSrc from "../../../utils"
+import genSrcPreviewSrc, {getVideoPreviewUrl} from "../../../utils"
 import Sortable from 'sortablejs';
 import videojs from 'video.js'
 import {getDocumentImage, joyeaMenuPath, getFileNameWithoutExtension} from "@/utils/JoyeaUtil";
@@ -361,26 +362,44 @@ export default {
         })
     },
     methods: {
-        handleClickRootMenu(menu) {
-            this.handleListLenovoDir("/行政自助服务/" + menu.path, "ent")
+        handleGoToPreview(row) {
+            let previewType = 'pic';    // if video is av
+            if (row.mime_type.startsWith("video")) {
+                previewType = 'av'
+                this.handlePlayVideo(row);
+                return
+            } else if (row.mime_type.startsWith("doc")) {
+                previewType = 'doc'
+            }
+            let url = genSrcPreviewSrc(row.neid, row.hash, row.rev, previewType, this.userInfo.session);
+            if (row.mime_type.startsWith("video")) {
+
+            } else if (row.mime_type.startsWith("image")) {
+                //this.handlePlayImage(url, row.path.substr(row.path.lastIndexOf("/") + 1),);
+            } else if (row.mime_type.startsWith("doc")) {
+                window.open(url);
+            } else {
+                this.$message.error("暂不支持的预览类型！")
+            }
         },
-        handleClickTopSearchKey(key) {
-            this.handleSearch(key);
-        },
-        handleGetDocumentImage(mimeType) {
-            return getDocumentImage(mimeType)
-        },
-        handlePlayVideo(url, title) {
+        handlePlayVideo(row) {
             this.visible.videoDialogVisible = true;
-            this.toPlayVideo.url = url;
-            this.toPlayVideo.title = title;
+            this.visible.videoPrepared = false;
+            let title = row.path.substr(row.path.lastIndexOf("/") + 1);
+            const {promise, abort} = getVideoPreviewUrl(row.neid, 30)
+            this.videoPreviewPromise = promise;
+            this.videoPreviewAbort = abort;
+            let _this = this;
+            this.videoPreviewPromise.then(videoUrl => {
+                _this.visible.videoPrepared = true;
+                _this.toPlayVideo.url = videoUrl;
+                _this.toPlayVideo.title = title;
+                if (_this.visible.videoDialogVisible) {
+                    _this.playVideo(videoUrl);
+                }
+            })
         },
-        handlePlayImage(url, title) {
-            this.visible.imageDialogVisible = true;
-            this.toPlayImage.url = url;
-            this.toPlayImage.title = title;
-        },
-        playVideo() {
+        initVideoPlayer() {
             let _this = this;
             if (this.player == null) {
                 videojs(document.getElementById('myVideo'), {
@@ -391,6 +410,7 @@ export default {
                     language: 'zh-CN', // 设置语言
                     muted: false, // 是否静音
                     inactivityTimeout: false,
+                    poster: 'video-loading.jpg',
                     controlBar: { // 设置控制条组件
                         children: [
                             {name: 'playToggle'}, // 播放按钮
@@ -404,30 +424,40 @@ export default {
                             {name: 'FullscreenToggle'} // 全屏
                         ]
                     },
-                    sources: [ // 视频源
-                        {
-                            src: _this.toPlayVideo.url,
-                            type: 'video/mp4',
-                        }
-                    ]
+                    sources: []
                 }, function () {
                     _this.player = this;
                 });
             } else {
-                const data = {
-                    src: _this.toPlayVideo.url,
-                    type: 'video/mp4'
-                };
-                this.player.pause();
-                this.player.src(data);
-                this.player.load(data);
-                this.player.play();
+                _this.player.poster("video-loading.jpg")
             }
         },
+        playVideo(videoUrl) {
+            const data = {
+                src: videoUrl,
+                type: 'video/mp4'
+            };
+            this.player.pause();
+            this.player.src(data);
+            this.player.load(data);
+            this.player.play();
+        },
         handleCloseVideo() {
-            if (this.player != null) {
-                this.player.pause();
+            if (this.videoPreviewAbort) {
+                this.videoPreviewAbort();
             }
+            if (this.player != null) {
+                this.player.reset();
+            }
+        },
+        handleClickRootMenu(menu) {
+            this.handleListLenovoDir("/行政自助服务/" + menu.path, "ent")
+        },
+        handleClickTopSearchKey(key) {
+            this.handleSearch(key);
+        },
+        handleGetDocumentImage(mimeType) {
+            return getDocumentImage(mimeType)
         },
         handleCloseImage() {
             this.toPlayImage.url = "";
@@ -737,24 +767,6 @@ export default {
                     this.toCreateAlbum.list = [];
                 }
             });
-        },
-        handleGoToPreview(row) {
-            let previewType = 'pic';    // if video is av
-            if (row.mime_type.startsWith("doc")) {
-                previewType = 'doc'
-            } else if (row.mime_type.startsWith("video")) {
-                previewType = 'av'
-            }
-            let url = genSrcPreviewSrc(row.neid, row.hash, row.rev, previewType, this.userInfo.session);
-            if (row.mime_type.startsWith("video")) {
-                this.handlePlayVideo(url, row.path.substr(row.path.lastIndexOf("/") + 1),);
-            } else if (row.mime_type.startsWith("image")) {
-                //this.handlePlayImage(url, row.path.substr(row.path.lastIndexOf("/") + 1),);
-            } else if (row.mime_type.startsWith("doc")) {
-                window.open(url);
-            } else {
-                this.$message.error("暂不支持的预览类型！")
-            }
         },
         handleDownloadSrc(isList, row) {
             let _this = this;

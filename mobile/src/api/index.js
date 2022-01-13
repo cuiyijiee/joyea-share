@@ -148,9 +148,9 @@ export function createAlbum(name, fileList) {
     })
 }
 
-export function updateAlbum(id,name, fileList) {
+export function updateAlbum(id, name, fileList) {
     return service.post('/api/v1/album/collect/update', {
-        id:id,
+        id: id,
         name: name,
         src: fileList
     }).then(resp => {
@@ -226,4 +226,11 @@ export function moveAlbumMenu(albumId, menuId) {
         albumId: albumId,
         menuId: menuId
     }).then(resp => resp.data);
+}
+
+export function previewFile(neid) {
+    return service.get("api/preview?neid=" + neid)
+        .then(resp => {
+            return resp.data;
+        })
 }
