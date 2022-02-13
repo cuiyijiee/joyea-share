@@ -43,7 +43,12 @@
                                 </span>
                     </el-col>
                     <el-col :span="3" :offset="3">
-                        共{{ dir.tableData.length }}个资源
+                        <span>
+                            共{{ dir.tableData.length }}个资源
+                        </span>
+                        <span>
+                            <el-button size="small" type="primary" @click="handleGetCurRedirectPath">获取短链</el-button>
+                        </span>
                     </el-col>
                 </el-row>
                 <el-row class="contentHead" v-if="userInfo.isAdmin">
@@ -78,7 +83,7 @@
                                      preview="dir_image_list" :preview-text="scope.row.path"
                                      :src="genPreviewUrl(scope.row.neid,scope.row.hash,scope.row.rev,scope.row.mime_type)">
                                 <i v-else-if="scope.row.mime_type.startsWith('doc')" class="el-icon-tickets"></i>
-                                <i v-else-if="scope.row.mime_type.startsWith('word')" class="el-icon-link"></i>
+                                <i v-else-if="scope.row.mime_type.startsWith('word') && userInfo.isAdmin" class="el-icon-link"></i>
                                 <i v-else class="el-icon-question"></i>
                                 <span v-if="scope.row.mime_type && scope.row.mime_type.startsWith('word')"
                                       style="vertical-align:top;color: #333333"> {{
@@ -363,7 +368,8 @@ import api, {
     queryDownload,
     getMyWordList,
     addWordToDir,
-    previewFile
+    previewFile,
+    addRedirectPath
 } from "../../../api";
 import genSrcPreviewSrc, {getVideoPreviewUrl} from "../../../utils"
 import Sortable from 'sortablejs';
@@ -455,6 +461,24 @@ export default {
         })
     },
     methods: {
+        handleGetCurRedirectPath() {
+            let _this = this;
+            let currentFullPath = "";
+            this.dir.currentPath.forEach(tmp => {
+                currentFullPath = currentFullPath + "/" + tmp
+            })
+            addRedirectPath(currentFullPath).then(resp => {
+                let redirectPath = window.location.protocol + "//"
+                    + window.location.host + "/api/redirectPath?id=" + resp.id;
+                var input = document.createElement("input");
+                input.value = redirectPath;
+                document.body.appendChild(input);
+                input.select();
+                input.setSelectionRange(0, input.value.length), document.execCommand('Copy');
+                document.body.removeChild(input);
+                _this.$message.success("获取成功，已复制到剪贴板！");
+            })
+        },
         handleGoToPreview(row) {
             let previewType = 'pic';    // if video is av
             if (row.mime_type.startsWith("video")) {
@@ -1055,7 +1079,15 @@ export default {
 
     },
     mounted() {
-        this.handleListLenovoDir("/营销素材展示", "ent");
+        let redirectPath = window.localStorage.getItem("redirectPath")
+        if (redirectPath) {
+            this.handleListLenovoDir(redirectPath, "ent");
+            setTimeout(() => {
+                window.localStorage.removeItem("redirectPath")
+            }, 5000)
+        } else {
+            this.handleListLenovoDir("/营销素材展示", "ent");
+        }
         let toEditList = this.$route.params.toEditList;
         if (toEditList) {
             this.toCreateAlbum.idEditMode = true;
@@ -1074,7 +1106,7 @@ export default {
         Sortable.create(table, {
             onEnd({newIndex, oldIndex}) {
                 const targetRow = self.toCreateAlbum.list.splice(oldIndex, 1)[0];
-                self.toCreateAlbum.list.splice(newIndex, 0, targetRow)
+                self.toCreateAlbum.list.splice(newIndex, 0, targetRow);
             }
         });
     }

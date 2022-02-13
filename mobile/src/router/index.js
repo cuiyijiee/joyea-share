@@ -19,6 +19,7 @@ import MyUpload from "@/views/upload/MyUpload";
 import ChangePwd from "@/views/ChangePwd";
 import Leaderboard from "../views/Leaderboard";
 import UserBind from "@/views/UserBind"
+import Redirect from "@/views/Redirect";
 
 Vue.use(Router);
 
@@ -156,6 +157,15 @@ export default new Router({
             path: '/user/bind',
             name: '绑定原账号',
             component: UserBind,
+            meta: {
+                allowBack: false,
+                allowHome: false
+            }
+        },
+        {
+            path: '/redirect',
+            name: '跳转',
+            component: Redirect,
             meta: {
                 allowBack: false,
                 allowHome: false

@@ -13,6 +13,14 @@ module.exports = {
                 target: 'http://localhost:8080',
                 changeOrigin: true
             },
+            'api/addRedirectPath': {
+                target: 'http://localhost:8080',
+                changeOrigin: true
+            },
+            'api/redirectPath': {
+                target: 'http://localhost:8080',
+                changeOrigin: true
+            },
             '/': {
                 target: 'http://localhost:8000',
                 changeOrigin: true

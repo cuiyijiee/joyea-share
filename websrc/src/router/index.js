@@ -4,6 +4,7 @@ import Home from '../views/home/index'
 import Login from '../views/login/index'
 
 import Build from '../views/home/build'
+import Redirect from '../views/home/redirect'
 import List from '../views/home/manage/list'
 import Share from '../views/home/share'
 import UploadManage from "../views/home/UploadManage";
@@ -19,6 +20,13 @@ export default new Router({
             name: 'login',
             desc: '登陆',
             component: Login,
+            hidden: true
+        },
+        {
+            path: '/redirect',
+            name: 'redirect',
+            desc: '跳转',
+            component: Redirect,
             hidden: true
         },
         {

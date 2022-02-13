@@ -260,3 +260,11 @@ export function previewFile(neid){
             return resp.data;
         })
 }
+
+
+export function addRedirectPath(path){
+    return service.get("api/addRedirectPath?path=" + path)
+        .then(resp => {
+            return resp.data;
+        })
+}
