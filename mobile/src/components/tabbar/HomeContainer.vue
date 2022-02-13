@@ -172,7 +172,7 @@
                 </van-tab>
             </van-tabs>
         </div>
-        <van-dialog v-model:show="redirectPathVisible" title="获取短链成功！">
+        <van-dialog v-model:show="redirectPathVisible" title="获取短链成功！安卓用户已自动复制到剪切板，IOS用户需手动复制如下链接">
             <div style="margin: 0 auto;padding: 1rem">
                 <textarea rows="3" style="width: 100%;">{{redirectPath}}</textarea>
             </div>
