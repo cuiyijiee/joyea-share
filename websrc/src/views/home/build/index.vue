@@ -83,7 +83,7 @@
                                      preview="dir_image_list" :preview-text="scope.row.path"
                                      :src="genPreviewUrl(scope.row.neid,scope.row.hash,scope.row.rev,scope.row.mime_type)">
                                 <i v-else-if="scope.row.mime_type.startsWith('doc')" class="el-icon-tickets"></i>
-                                <i v-else-if="scope.row.mime_type.startsWith('word') && userInfo.isAdmin" class="el-icon-link"></i>
+                                <i v-else-if="scope.row.mime_type.startsWith('word')" class="el-icon-link"></i>
                                 <i v-else class="el-icon-question"></i>
                                 <span v-if="scope.row.mime_type && scope.row.mime_type.startsWith('word')"
                                       style="vertical-align:top;color: #333333"> {{
@@ -982,7 +982,12 @@ export default {
                         response.data.content.forEach(item => {
                             item.joyeaDesc = "";
                             item.isModify = false;
-                            this.dir.tableData.push(item)
+
+                            if(item.mime_type && item.mime_type === 'word' && !this.userInfo.isAdmin) {
+
+                            }else{
+                                this.dir.tableData.push(item)
+                            }
                         });
                         this.dir.currentPath = [];
                         response.data.path.split('/').forEach(item => {

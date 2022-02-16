@@ -172,9 +172,10 @@
                 </van-tab>
             </van-tabs>
         </div>
-        <van-dialog v-model:show="redirectPathVisible" title="获取短链成功！安卓用户已自动复制到剪切板，IOS用户需手动复制如下链接">
+        <van-dialog v-model:show="redirectPathVisible" title="获取短链成功！" :show-confirm-button="false" :show-cancel-button="false">
             <div style="margin: 0 auto;padding: 1rem">
-                <textarea rows="3" style="width: 100%;">{{redirectPath}}</textarea>
+                <textarea rows="3" style="width: 100%;color: #8c939d;border: solid 0px" id="copyVal">{{redirectPath}}</textarea>
+                <van-button round style="width: 100%;margin-top: 10px" type="primary" @click="copyRedirectText">复制到剪贴板</van-button>
             </div>
         </van-dialog>
     </div>
@@ -240,8 +241,8 @@ export default {
                     name: "友商信息", path: "友商信息", icon: "menu-icon/7.png"
                 }
             ],
-            redirectPath:"",
-            redirectPathVisible:false
+            redirectPath: "",
+            redirectPathVisible: false
         }
     },
     methods: {
@@ -256,9 +257,9 @@ export default {
                     + window.location.host + "/api/redirectPath?id=" + resp.id;
                 _this.redirectPath = redirectPath;
                 _this.redirectPathVisible = true;
-                this.$copyText(redirectPath,function (e) {
-
-                })
+                // this.$copyText(redirectPath,function (e) {
+                //
+                // })
                 // var input = document.createElement("input");
                 // input.value = redirectPath;
                 // document.body.appendChild(input);
@@ -267,6 +268,18 @@ export default {
                 // document.body.removeChild(input);
                 //_this.$dialog({message: "获取成功，已复制到剪贴板！\n\n" + redirectPath});
             })
+        },
+        copyRedirectText() {
+            window.getSelection().removeAllRanges();
+            const dom = document.getElementById('copyVal')
+            dom.select()
+            const copyResult = document.execCommand('copy');
+            this.$notify({
+                message: copyResult ? '复制成功' : '复制失败',
+                type: "success"
+            });
+            window.getSelection().removeAllRanges();
+            this.redirectPathVisible = false;
         },
         handleGetDocumentImage(mimeType) {
             return getDocumentImage(mimeType)
