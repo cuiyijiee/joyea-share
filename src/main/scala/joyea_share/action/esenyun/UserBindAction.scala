@@ -17,20 +17,37 @@ class UserBindAction extends BaseAction[UserBindReq] {
       case Success(nextPlusUserOpt) =>
         if (nextPlusUserOpt.isDefined) {
           if (req.isNew) {
-            JoyeaUser.create(joyeaId = nextPlusUserOpt.get.phone,
-              joyeaName = nextPlusUserOpt.get.name, password = "123456",
-              position = nextPlusUserOpt.get.position,
-              department = nextPlusUserOpt.get.departmentName, ytmId = req.ytmId).onComplete {
-              case Failure(exception) =>
+            JoyeaUser.findByYtmId(req.ytmId).onComplete {
+              case Failure(exception) => {
                 logError(exception, "create new joyea user error")
-              case Success(newJoyeaUser) =>
-                session("user_name") = newJoyeaUser.joyeaName
-                session("user_id") = newJoyeaUser.joyeaId
-                baseResponseSuccess(LoginResp(
-                  userName = newJoyeaUser.joyeaName,
-                  session = DownloadManager.getAdminToken,
-                  isAdmin = newJoyeaUser.isAdmin
-                ))
+              }
+              case Success(value) => {
+                if(value.isEmpty) {
+                  JoyeaUser.create(joyeaId = nextPlusUserOpt.get.phone,
+                    joyeaName = nextPlusUserOpt.get.name, password = "123456",
+                    position = nextPlusUserOpt.get.position,
+                    department = nextPlusUserOpt.get.departmentName, ytmId = req.ytmId).onComplete {
+                    case Failure(exception) =>
+                      logError(exception, "create new joyea user error")
+                    case Success(newJoyeaUser) =>
+                      session("user_name") = newJoyeaUser.joyeaName
+                      session("user_id") = newJoyeaUser.joyeaId
+                      baseResponseSuccess(LoginResp(
+                        userName = newJoyeaUser.joyeaName,
+                        session = DownloadManager.getAdminToken,
+                        isAdmin = newJoyeaUser.isAdmin
+                      ))
+                  }
+                }else{
+                  session("user_name") = value.get.joyeaName
+                  session("user_id") = value.get.joyeaId
+                  baseResponseSuccess(LoginResp(
+                    userName = value.get.joyeaName,
+                    session = DownloadManager.getAdminToken,
+                    isAdmin = value.get.isAdmin
+                  ))
+                }
+              }
             }
           } else {
             JoyeaUser.findByJoyeaId(req.joyeaUserId.get).onComplete(safeResponse[Option[JoyeaUser]](_, maybeUser => {
