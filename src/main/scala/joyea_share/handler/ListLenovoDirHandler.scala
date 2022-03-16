@@ -10,6 +10,7 @@ import joyea_share.util.{CommonListener, LenovoUtil}
 import java.util
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
+import scala.jdk.CollectionConverters.IterableHasAsScala
 
 class ListLenovoDirHandler extends IAction {
   override def execute(request: JsonObject, listener: ExecListener): Unit = {
@@ -22,7 +23,6 @@ class ListLenovoDirHandler extends IAction {
         val tempMap = new util.HashMap[String, JsonObject]()
         if (contentOpt != null) {
           val contentJsonArr = contentOpt.asArray()
-          import scala.collection.JavaConverters._
           val filteredContent = contentJsonArr.asScala.filter(value => {
             val content = value.asObject()
             val path = content.get("path").asString()

@@ -2,7 +2,7 @@ organization := "com.cuje"
 name := "joyea_share"
 version := "1.0-SNAPSHOT"
 
-scalaVersion := "2.12.10"
+scalaVersion := "2.13.8"
 scalacOptions ++= Seq("-deprecation", "-feature", "-unchecked")
 
 // Xitrum requires Java 8
@@ -39,10 +39,9 @@ libraryDependencies += "com.alibaba" % "easyexcel" % "2.2.6"
 
 // Put config directory in classpath for easier development --------------------
 // For "sbt console"
-unmanagedClasspath in Compile += baseDirectory.value / "config"
-
+Compile / unmanagedClasspath += baseDirectory.value / "config"
 // For "sbt fgRun"
-unmanagedClasspath in Runtime += baseDirectory.value / "config"
+Runtime / unmanagedClasspath += baseDirectory.value / "config"
 
 // Copy these to target/xitrum when sbt xitrum-package is run
 XitrumPackage.copy("config", "public", "script")

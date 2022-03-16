@@ -31,7 +31,7 @@ object SrcQuote extends SQLSyntaxSupport[SrcQuote] with ShortenedNames {
 
     lazy val sq: scalikejdbc.QuerySQLSyntaxProvider[scalikejdbc.SQLSyntaxSupport[SrcQuote], SrcQuote] = SrcQuote.syntax("sq")
 
-    override lazy val columns: Seq[String] = autoColumns[SrcQuote]()
+    override lazy val columns: collection.Seq[String] = autoColumns[SrcQuote]()
 
     val ju: scalikejdbc.QuerySQLSyntaxProvider[scalikejdbc.SQLSyntaxSupport[JoyeaUser], JoyeaUser] = JoyeaUser.ju
 

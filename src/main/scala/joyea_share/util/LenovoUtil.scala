@@ -232,7 +232,7 @@ object LenovoUtil extends Log {
 
   //https://console.box.lenovo.com/v2/fileops/auth_upload/databox/
   def preUpload(sessionId: String, file: File): Future[String] = {
-    val promise = Promise[String]
+    val promise = Promise[String]()
     val requestUrl = "https://console.box.lenovo.com/v2/fileops/auth_upload/databox/营销素材展示/素材库上传临时文件夹?path_type=ent&bytes=" + file.length()
     val request = OkHttpUtil.obtainBaseRequest(sessionId).url(requestUrl).get().build()
     OkHttpUtil.okHttpClient.newCall(request).enqueue(new Callback {
@@ -249,7 +249,7 @@ object LenovoUtil extends Log {
 
 
   def uploadFile(sessionId: String, uploadRegion: String, file: File): Future[String] = {
-    val promise = Promise[String]
+    val promise = Promise[String]()
     if (!file.exists()) {
       promise.failure(new FileNotFoundException(s"to upload file ${file.getAbsolutePath} not exist!"))
     }
@@ -352,7 +352,7 @@ object LenovoUtil extends Log {
   }
 
   def renameFile(fileNeid: String, fileName: String, session: String): Future[Boolean] = {
-    val promise = Promise[Boolean]
+    val promise = Promise[Boolean]()
     val infoJson = new JsonObject()
     infoJson.add("fileName", fileName)
     infoJson.add("op_info", new JsonObject().add("neid", fileNeid))

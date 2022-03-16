@@ -6,6 +6,7 @@ import okhttp3._
 
 import java.util
 import scala.concurrent.{Future, Promise}
+import scala.jdk.CollectionConverters.ListHasAsScala
 
 object HttpUtil {
 
@@ -25,7 +26,7 @@ object HttpUtil {
            requestUrl: String,
            requestParams: Map[String, Any],
          ): Future[String] = {
-    val promise = Promise[String]
+    val promise = Promise[String]()
 
     val urlBuilder = HttpUrl.parse(requestUrl).newBuilder()
     requestParams.foreach(entry => {
@@ -48,7 +49,7 @@ object HttpUtil {
                 requestUrl: String,
                 postForm: Map[String, Any]
               ): Future[String] = {
-    val promise = Promise[String]
+    val promise = Promise[String]()
     val urlBuilder = HttpUrl.parse(requestUrl).newBuilder().build()
     val requestBody = new FormBody.Builder()
     postForm.foreach(entry => {
@@ -64,7 +65,7 @@ object HttpUtil {
                 postJsonObj: String,
                 headerMap: Map[String, String] = Map()
               ): Future[String] = {
-    val promise = Promise[String]
+    val promise = Promise[String]()
     val urlBuilder = HttpUrl.parse(requestUrl).newBuilder().build()
     val requestBody = RequestBody.create(postJsonObj, JSON)
     val requestBuilder = baseRequestBuilder().url(urlBuilder).post(requestBody)
@@ -90,8 +91,6 @@ object HttpUtil {
 
 class PersistenceCookieJar extends CookieJar {
   val cache = new util.ArrayList[Cookie]()
-
-  import scala.collection.JavaConverters._
 
   override def loadForRequest(httpUrl: HttpUrl): util.List[Cookie] = {
     //过期的Cookie

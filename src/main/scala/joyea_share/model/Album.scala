@@ -35,7 +35,7 @@ case class Album(
                   menuId: Option[Long],
 
                   menu: Option[AlbumMenu] = None,
-                  src: Seq[AlbumSrc] = Seq()
+                  src: collection.Seq[AlbumSrc] = collection.Seq()
                 ) extends ShortenedNames {
 
     def save(): Future[Album] = Album.save(this)
@@ -76,7 +76,7 @@ object Album extends SQLSyntaxSupport[Album] with ShortenedNames {
 
     lazy val am: scalikejdbc.QuerySQLSyntaxProvider[scalikejdbc.SQLSyntaxSupport[AlbumMenu], AlbumMenu] = AlbumMenu.am
 
-    override lazy val columns: Seq[String] = autoColumns[Album]("menu", "src")
+    override lazy val columns: collection.Seq[String] = autoColumns[Album]("menu", "src")
 
     def apply(a: SyntaxProvider[Album])(rs: WrappedResultSet): Album = apply(a.resultName)(rs)
 

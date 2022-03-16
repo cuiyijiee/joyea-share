@@ -23,7 +23,7 @@ object AlbumQuote extends SQLSyntaxSupport[AlbumQuote] with ShortenedNames {
 
     lazy val aq: scalikejdbc.QuerySQLSyntaxProvider[scalikejdbc.SQLSyntaxSupport[AlbumQuote], AlbumQuote] = AlbumQuote.syntax("aq")
 
-    override lazy val columns: Seq[String] = autoColumns[AlbumQuote]()
+    override lazy val columns: collection.Seq[String] = autoColumns[AlbumQuote]()
 
     val ju: scalikejdbc.QuerySQLSyntaxProvider[scalikejdbc.SQLSyntaxSupport[JoyeaUser], JoyeaUser] = JoyeaUser.ju
 

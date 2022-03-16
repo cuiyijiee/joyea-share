@@ -20,7 +20,7 @@ object AlbumMenu extends SQLSyntaxSupport[AlbumMenu] with ShortenedNames {
 
     lazy val am: scalikejdbc.QuerySQLSyntaxProvider[scalikejdbc.SQLSyntaxSupport[AlbumMenu], AlbumMenu] = AlbumMenu.syntax("am")
 
-    override lazy val columns: Seq[String] = autoColumns[AlbumMenu]()
+    override lazy val columns: collection.Seq[String] = autoColumns[AlbumMenu]()
 
     def apply(a: SyntaxProvider[AlbumMenu])(rs: WrappedResultSet): AlbumMenu = apply(a.resultName)(rs)
 

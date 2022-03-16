@@ -32,7 +32,7 @@ object DownloadRecord extends SQLSyntaxSupport[DownloadRecord] with ShortenedNam
 
     lazy val ju: scalikejdbc.QuerySQLSyntaxProvider[scalikejdbc.SQLSyntaxSupport[JoyeaUser], JoyeaUser] = JoyeaUser.ju
 
-    override lazy val columns: Seq[String] = autoColumns[DownloadRecord]("index", "rev", "pathType")
+    override lazy val columns: collection.Seq[String] = autoColumns[DownloadRecord]("index", "rev", "pathType")
 
     def apply(sc: SyntaxProvider[DownloadRecord])(rs: WrappedResultSet): DownloadRecord = apply(sc.resultName)(rs)
 
@@ -51,7 +51,7 @@ object DownloadRecord extends SQLSyntaxSupport[DownloadRecord] with ShortenedNam
                 column.fileName -> fileName,
                 column.createdAt -> createdAt,
             )
-        }.updateAndReturnGeneratedKey.future()
+        }.updateAndReturnGeneratedKey().future()
     }
 
     def getTodayDownload(joyeaUserId: String)

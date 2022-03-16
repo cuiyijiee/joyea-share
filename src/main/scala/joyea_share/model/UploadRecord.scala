@@ -43,7 +43,7 @@ object UploadRecord extends SQLSyntaxSupport[UploadRecord] with ShortenedNames {
 
     lazy val ur: scalikejdbc.QuerySQLSyntaxProvider[scalikejdbc.SQLSyntaxSupport[UploadRecord], UploadRecord] = UploadRecord.syntax("ur")
 
-    override lazy val columns: Seq[String] = autoColumns[UploadRecord]("uploaderName")
+    override lazy val columns: collection.Seq[String] = autoColumns[UploadRecord]("uploaderName")
 
     val ju = JoyeaUser.ju
 

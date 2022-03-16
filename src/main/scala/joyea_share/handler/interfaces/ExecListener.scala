@@ -3,11 +3,11 @@ package joyea_share.handler.interfaces
 import com.json.JsonObject
 
 /**
-  * Created by ivy on 2019-04-02
-  */
+ * Created by ivy on 2019-04-02
+ */
 trait ExecListener {
 
-  def onSuccess(respJson: JsonObject)
+  def onSuccess(respJson: JsonObject): Unit
 
-  def onError(error: String)
+  def onError(error: String): Unit
 }

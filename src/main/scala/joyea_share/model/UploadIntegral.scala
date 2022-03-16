@@ -32,7 +32,7 @@ object UploadIntegral extends SQLSyntaxSupport[UploadIntegral] with ShortenedNam
 
     lazy val ui: scalikejdbc.QuerySQLSyntaxProvider[scalikejdbc.SQLSyntaxSupport[UploadIntegral], UploadIntegral] = UploadIntegral.syntax("ui")
 
-    override lazy val columns: Seq[String] = autoColumns[UploadIntegral]()
+    override lazy val columns: collection.Seq[String] = autoColumns[UploadIntegral]()
 
     val ju: scalikejdbc.QuerySQLSyntaxProvider[scalikejdbc.SQLSyntaxSupport[JoyeaUser], JoyeaUser] = JoyeaUser.ju
 

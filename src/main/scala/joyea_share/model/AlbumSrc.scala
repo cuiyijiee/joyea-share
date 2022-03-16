@@ -43,7 +43,7 @@ object AlbumSrc extends SQLSyntaxSupport[AlbumSrc] with ShortenedNames {
 
     lazy val as: scalikejdbc.QuerySQLSyntaxProvider[scalikejdbc.SQLSyntaxSupport[AlbumSrc], AlbumSrc] = AlbumSrc.syntax("_as")
 
-    override lazy val columns: Seq[String] = autoColumns[AlbumSrc]()
+    override lazy val columns: collection.Seq[String] = autoColumns[AlbumSrc]()
 
     def apply(as: SyntaxProvider[AlbumSrc])(rs: WrappedResultSet): AlbumSrc = apply(as.resultName)(rs)
 
