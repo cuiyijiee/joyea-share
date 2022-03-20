@@ -122,6 +122,13 @@
                                                    @click.stop="handleAdd(scope.$index, scope.row)"
                                                    icon="el-icon-plus"/>
                             </span>
+                            <span>
+                                        <el-button circle type=""
+                                                   v-if="userInfo.isAdmin && !scope.row.is_dir && (scope.row.mime_type && scope.row.mime_type.startsWith('video'))"
+                                                   @click.stop="handleAddTranscodeVideo(scope.$index, scope.row)"
+                                                   icon="el-icon-link">
+                                        </el-button>
+                            </span>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -369,7 +376,7 @@ import api, {
     getMyWordList,
     addWordToDir,
     previewFile,
-    addRedirectPath
+    addRedirectPath, addTranscodeVideo
 } from "../../../api";
 import genSrcPreviewSrc, {getVideoPreviewUrl} from "../../../utils"
 import Sortable from 'sortablejs';
@@ -744,6 +751,15 @@ export default {
                 })
             }
         },
+        handleAddTranscodeVideo(index, row) {
+            addTranscodeVideo(row.neid).then(resp => {
+                if (resp.code === "0") {
+                    this.$message.success("添加成功！")
+                } else {
+                    this.$message.error("添加失败：" + resp.msg);
+                }
+            })
+        },
         handleAdd(index, row) {
             let isIn = false;
             this.toCreateAlbum.list.forEach(item => {
@@ -983,9 +999,9 @@ export default {
                             item.joyeaDesc = "";
                             item.isModify = false;
 
-                            if(item.mime_type && item.mime_type === 'word' && !this.userInfo.isAdmin) {
+                            if (item.mime_type && item.mime_type === 'word' && !this.userInfo.isAdmin) {
 
-                            }else{
+                            } else {
                                 this.dir.tableData.push(item)
                             }
                         });

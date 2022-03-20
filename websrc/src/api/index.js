@@ -136,15 +136,42 @@ export function addWordToDir(neid, wordList) {
 }
 
 export function previewFile(neid){
-    return service.get("api/preview?neid=" + neid)
+    return service.get("apiv2/preview?neid=" + neid)
         .then(resp => {
             return resp.data;
         })
 }
 
 export function addRedirectPath(path){
-    return service.get("api/addRedirectPath?path=" + path)
+    return service.get("apiv2/addRedirectPath?path=" + path)
         .then(resp => {
             return resp.data;
         })
 }
+
+export function addTranscodeVideo(neid) {
+    return service.post("apiv2/transcode/insert", {
+        neid:neid
+    }).then(resp => {
+        return resp.data;
+    })
+}
+
+export function deleteTranscodeVideo(id) {
+    return service.post("apiv2/transcode/delete", {
+        id:id
+    }).then(resp => {
+        return resp.data;
+    })
+}
+
+export function listTranscodeVideo(fileName,pageNum,pageSize) {
+    return service.post("apiv2/transcode/list", {
+        fileName:fileName,
+        pageNum:pageNum,
+        pageSize:pageSize,
+    }).then(resp => {
+        return resp.data;
+    })
+}
+

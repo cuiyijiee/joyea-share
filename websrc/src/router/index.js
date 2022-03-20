@@ -9,6 +9,7 @@ import List from '../views/home/manage/list'
 import Share from '../views/home/share'
 import UploadManage from "../views/home/UploadManage";
 import UploadIndex from "../views/home/upload/index";
+import Transcode from  "../views/home/tanscode";
 
 Vue.use(Router);
 
@@ -78,6 +79,16 @@ export default new Router({
                 {path: '/upload/index', component: UploadIndex, name: 'uploadIndex', desc: '素材上传'},
             ]
         },
+        {
+            path: '/',
+            name: '转码视频管理',
+            component: Home,
+            icon: 'el-icon-paperclip',
+            noChild: true,
+            children: [
+                {path: '/transcode/index', component: Transcode, name: 'transcode', desc: '转码视频管理'},
+            ]
+        }
         // {
         //     path: '/',
         //     name: '我的收藏',

@@ -2,7 +2,7 @@
     <div>
         <el-row class="container">
             <el-col :span="24" class="header">
-                <el-col :span="12">
+                <el-col :span="9">
                     <div class="main_content" @click="jumpToBuild">
                         <img src="logo.gif"
                              style="height: 30px;vertical-align: middle"/>
@@ -10,7 +10,7 @@
                     </div>
                 </el-col>
 
-                <el-col :span="12" class="userinfo">
+                <el-col :span="15" class="userinfo">
                     <el-button size="small" icon="el-icon-edit" @click="jumpToBuild"
                                :class="{'is-active':currentPath==='/build'}"> 工作台
                     </el-button>
@@ -26,6 +26,11 @@
                                v-if="userInfo.isAdmin"
                                :class="{'is-active':currentPath==='/upload/manage'}"
                                style="margin-left:0;margin-right: 10px">素材审核
+                    </el-button>
+                    <el-button size="small" icon="el-icon-tickets" @click="jumpToTranscode"
+                               v-if="userInfo.isAdmin"
+                               :class="{'is-active':currentPath==='/transcode/index'}"
+                               style="margin-left:0;margin-right: 10px">转码素材管理
                     </el-button>
                     <el-popover
                         style="margin-right: 20px"
@@ -127,6 +132,9 @@ export default {
         },
         jumpToUploadManage() {
             this.$router.replace("/upload/manage");
+        },
+        jumpToTranscode(){
+            this.$router.replace("/transcode/index");
         },
         handleOpen() {
         },

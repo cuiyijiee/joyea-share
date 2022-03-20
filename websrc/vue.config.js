@@ -9,20 +9,12 @@ module.exports = {
     productionSourceMap: false,
     devServer: {
         proxy: {
-            'api/preview': {
-                target: 'http://localhost:8080',
-                changeOrigin: true
-            },
-            'api/addRedirectPath': {
-                target: 'http://localhost:8080',
-                changeOrigin: true
-            },
-            'api/redirectPath': {
-                target: 'http://localhost:8080',
+            'apiv2/': {
+                target: 'http://192.168.1.38:8081',
                 changeOrigin: true
             },
             '/': {
-                target: 'http://localhost:8000',
+                target: 'http://sck.joyea.cn:8000',
                 changeOrigin: true
             }
         }
