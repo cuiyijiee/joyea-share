@@ -4,8 +4,12 @@ target
 /download
 /upload
 project/target
-websrc/dist
-mobile/dist
 tmp
 .DS_Store
 /video-transcoding
+websrc/dist
+websrc/package-lock.json
+websrc/yarn.lock
+mobile/dist
+mobile/package-lock.json
+mobile/yarn.lock

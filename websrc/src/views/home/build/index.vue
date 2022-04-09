@@ -5,7 +5,7 @@
             <el-input placeholder="请输入关键字" v-model="search.key" class="my-input"
                       @keyup.enter.native="handleSearch">
                 <el-button slot="append" icon="el-icon-search"
-                           style="border-radius: 100px;margin: 0px -20px !important;" v-on:click="handleSearch"
+                           style="margin: 0px -20px !important;" v-on:click="handleSearch"
                            class="search-button"/>
             </el-input>
             <div style="padding:15px 0;color: #ffffff">热门搜索:
@@ -1214,17 +1214,6 @@ export default {
 .search-button {
     background: #eb7708 !important;
     color: #ffffff !important;
-}
-
-/deep/ .el-input-group__append {
-    background: #ffffff;
-    border-bottom-right-radius: 100px !important;
-    border-top-right-radius: 100px !important;
-}
-
-/deep/ .search-button--default {
-    border-bottom-right-radius: 100px !important;
-    border-top-right-radius: 100px !important;
 }
 
 .el-icon-folder-opened {
