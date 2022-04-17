@@ -92,7 +92,7 @@
 </template>
 
 <script>
-import api, {check, getTodayDownload, logout} from "../../api/index";
+import {check, getTodayDownload, logout} from "../../api/index";
 import getNowFormatDate from "../../utils/time"
 
 const localStorage = window.localStorage;

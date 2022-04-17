@@ -95,7 +95,7 @@
                                     }}</span>
                                 <div v-if="scope.row.tags">
                                     <el-tag style="margin-right: 2px" v-for="tag in scope.row.tags" type="info"
-                                            size="mini">{{ tag.replace(markReg, "") }}
+                                            size="mini">{{ tag.name.replace(markReg, "") }}
                                     </el-tag>
                                 </div>
                             </div>
@@ -268,9 +268,8 @@
                                    class="el-icon-tickets"></i>
                                 <i v-else class="el-icon-question"></i>
                                 {{ scope.row.path.substr(scope.row.path.lastIndexOf("/") + 1) }}</h4>
-                            <!--                                    {{scope.row.path}}-->
                             <div v-if="scope.row.tags">
-                                <el-tag style="margin-right: 2px" v-for="tag in scope.row.tags" type="info"
+                                <el-tag style="margin-right: 2px" v-for="tag in scope.row.tags.split(' ')" type="info"
                                         size="mini">{{ tag.replace(markReg, "") }}
                                 </el-tag>
                             </div>
@@ -370,13 +369,13 @@
 
 <script>
 import api, {
-    getTopSearchKey,
-    prepareDownloadFile,
-    queryDownload,
-    getMyWordList,
-    addWordToDir,
-    previewFile,
-    addRedirectPath, addTranscodeVideo
+  getTopSearchKey,
+  prepareDownloadFile,
+  queryDownload,
+  getMyWordList,
+  addWordToDir,
+  previewFile,
+  addRedirectPath, addTranscodeVideo, getFileMetadata, ftsSearch
 } from "../../../api";
 import genSrcPreviewSrc, {getVideoPreviewUrl} from "../../../utils"
 import Sortable from 'sortablejs';
@@ -646,108 +645,100 @@ export default {
             })
         },
         handleSearch(searchKey) {
-            let _this = this;
-            if (searchKey !== undefined && typeof (searchKey) == 'string') {
-                _this.search.key = searchKey;
-            }
-            if (_this.search.key.trim().length === 0) {
-                _this.$message.warning("请输入搜索的关键字！")
-            } else {
-                if (_this.searchTabName === 'list') {
-                    _this.loading.searchList = true;
-                    api({
-                        action: "searchList",
-                        searchKey: _searchKey
-                    }).then(response => {
-                        _this.loading.searchList = false;
-                        if (response.result) {
-                            _this.searchListResult = [];
-                            if (response.list.length === 0) {
-                                _this.$message.error("没有搜索到与【" + _this.search.key + "】有关的清单！")
-                            } else {
-                                response.list.forEach(list => {
-                                    _this.searchListResult.push(list)
-                                })
-                            }
+          let _this = this;
+          if (searchKey !== undefined && typeof (searchKey) == 'string') {
+            _this.search.key = searchKey;
+          }
+          if (_this.search.key.trim().length === 0) {
+            _this.$message.warning("请输入搜索的关键字！")
+          } else {
+            if (_this.searchTabName === 'list') {
+              _this.loading.searchList = true;
+              api({
+                action: "searchList",
+                searchKey: _searchKey
+              }).then(response => {
+                _this.loading.searchList = false;
+                if (response.result) {
+                  _this.searchListResult = [];
+                  if (response.list.length === 0) {
+                    _this.$message.error("没有搜索到与【" + _this.search.key + "】有关的清单！")
+                  } else {
+                    response.list.forEach(list => {
+                      _this.searchListResult.push(list)
+                    })
+                  }
 
-                        } else {
-                            _this.$notify.error({
-                                title: '搜索出错',
-                                message: '搜索过程出现错误：' + response.msg
-                            });
-                            console.log(response.msg)
-                        }
-                    });
-                    _this.searchTabName = "list";
                 } else {
-                    _this.loading.search = true;
-                    api({
-                        action: 'search',
-                        searchKey: _this.search.key,
-                        offset: 0
-                    }).then(response => {
-                        if (response.result) {
-                            _this.search.hasNext = response["has_more"];
-                            if (_this.search.hasNext) {
-                                _this.loadMoreForm.key = _this.search.key;
-                                _this.loadMoreForm.nextOffset = response["next_offset"];
-                            }
-                            _this.searchResult = [];
-                            if (response.content.length === 0) {
-                                _this.$message.error("没有搜索到与【" + _this.search.key + "】有关的文件或文件夹！")
-                            } else {
-                                _this.visible.searchDialogVisible = true;
-                                response.content.forEach(item => {
-                                    item.joyeaDesc = "";
-                                    item.isModify = false;
-                                    _this.searchResult.push(item)
-                                })
-                            }
-                        } else {
-                            _this.$notify.error({
-                                title: '搜索出错',
-                                message: '搜索过程出现错误：' + response.msg
-                            });
-                            console.log(response.msg)
-                        }
-                    }).finally(() => {
-                        _this.loading.search = false
-                    });
-                    _this.searchTabName = "pan";
+                  _this.$notify.error({
+                    title: '搜索出错',
+                    message: '搜索过程出现错误：' + response.msg
+                  });
+                  console.log(response.msg)
                 }
+              });
+              _this.searchTabName = "list";
+            } else {
+              _this.loading.search = true;
+
+              ftsSearch(_this.search.key,0).then(response => {
+                if (response.code === "0") {
+                  _this.search.hasNext = response.obj["has_more"];
+                  if (_this.search.hasNext) {
+                    _this.loadMoreForm.key = _this.search.key;
+                    _this.loadMoreForm.nextOffset = response.obj["next_offset"];
+                  }
+                  _this.searchResult = [];
+                  if (response.obj.content.length === 0) {
+                    _this.$message.error("没有搜索到与【" + _this.search.key + "】有关的文件或文件夹！")
+                  } else {
+                    _this.visible.searchDialogVisible = true;
+                    response.obj.content.forEach(item => {
+                      item.joyeaDesc = "";
+                      item.isModify = false;
+                      _this.searchResult.push(item)
+                    })
+                  }
+                } else {
+                  _this.$notify.error({
+                    title: '搜索出错',
+                    message: '搜索过程出现错误：' + response.msg
+                  });
+                  console.log(response.msg)
+                }
+              }).finally(() => {
+                _this.loading.search = false
+              });
+              _this.searchTabName = "pan";
             }
+          }
         },
         handleLoadMore() {
             let _this = this;
             if (_this.loadMoreForm.key.trim().length !== 0) {
                 _this.loading.searchMore = true;
-                api({
-                    action: 'search',
-                    searchKey: _this.loadMoreForm.key,
-                    searchType: _this.loadMoreForm.type,
-                    offset: _this.loadMoreForm.nextOffset
-                }).then(response => {
-                    if (response.result) {
-                        _this.search.hasNext = response["has_more"];
-                        if (_this.search.hasNext) {
-                            _this.loadMoreForm.key = _this.search.key;
-                            _this.loadMoreForm.nextOffset = response["next_offset"];
-                        }
-                        //_this.searchResult = [];
-                        response.content.forEach(item => {
-                            item.joyeaDesc = "";
-                            item.isModify = false;
-                            _this.searchResult.push(item)
-                        })
-                    } else {
-                        _this.$notify.error({
-                            title: '搜索出错',
-                            message: '搜索过程出现错误：' + response.msg
-                        });
-                        console.log(response.msg)
+                ftsSearch(_this.loadMoreForm.key,this.loadMoreForm.nextOffset).then(response => {
+                  if (response.code === "0") {
+                    _this.search.hasNext = response.obj["has_more"];
+                    if (_this.search.hasNext) {
+                      _this.loadMoreForm.key = _this.search.key;
+                      _this.loadMoreForm.nextOffset = response.obj["next_offset"];
                     }
+                    //_this.searchResult = [];
+                    response.obj.content.forEach(item => {
+                      item.joyeaDesc = "";
+                      item.isModify = false;
+                      _this.searchResult.push(item)
+                    })
+                  } else {
+                    _this.$notify.error({
+                      title: '搜索出错',
+                      message: '搜索过程出现错误：' + response.msg
+                    });
+                    console.log(response.msg)
+                  }
                 }).finally(() => {
-                    _this.loading.searchMore = false
+                  _this.loading.searchMore = false
                 })
             }
         },
@@ -984,45 +975,40 @@ export default {
         },
         handleListLenovoDir(path, pathType) {
             this.dir.loadingDir = true;
-            api({
-                action: 'listLenovoDir',
-                path: path.replace("+", "%2B"),
-                path_type: pathType === undefined ? 'ent' : pathType
-            }).then(response => {
-                if (response.result) {
-                    this.curDirNeid = response.data.neid;
-                    console.log("current dir neid:" + this.curDirNeid);
-                    this.dir.tableData = [];
-                    this.wordListSelected = [];
-                    if (response.data.content) {
-                        response.data.content.forEach(item => {
-                            item.joyeaDesc = "";
-                            item.isModify = false;
+            getFileMetadata(path.replace("+", "%2B")).then(response => {
+              if (response.code === "0") {
+                this.curDirNeid = response.obj.neid;
+                console.log("current dir neid:" + this.curDirNeid);
+                this.dir.tableData = [];
+                this.wordListSelected = [];
+                if (response.obj.content) {
+                  response.obj.content.forEach(item => {
+                    item.joyeaDesc = "";
+                    item.isModify = false;
+                    if (item.mime_type && item.mime_type === 'word' && !this.userInfo.isAdmin) {
 
-                            if (item.mime_type && item.mime_type === 'word' && !this.userInfo.isAdmin) {
-
-                            } else {
-                                this.dir.tableData.push(item)
-                            }
-                        });
-                        this.dir.currentPath = [];
-                        response.data.path.split('/').forEach(item => {
-                            if (item.length !== 0) {
-                                this.dir.currentPath.push(item)
-                            }
-                        });
+                    } else {
+                      this.dir.tableData.push(item)
                     }
-                } else {
-                    this.$notify.error({
-                        title: '提示',
-                        message: '文件夹列表获取失败'
-                    });
-                    console.log('文件夹列表获取失败' + response.msg)
+                  });
+                  this.dir.currentPath = [];
+                  response.obj.path.split('/').forEach(item => {
+                    if (item.length !== 0) {
+                      this.dir.currentPath.push(item)
+                    }
+                  });
                 }
-                this.dir.loadingDir = false;
+              } else {
+                this.$notify.error({
+                  title: '提示',
+                  message: '文件夹列表获取失败'
+                });
+                console.log('文件夹列表获取失败' + response.msg)
+              }
+              this.dir.loadingDir = false;
             }).finally(() => {
-                //2021.11.20-侍-要求点开文件夹回到顶部！
-                document.getElementById("build").scrollTop = 0;
+              //2021.11.20-侍-要求点开文件夹回到顶部！
+              document.getElementById("build").scrollTop = 0;
             });
         },
         handleClickDirItem(row, column, event) {

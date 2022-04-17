@@ -3,12 +3,13 @@ package org.cuje.lib.net
 import java.io.IOException
 import java.net.{InetSocketAddress, Proxy}
 import okhttp3._
+import xitrum.Log
 
 import java.util
 import scala.concurrent.{Future, Promise}
 import scala.jdk.CollectionConverters.ListHasAsScala
 
-object HttpUtil {
+object HttpUtil extends Log{
 
   val okhttpClient: OkHttpClient = new OkHttpClient.Builder()
 
@@ -35,6 +36,7 @@ object HttpUtil {
     val request = baseRequestBuilder()
       .url(urlBuilder.build())
       .build()
+    log.info("gen fts request: " + request.toString)
     okhttpClient.newCall(request).enqueue(generateCallback(promise))
     promise.future
   }

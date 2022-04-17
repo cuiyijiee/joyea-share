@@ -175,3 +175,19 @@ export function listTranscodeVideo(fileName,pageNum,pageSize) {
     })
 }
 
+export function getFileMetadata(path) {
+    return service.post("apiv2/lenovo/fileMetadata", {
+        path:path
+    }).then(resp => {
+        return resp.data;
+    })
+}
+
+export function ftsSearch(searchKey,offset) {
+    return service.post("apiv2/lenovo/ftsSearch", {
+        searchKey:searchKey,
+        offset:offset
+    }).then(resp => {
+        return resp.data;
+    })
+}

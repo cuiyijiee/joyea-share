@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import api from "@/api";
+import api, {getFileMetadata} from "@/api";
 import {genFileName, filterDirList} from "../utils/JoyeaUtil";
 
 export default {
@@ -72,24 +72,19 @@ export default {
     },
     handleListLenovoDir(path, pathType) {
       this.dir.loadingDir = true;
-      api({
-        action: 'listLenovoDir',
-        path: path.replace("+", "%2B"),
-        path_type: pathType === undefined ? 'ent' : pathType
-      }).then(response => {
-        //toast.clear();
-        if (response.result) {
+      getFileMetadata(path.replace("+", "%2B")).then(response => {
+        if (response.code === "0") {
           this.currentTypeActive = 0;
           this.dir.tableData = [];
-          if (response.data.content) {
-            response.data.content.forEach(item => {
+          if (response.obj.content) {
+            response.obj.content.forEach(item => {
               item.joyeaDesc = "";
               item.isModify = false;
               this.dir.tableData.push(item)
             });
             this.dir.currentPath = [];
-            this.dir.currentPathNeid = response.data.neid;
-            response.data.path.split('/').forEach(item => {
+            this.dir.currentPathNeid = response.obj.neid;
+            response.obj.path.split('/').forEach(item => {
               if (item.length !== 0) {
                 this.dir.currentPath.push(item);
               }
@@ -99,7 +94,7 @@ export default {
           console.log('文件夹列表获取失败' + response.msg)
         }
         this.dir.loadingDir = false;
-      });
+      })
     },
     handleDialogOpened(){
       this.handleListLenovoDir("/营销素材展示", "ent");
