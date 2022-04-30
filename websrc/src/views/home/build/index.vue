@@ -1,4 +1,5 @@
 <template>
+
     <section id="build">
         <!--工具条-->
         <div style="padding: 10px 150px 0 150px;background: #1e162f;">
@@ -13,12 +14,20 @@
                       @click="handleClickTopSearchKey(key)"><u>{{ key }}</u></span>
             </div>
         </div>
+        <el-button style="position: absolute" icon="el-icon-menu" @click="menuDrawerVisible = !menuDrawerVisible">目录
+        </el-button>
+        <el-drawer title="目录菜单" :visible.sync="menuDrawerVisible" direction="ltr"
+                   custom-class="demo-drawer" ref="drawer">
+            <div class="demo-drawer__content">
+                <LenovoDirDrawer>
+                </LenovoDirDrawer>
+            </div>
+        </el-drawer>
         <div v-if="dir.currentPath.length === 1 && dir.currentPath[0] === '营销素材展示' && toCreateAlbum.list.length === 0"
              style="height:1080px;padding: 0 150px;background: #d1d1d1;">
             <div style="padding: 10px 10px 0 10px;height: 100%; "
                  v-loading="dir.loadingDir || loading.search"
-                 element-loading-background="rgba(209, 209, 209)"
-            >
+                 element-loading-background="rgba(209, 209, 209)">
                 <el-row :gutter="10" justify="center" align="middle">
                     <el-col :xs="24" :sm="12" :md="6" :lg="6" :xl="6" v-for="menu in menuPath">
                         <div class="menu-content" style="border: #000000 3px" @click="handleClickRootMenu(menu)">
@@ -28,7 +37,7 @@
                 </el-row>
             </div>
         </div>
-        <el-row v-else :gutter="20" style="padding: 10px 150px 0 150px;height:1080px;">
+        <el-row v-else :gutter="20" style="margin:0 150px;padding: 10px 0 0 0;height:1080px;">
             <el-col :span="18" class="bg-purple">
                 <!--文件路径显示-->
                 <el-row class="contentHead">
@@ -38,8 +47,9 @@
                         <span style="display: inline" v-for="(item,index) in dir.currentPath"
                               v-if="item !== '营销素材展示'">
                                     /
-                                    <span style=" color:#000000;font-size: 15px;cursor:pointer;"
-                                          @click="handleClickDirPath(item,index)">{{ item }}</span>
+                                    <span
+                                        style=" color:#000000;font-size: 15px;cursor:pointer;"
+                                        @click="handleClickDirPath(item,index)">{{ item }}</span>
                                 </span>
                     </el-col>
                     <el-col :span="3" :offset="3">
@@ -62,37 +72,25 @@
                         </el-button>
                     </el-col>
                 </el-row>
-                <el-table ref="fileTable"
-                          v-loading="dir.loadingDir || loading.search"
-                          :data="dir.tableData"
-                          tooltip-effect="dark"
-                          empty-text="文件夹为空"
-                          @row-click="handleClickDirItem"
-                          style="width: 100%;">
-                    <el-table-column
-                        show-overflow-tooltip
-                        label="文件名">
+                <el-table ref="fileTable" v-loading="dir.loadingDir || loading.search" :data="dir.tableData"
+                          tooltip-effect="dark" empty-text="文件夹为空" @row-click="handleClickDirItem" style="width: 100%;">
+                    <el-table-column show-overflow-tooltip label="文件名">
                         <template slot-scope="scope">
                             <div style="">
                                 <i v-if="scope.row.is_dir" class="el-icon-folder-opened"></i>
-                                <i v-else-if="scope.row.mime_type.startsWith('video')"
-                                   class="el-icon-video-camera"></i>
+                                <i v-else-if="scope.row.mime_type.startsWith('video')" class="el-icon-video-camera"></i>
                                 <img v-else-if="scope.row.mime_type.startsWith('image')"
                                      style="width: 60px;height: 60px;line-height: 30px"
-                                     :onerror="defaultImg"
-                                     preview="dir_image_list" :preview-text="scope.row.path"
+                                     :onerror="defaultImg" preview="dir_image_list" :preview-text="scope.row.path"
                                      :src="genPreviewUrl(scope.row.neid,scope.row.hash,scope.row.rev,scope.row.mime_type)">
                                 <i v-else-if="scope.row.mime_type.startsWith('doc')" class="el-icon-tickets"></i>
                                 <i v-else-if="scope.row.mime_type.startsWith('word')" class="el-icon-link"></i>
                                 <i v-else class="el-icon-question"></i>
                                 <span v-if="scope.row.mime_type && scope.row.mime_type.startsWith('word')"
-                                      style="vertical-align:top;color: #333333"> {{
-                                        ' ' + scope.row.path
-                                    }}</span>
-                                <span v-else
-                                      style="vertical-align:top;color: #333333">{{
-                                        ' ' + scope.row.path.substr(scope.row.path.lastIndexOf('/') + 1)
-                                    }}</span>
+                                      style="vertical-align:top;color: #333333">
+                                    {{ ' ' + scope.row.path }}</span>
+                                <span v-else style="vertical-align:top;color: #333333">
+                                    {{ ' ' + scope.row.path.substr(scope.row.path.lastIndexOf('/') + 1) }}</span>
                                 <div v-if="scope.row.tags">
                                     <el-tag style="margin-right: 2px" v-for="tag in scope.row.tags" type="info"
                                             size="mini">{{ tag.name.replace(markReg, "") }}
@@ -111,9 +109,7 @@
                             <span>{{ scope.row.is_dir ? '-' : scope.row.download_num }}</span>
                         </template>
                     </el-table-column>
-                    <el-table-column
-                        label="操作"
-                        width="180">
+                    <el-table-column label="操作" width="180">
                         <template slot-scope="scope">
                             <span
                                 v-if="scope.row.is_dir|| (scope.row.mime_type && scope.row.mime_type.startsWith('word'))">-</span>
@@ -316,45 +312,26 @@
                     <el-input placeholder="请输入关键字" style="width: auto" v-model="wordListSearchText">
                     </el-input>
                     <el-button icon="el-icon-search" @click="handleGetMyWordList"></el-button>
-                    <el-table
-                        v-loading="wordListLoading"
-                        :data="wordListOption"
-                        style="width: 100%">
-                        <el-table-column
-                            prop="title"
-                            label="待选小白板">
+                    <el-table v-loading="wordListLoading" :data="wordListOption" style="width: 100%">
+                        <el-table-column prop="title" label="待选小白板">
                         </el-table-column>
-                        <el-table-column
-                            fixed="right"
-                            label="操作"
-                            width="100">
+                        <el-table-column fixed="right" label="操作" width="100">
                             <template slot-scope="scope">
                                 <el-button type="text" size="small" @click="handleAddWordListRow(scope.row)">添加
                                 </el-button>
                             </template>
                         </el-table-column>
                     </el-table>
-                    <el-pagination
-                        background
-                        layout="prev, pager, next"
-                        @current-change="handleGetMyWordList"
-                        :current-page.sync="wordListPageNum"
-                        :page-size="wordListPageSize"
-                        :total=wordListTotal>
+                    <el-pagination background layout="prev, pager, next" @current-change="handleGetMyWordList"
+                                   :current-page.sync="wordListPageNum" :page-size="wordListPageSize"
+                                   :total=wordListTotal>
                     </el-pagination>
                 </el-col>
                 <el-col :span="12">
-                    <el-table
-                        :data="wordListSelected"
-                        style="width: 100%">
-                        <el-table-column
-                            prop="title"
-                            label="已选小白板">
+                    <el-table :data="wordListSelected" style="width: 100%">
+                        <el-table-column prop="title" label="已选小白板">
                         </el-table-column>
-                        <el-table-column
-                            fixed="right"
-                            label="操作"
-                            width="100">
+                        <el-table-column fixed="right" label="操作" width="100">
                             <template slot-scope="scope">
                                 <el-button type="text" size="small" @click="handleDeleteWordListRow(scope.row)">删除
                                 </el-button>
@@ -369,25 +346,28 @@
 
 <script>
 import api, {
-  getTopSearchKey,
-  prepareDownloadFile,
-  queryDownload,
-  getMyWordList,
-  addWordToDir,
-  previewFile,
-  addRedirectPath, addTranscodeVideo, getFileMetadata, ftsSearch
+    getTopSearchKey,
+    prepareDownloadFile,
+    queryDownload,
+    getMyWordList,
+    addWordToDir,
+    previewFile,
+    addRedirectPath, addTranscodeVideo, getFileMetadata, ftsSearch
 } from "../../../api";
 import genSrcPreviewSrc, {getVideoPreviewUrl} from "../../../utils"
 import Sortable from 'sortablejs';
 import videojs from 'video.js'
 import {getDocumentImage, joyeaMenuPath, getFileNameWithoutExtension} from "@/utils/JoyeaUtil";
 import {mapGetters} from "vuex";
+import LenovoDirSelector from "@/components/LenovoDirSelector";
+import LenovoDirDrawer from "@/components/LenovoDirDrawer";
 
 export default {
     name: "index",
-    components: {},
+    components: {LenovoDirSelector,LenovoDirDrawer},
     data() {
         return {
+            menuDrawerVisible: false,
             dir: {
                 currentPath: [],
                 tableData: [],
@@ -645,100 +625,99 @@ export default {
             })
         },
         handleSearch(searchKey) {
-          let _this = this;
-          if (searchKey !== undefined && typeof (searchKey) == 'string') {
-            _this.search.key = searchKey;
-          }
-          if (_this.search.key.trim().length === 0) {
-            _this.$message.warning("请输入搜索的关键字！")
-          } else {
-            if (_this.searchTabName === 'list') {
-              _this.loading.searchList = true;
-              api({
-                action: "searchList",
-                searchKey: _searchKey
-              }).then(response => {
-                _this.loading.searchList = false;
-                if (response.result) {
-                  _this.searchListResult = [];
-                  if (response.list.length === 0) {
-                    _this.$message.error("没有搜索到与【" + _this.search.key + "】有关的清单！")
-                  } else {
-                    response.list.forEach(list => {
-                      _this.searchListResult.push(list)
-                    })
-                  }
-
-                } else {
-                  _this.$notify.error({
-                    title: '搜索出错',
-                    message: '搜索过程出现错误：' + response.msg
-                  });
-                  console.log(response.msg)
-                }
-              });
-              _this.searchTabName = "list";
-            } else {
-              _this.loading.search = true;
-
-              ftsSearch(_this.search.key,0).then(response => {
-                if (response.code === "0") {
-                  _this.search.hasNext = response.obj["has_more"];
-                  if (_this.search.hasNext) {
-                    _this.loadMoreForm.key = _this.search.key;
-                    _this.loadMoreForm.nextOffset = response.obj["next_offset"];
-                  }
-                  _this.searchResult = [];
-                  if (response.obj.content.length === 0) {
-                    _this.$message.error("没有搜索到与【" + _this.search.key + "】有关的文件或文件夹！")
-                  } else {
-                    _this.visible.searchDialogVisible = true;
-                    response.obj.content.forEach(item => {
-                      item.joyeaDesc = "";
-                      item.isModify = false;
-                      _this.searchResult.push(item)
-                    })
-                  }
-                } else {
-                  _this.$notify.error({
-                    title: '搜索出错',
-                    message: '搜索过程出现错误：' + response.msg
-                  });
-                  console.log(response.msg)
-                }
-              }).finally(() => {
-                _this.loading.search = false
-              });
-              _this.searchTabName = "pan";
+            let _this = this;
+            if (searchKey !== undefined && typeof (searchKey) == 'string') {
+                _this.search.key = searchKey;
             }
-          }
+            if (_this.search.key.trim().length === 0) {
+                _this.$message.warning("请输入搜索的关键字！")
+            } else {
+                if (_this.searchTabName === 'list') {
+                    _this.loading.searchList = true;
+                    api({
+                        action: "searchList",
+                        searchKey: _searchKey
+                    }).then(response => {
+                        _this.loading.searchList = false;
+                        if (response.result) {
+                            _this.searchListResult = [];
+                            if (response.list.length === 0) {
+                                _this.$message.error("没有搜索到与【" + _this.search.key + "】有关的清单！")
+                            } else {
+                                response.list.forEach(list => {
+                                    _this.searchListResult.push(list)
+                                })
+                            }
+
+                        } else {
+                            _this.$notify.error({
+                                title: '搜索出错',
+                                message: '搜索过程出现错误：' + response.msg
+                            });
+                            console.log(response.msg)
+                        }
+                    });
+                    _this.searchTabName = "list";
+                } else {
+                    _this.loading.search = true;
+                    ftsSearch(_this.search.key, 0).then(response => {
+                        if (response.code === "0") {
+                            _this.search.hasNext = response.obj["has_more"];
+                            if (_this.search.hasNext) {
+                                _this.loadMoreForm.key = _this.search.key;
+                                _this.loadMoreForm.nextOffset = response.obj["next_offset"];
+                            }
+                            _this.searchResult = [];
+                            if (response.obj.content.length === 0) {
+                                _this.$message.error("没有搜索到与【" + _this.search.key + "】有关的文件或文件夹！")
+                            } else {
+                                _this.visible.searchDialogVisible = true;
+                                response.obj.content.forEach(item => {
+                                    item.joyeaDesc = "";
+                                    item.isModify = false;
+                                    _this.searchResult.push(item)
+                                })
+                            }
+                        } else {
+                            _this.$notify.error({
+                                title: '搜索出错',
+                                message: '搜索过程出现错误：' + response.msg
+                            });
+                            console.log(response.msg)
+                        }
+                    }).finally(() => {
+                        _this.loading.search = false
+                    });
+                    _this.searchTabName = "pan";
+                }
+            }
         },
         handleLoadMore() {
             let _this = this;
             if (_this.loadMoreForm.key.trim().length !== 0) {
                 _this.loading.searchMore = true;
-                ftsSearch(_this.loadMoreForm.key,this.loadMoreForm.nextOffset).then(response => {
-                  if (response.code === "0") {
-                    _this.search.hasNext = response.obj["has_more"];
-                    if (_this.search.hasNext) {
-                      _this.loadMoreForm.key = _this.search.key;
-                      _this.loadMoreForm.nextOffset = response.obj["next_offset"];
+                ftsSearch(_this.loadMoreForm.key, this.loadMoreForm.nextOffset).then(response => {
+                    if (response.code === "0") {
+                        _this.search.hasNext = response.obj["has_more"];
+                        if (_this.search.hasNext) {
+                            _this.loadMoreForm.key = _this.search.key;
+                            _this.loadMoreForm.nextOffset = response.obj["next_offset"];
+                        }
+                        //_this.searchResult = [];
+                        response.obj.content.forEach(item => {
+                            item.joyeaDesc = "";
+                            item.isModify = false;
+                            _this.searchResult.push(item)
+                        })
+                    } else {
+                        _this.$notify.error({
+                            title: '搜索出错',
+                            message: '搜索过程出现错误：' + response.msg
+                        });
+                        console.log(response.msg)
                     }
-                    //_this.searchResult = [];
-                    response.obj.content.forEach(item => {
-                      item.joyeaDesc = "";
-                      item.isModify = false;
-                      _this.searchResult.push(item)
-                    })
-                  } else {
-                    _this.$notify.error({
-                      title: '搜索出错',
-                      message: '搜索过程出现错误：' + response.msg
-                    });
-                    console.log(response.msg)
-                  }
                 }).finally(() => {
-                  _this.loading.searchMore = false
+                    _this.loading.searchMore = false
                 })
             }
         },
@@ -976,39 +955,39 @@ export default {
         handleListLenovoDir(path, pathType) {
             this.dir.loadingDir = true;
             getFileMetadata(path.replace("+", "%2B")).then(response => {
-              if (response.code === "0") {
-                this.curDirNeid = response.obj.neid;
-                console.log("current dir neid:" + this.curDirNeid);
-                this.dir.tableData = [];
-                this.wordListSelected = [];
-                if (response.obj.content) {
-                  response.obj.content.forEach(item => {
-                    item.joyeaDesc = "";
-                    item.isModify = false;
-                    if (item.mime_type && item.mime_type === 'word' && !this.userInfo.isAdmin) {
+                if (response.code === "0") {
+                    this.curDirNeid = response.obj.neid;
+                    console.log("current dir neid:" + this.curDirNeid);
+                    this.dir.tableData = [];
+                    this.wordListSelected = [];
+                    if (response.obj.content) {
+                        response.obj.content.forEach(item => {
+                            item.joyeaDesc = "";
+                            item.isModify = false;
+                            if (item.mime_type && item.mime_type === 'word' && !this.userInfo.isAdmin) {
 
-                    } else {
-                      this.dir.tableData.push(item)
+                            } else {
+                                this.dir.tableData.push(item)
+                            }
+                        });
+                        this.dir.currentPath = [];
+                        response.obj.path.split('/').forEach(item => {
+                            if (item.length !== 0) {
+                                this.dir.currentPath.push(item)
+                            }
+                        });
                     }
-                  });
-                  this.dir.currentPath = [];
-                  response.obj.path.split('/').forEach(item => {
-                    if (item.length !== 0) {
-                      this.dir.currentPath.push(item)
-                    }
-                  });
+                } else {
+                    this.$notify.error({
+                        title: '提示',
+                        message: '文件夹列表获取失败'
+                    });
+                    console.log('文件夹列表获取失败' + response.msg)
                 }
-              } else {
-                this.$notify.error({
-                  title: '提示',
-                  message: '文件夹列表获取失败'
-                });
-                console.log('文件夹列表获取失败' + response.msg)
-              }
-              this.dir.loadingDir = false;
+                this.dir.loadingDir = false;
             }).finally(() => {
-              //2021.11.20-侍-要求点开文件夹回到顶部！
-              document.getElementById("build").scrollTop = 0;
+                //2021.11.20-侍-要求点开文件夹回到顶部！
+                document.getElementById("build").scrollTop = 0;
             });
         },
         handleClickDirItem(row, column, event) {

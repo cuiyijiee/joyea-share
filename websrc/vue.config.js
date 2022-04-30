@@ -10,7 +10,7 @@ module.exports = {
     devServer: {
         proxy: {
             'apiv2/': {
-                target: 'http://192.168.1.36:8081',
+                target: 'http://192.168.1.35:8081',
                 //target: 'http://sck.joyea.cn:8000',
                 changeOrigin: true
             },
