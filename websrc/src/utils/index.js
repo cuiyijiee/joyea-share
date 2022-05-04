@@ -1,6 +1,6 @@
 import {previewFile} from "@/api";
 
-export default function genSrcPreviewUrl(neid, hash, rev, previewType, sessionId) {
+export default function genSrcPreviewUrl(neid) {
     return "/apiv2/imagePreview?neid=" + neid + "&thumbtail=false"
 }
 

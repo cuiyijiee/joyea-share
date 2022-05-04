@@ -16,8 +16,7 @@ export default function api(params) {
 
 export function login(user, pwd) {
     return service.post('api/v1/user/login', {
-        user: user,
-        pwd: pwd
+        user: user, pwd: pwd
     }).then(res => {
         return res.data;
     })
@@ -82,8 +81,7 @@ export function uploadFile(file, fileDesc) {
 
     //设置请求头
     let config = {
-        headers: {'Content-Type': 'multipart/form-data'},
-        onUploadProgress: progressEvent => {
+        headers: {'Content-Type': 'multipart/form-data'}, onUploadProgress: progressEvent => {
             let completed = (progressEvent.loaded / progressEvent.total * 100 | 0) + "%";
             console.log(completed)
         }
@@ -116,11 +114,9 @@ export function getTodayDownload() {
     })
 }
 
-export function getMyWordList(search,pageSize,pageNum) {
+export function getMyWordList(search, pageSize, pageNum) {
     return service.post("api/v1/esunyun/myword", {
-        search: search,
-        pageSize:pageSize,
-        pageNum:pageNum
+        search: search, pageSize: pageSize, pageNum: pageNum
     }).then(resp => {
         return resp.data;
     })
@@ -128,22 +124,21 @@ export function getMyWordList(search,pageSize,pageNum) {
 
 export function addWordToDir(neid, wordList) {
     return service.post("api/v1/word/add", {
-        neid: neid,
-        word: wordList
+        neid: neid, word: wordList
     }).then(resp => {
         return resp.data;
     })
 }
 
-export function previewFile(neid){
+export function previewFile(neid) {
     return service.get("apiv2/preview?neid=" + neid)
         .then(resp => {
             return resp.data;
         })
 }
 
-export function addRedirectPath(path){
-    return service.get("apiv2/addRedirectPath?path=" + path)
+export function addRedirectPath(path, directoryType) {
+    return service.get("apiv2/addRedirectPath?path=" + path + "&type=" + directoryType)
         .then(resp => {
             return resp.data;
         })
@@ -151,7 +146,7 @@ export function addRedirectPath(path){
 
 export function addTranscodeVideo(neid) {
     return service.post("apiv2/transcode/insert", {
-        neid:neid
+        neid: neid
     }).then(resp => {
         return resp.data;
     })
@@ -159,34 +154,103 @@ export function addTranscodeVideo(neid) {
 
 export function deleteTranscodeVideo(id) {
     return service.post("apiv2/transcode/delete", {
-        id:id
+        id: id
     }).then(resp => {
         return resp.data;
     })
 }
 
-export function listTranscodeVideo(fileName,pageNum,pageSize) {
+export function listTranscodeVideo(fileName, pageNum, pageSize) {
     return service.post("apiv2/transcode/list", {
-        fileName:fileName,
-        pageNum:pageNum,
-        pageSize:pageSize,
+        fileName: fileName, pageNum: pageNum, pageSize: pageSize,
     }).then(resp => {
         return resp.data;
     })
 }
 
-export function getFileMetadata(path) {
+export function getFileMetadata(directoryType, path, parentDirId) {
     return service.post("apiv2/lenovo/fileMetadata", {
-        path:path
+        directoryType: directoryType, path: path, parentDirId: parentDirId,
     }).then(resp => {
         return resp.data;
     })
 }
 
-export function ftsSearch(searchKey,offset) {
+export function ftsSearch(searchKey, offset) {
     return service.post("apiv2/lenovo/ftsSearch", {
-        searchKey:searchKey,
-        offset:offset
+        searchKey: searchKey, offset: offset
+    }).then(resp => {
+        return resp.data;
+    })
+}
+
+export function newPrivateDir(parentDirId, dirName) {
+    return service.post("apiv2/privateDir/new", {
+        parentDirId: parentDirId, dirName: dirName
+    }).then(resp => {
+        return resp.data;
+    })
+}
+
+export function removePrivateDir(dirId) {
+    return service.post("apiv2/privateDir/remove", {
+        dirId: dirId
+    }).then(resp => {
+        return resp.data;
+    })
+}
+
+export function newPrivateDirSrc(parentDirId, srcPath) {
+    return service.post("apiv2/privateDir/newSrc", {
+        parentDirId: parentDirId, srcPath: srcPath
+    }).then(resp => {
+        return resp.data;
+    })
+}
+
+export function removePrivateDirSrc(parentDirId, neid) {
+    return service.post("apiv2/privateDir/removeSrc", {
+        parentDirId: parentDirId, neid: neid
+    }).then(resp => {
+        return resp.data;
+    })
+}
+
+export function listPrivateDir(parentDirId) {
+    return service.post("apiv2/privateDir/list", {
+        parentDirId: parentDirId,
+    }).then(resp => {
+        return resp.data;
+    })
+}
+
+export function renamePrivateDir(dirId, newDirName) {
+    return service.post("apiv2/privateDir/rename", {
+        dirId: dirId, newDirName: newDirName,
+    }).then(resp => {
+        return resp.data;
+    })
+}
+
+export function listJoyeaUser(joyeaName) {
+    return service.post("apiv2/joyeaUser/list", {
+        joyeaName: joyeaName,
+    }).then(resp => {
+        return resp.data;
+    })
+}
+
+export function updatePrivateDirectoryAdmin(dirId, admins) {
+    return service.post("apiv2/privateDir/updateAdmin", {
+        dirId: dirId, admins: admins,
+    }).then(resp => {
+        return resp.data;
+    })
+}
+
+export function listPrivateDirectoryAdmin(dirId) {
+    return service.post("apiv2/privateDir/listAdmin", {
+        dirId: dirId
     }).then(resp => {
         return resp.data;
     })

@@ -62,7 +62,7 @@
       </span>
         </el-dialog>
         <lenovo-dir-selector :visible.sync="selectPathVisible" @close="selectPathVisible=false"
-                             @selectPath="handleSelectUploadPath"></lenovo-dir-selector>
+                             @selectDirPath="handleSelectUploadPath"></lenovo-dir-selector>
         <el-dialog :title="toPlayVideo.title" :visible.sync="visible.videoDialogVisible" @close="handleCloseVideo"
                    @opened="playVideo()">
             <video id="myVideo" class="video-js vjs-big-play-centered vjs-fluid" oncontextmenu="return false">

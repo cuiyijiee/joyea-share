@@ -16,31 +16,31 @@ export function getDocumentImage(mimeType) {
 
 export let joyeaMenuPath = [
     {
-        name: "STICK线", path: "STICK线", icon: "menu-icon/11.png"
+        name: "STICK线", path: "/营销素材展示/STICK线", icon: "menu-icon/11.png"
     },
     {
-        name: "听装线", path: "听装线", icon: "menu-icon/12.png"
+        name: "听装线", path: "/营销素材展示/听装线", icon: "menu-icon/12.png"
     },
     {
-        name: "泡罩线", path: "泡罩线", icon: "menu-icon/15.png"
+        name: "泡罩线", path: "/营销素材展示/泡罩线", icon: "menu-icon/15.png"
     },
     // {
-    //     name: "软双铝线", path: "软双铝线", icon: "menu-icon/13.png"
+    //     name: "软双铝线", path: "/营销素材展示/软双铝线", icon: "menu-icon/13.png"
     // },
     {
-        name: "制粒线", path: "制粒线", icon: "menu-icon/14.png"
+        name: "制粒线", path: "/营销素材展示/制粒线", icon: "menu-icon/14.png"
     },
     {
-        name: "智能物流系统", path: "智能物流系统", icon: "menu-icon/19.png"
+        name: "智能物流系统", path: "/营销素材展示/智能物流系统", icon: "menu-icon/19.png"
     },
     {
-        name: "其他生产线", path: "其他生产线", icon: "menu-icon/18.png"
+        name: "其他生产线", path: "/营销素材展示/其他生产线", icon: "menu-icon/18.png"
     },
     {
-        name: "公司介绍", path: "公司介绍", icon: "menu-icon/16.png"
+        name: "公司介绍", path: "/营销素材展示/公司介绍", icon: "menu-icon/16.png"
     },
     {
-        name: "友商信息", path: "友商信息", icon: "menu-icon/17.png"
+        name: "友商信息", path: "/营销素材展示/友商信息", icon: "menu-icon/17.png"
     }
 ]
 
@@ -62,7 +62,6 @@ export function getFileNameWithoutExtension(fileName) {
 }
 
 export function filterDirList(dir) {
-    console.log(dir)
     return dir.filter(item => {
         return item.is_dir;
     })

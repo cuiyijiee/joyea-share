@@ -4,8 +4,8 @@
             <el-col :span="24" class="header">
                 <el-col :span="9">
                     <div class="main_content" @click="jumpToBuild">
-                        <img src="logo.gif"
-                             style="height: 30px;vertical-align: middle"/>
+                        <img :src="joyeaLogo"
+                             style="height: 30px;vertical-align: middle;"/>
                         <span class="logo" style="font-size: 20px;margin-left: 10px;vertical-align:bottom">仅一素材库</span>
                     </div>
                 </el-col>
@@ -104,7 +104,8 @@ export default {
     data() {
         return {
             currentPath: "",
-            downloadTask: []
+            downloadTask: [],
+            joyeaLogo:require("@assets/joyea.png")
         }
     },
     computed: {
@@ -133,7 +134,7 @@ export default {
         jumpToUploadManage() {
             this.$router.replace("/upload/manage");
         },
-        jumpToTranscode(){
+        jumpToTranscode() {
             this.$router.replace("/transcode/index");
         },
         handleOpen() {
@@ -249,8 +250,8 @@ export default {
     .header {
         height: 60px;
         line-height: 60px;
-        background: #1e162f;
-        color: #fff;
+        background: #E9E9E9;
+        color: #000;
 
         .userinfo {
             text-align: right;
@@ -259,7 +260,7 @@ export default {
 
             .userinfo-inner {
                 cursor: pointer;
-                color: #fff;
+                color: #000;
 
                 img {
                     width: 40px;
