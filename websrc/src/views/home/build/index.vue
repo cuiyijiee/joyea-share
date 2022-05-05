@@ -1054,10 +1054,10 @@ export default {
                     toDownloadList.push({
                         index: index += 1,
                         filename: src.path.substr(src.path.lastIndexOf("/") + 1),
-                        rev: src.rev,
                         neid: src.neid,
-                        path: src.path.replace("+", "%2b"),
-                        path_type: src.path_type
+                        path_type: src.path_type,
+                        rev: "",
+                        path: "",
                     })
                 })
             } else {
@@ -1065,7 +1065,8 @@ export default {
                     filename: row.path.substr(row.path.lastIndexOf("/") + 1),
                     rev: row.rev,
                     neid: row.neid.toString(),
-                    path_type: row.path_type
+                    path_type: row.path_type,
+                    path: ""
                 })
             }
             let totalKb = totalBytes / 1024;
