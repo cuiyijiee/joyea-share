@@ -47,20 +47,19 @@ export default {
 
 .lenovo-bg {
     display: inline-block;
-    width: 600px;
+    width: 45%;
     height: 300px;
     background: url("../assets/background-lenovo.png") no-repeat;
-    background-size: 600px 300px;
+    background-size: 100% 100%;
     float: right;
 }
 
 .self-bg {
     display: inline-block;
-    width: 600px;
+    width: 45%;
     height: 300px;
     background: url("../assets/background-self.png") no-repeat;
-    background-size: 600px 300px;
-
+    background-size: 100% 100%;
 }
 
 .self-bg .title {

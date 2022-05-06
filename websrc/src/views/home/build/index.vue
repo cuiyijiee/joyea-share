@@ -72,7 +72,7 @@
                 </el-row>
                 <div class="adminContentHead" v-if="hasBtnShowPermission(null,'NEW_PRIVATE_DIR')"
                      style="text-align: right">
-                    <AddSrcToPrivateDir v-if="directoryType==='SELF'"
+                    <AddSrcToPrivateDir v-if="directoryType==='SELF'" @preview="handleClickDirItem"
                                         :curDirNeid="curDirNeid" @onAddSuccess="handleRefreshDir"/>
                     <AddPrivateDirectory v-if="directoryType==='SELF'"
                                          :curDirNeid="curDirNeid" @onAddSuccess="handleRefreshDir"/>
@@ -316,7 +316,7 @@
                 <el-table-column label="操作" width="180">
                     <template slot-scope="scope">
                         <div v-if="scope.row.is_dir">
-                            <el-button circle type="primary" @click.stop="handleClickDirItem(scope.row)"
+                            <el-button circle type="primary" @click.stop="handleClickSearch(scope.row)"
                                        icon="el-icon-folder-opened"/>
                         </div>
                         <div v-else>
@@ -502,35 +502,40 @@ export default {
     methods: {
         hasBtnShowPermission(fileItem, mode) {
             let hasPermission = false;
-            switch (mode) {
-                case "PRIVATE_DIR_REMOVE_SRC":
-                    hasPermission = this.directoryType === "SELF"
-                        && (this.userInfo.isAdmin || fileItem.adminUser.filter(item => this.userInfo.email === item.joyeaId).length > 0);
-                    break;
-                case "PRIVATE_DIR_DOWNLOAD":
-                    hasPermission = this.directoryType === "SELF" && fileItem.is_dir
-                    break;
-                case "NEW_PRIVATE_DIR":
-                    hasPermission = this.directoryType === "SELF"
-                        && (this.userInfo.isAdmin || this.curDirAdminUser.filter(item => this.userInfo.email === item.joyeaId).length > 0);
-                    break;
-                case "MANAGER":
-                    hasPermission = this.directoryType === "SELF" && fileItem.path === '/' + fileItem.file_name
-                        && fileItem.is_dir
-                        && (this.userInfo.isAdmin || fileItem.adminUser.filter(item => this.userInfo.email === item.joyeaId).length > 0);
-                    break;
-                case "RENAME":
-                    hasPermission = this.userInfo.isAdmin &&
-                        this.directoryType === "SELF" && fileItem.is_dir;
-                    break;
-                case "TRANSCODE":
-                    hasPermission = this.userInfo.isAdmin
-                        && !fileItem.is_dir
-                        && (fileItem.mime_type && fileItem.mime_type.startsWith('video'))
-                    break;
-                default:
-                    break
+            try{
+                switch (mode) {
+                    case "PRIVATE_DIR_REMOVE_SRC":
+                        hasPermission = this.directoryType === "SELF"
+                            && (this.userInfo.isAdmin || this.curDirAdminUser.filter(item => this.userInfo.email === item.joyeaId).length > 0);
+                        break;
+                    case "PRIVATE_DIR_DOWNLOAD":
+                        hasPermission = this.directoryType === "SELF" && fileItem.is_dir
+                        break;
+                    case "NEW_PRIVATE_DIR":
+                        hasPermission = this.directoryType === "SELF"
+                            && (this.userInfo.isAdmin || this.curDirAdminUser.filter(item => this.userInfo.email === item.joyeaId).length > 0);
+                        break;
+                    case "MANAGER":
+                        hasPermission = this.directoryType === "SELF" && fileItem.path === '/' + fileItem.file_name
+                            && fileItem.is_dir
+                            && (this.userInfo.isAdmin || fileItem.adminUser.filter(item => this.userInfo.email === item.joyeaId).length > 0);
+                        break;
+                    case "RENAME":
+                        hasPermission = this.userInfo.isAdmin &&
+                            this.directoryType === "SELF" && fileItem.is_dir;
+                        break;
+                    case "TRANSCODE":
+                        hasPermission = this.userInfo.isAdmin
+                            && !fileItem.is_dir
+                            && (fileItem.mime_type && fileItem.mime_type.startsWith('video'))
+                        break;
+                    default:
+                        break
+                }
+            }catch (e) {
+                hasPermission = false;
             }
+            console.log(mode + " - " + hasPermission + " - " + JSON.stringify(fileItem));
             return hasPermission;
         },
         handleGetCurRedirectPath() {
@@ -539,6 +544,9 @@ export default {
             this.dir.currentPath.forEach(tmp => {
                 currentFullPath = currentFullPath + "/" + tmp
             })
+            if(currentFullPath.length === 0 && this.directoryType === "SELF") {
+                currentFullPath = "/"
+            }
             addRedirectPath(currentFullPath, this.directoryType).then(resp => {
                 let redirectPath = window.location.protocol + "//"
                     + window.location.host + "/api/redirectPath?id=" + resp.id;

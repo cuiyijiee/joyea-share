@@ -208,6 +208,14 @@ export function newPrivateDirSrc(parentDirId, srcPath) {
     })
 }
 
+export function batchNewPrivateDirSrc(parentDirId, srcPaths) {
+    return service.post("apiv2/privateDir/batchNewSrc", {
+        parentDirId: parentDirId, srcPaths: srcPaths
+    }).then(resp => {
+        return resp.data;
+    })
+}
+
 export function removePrivateDirSrc(parentDirId, neid) {
     return service.post("apiv2/privateDir/removeSrc", {
         parentDirId: parentDirId, neid: neid
