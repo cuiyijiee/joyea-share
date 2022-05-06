@@ -18,9 +18,9 @@ class PrepareDownloadAction extends BaseAction[PrepareDownloadReq] {
                 downloadFile = req.src.map(src => {
                     DownloadRecord(
                         index = src.index,
-                        filePath = src.path,
+                        filePath = src.path.getOrElse(""),
                         joyeaUserId = myUid,
-                        rev = src.rev,
+                        rev = src.rev.getOrElse(""),
                         neid = src.neid,
                         fileName = src.filename
                     )
@@ -46,8 +46,8 @@ index = toDownloadObj.get("index").asInt(),
  */
 case class DownloadSrc(
                         index: Int,
-                        path: String,
-                        rev: String,
+                        path: Option[String],
+                        rev: Option[String],
                         neid: String,
                         filename: String
                       )
