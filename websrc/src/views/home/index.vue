@@ -3,33 +3,34 @@
         <el-row class="container">
             <el-col :span="24" class="header">
                 <el-col :span="9">
-                    <div class="main_content" @click="jumpToBuild">
-                        <img :src="joyeaLogo"
+                    <div class="main_content">
+                        <img :src="joyeaLogo" @click="jumpToBuild"
                              style="height: 30px;vertical-align: middle;"/>
-                        <span class="logo" style="font-size: 20px;margin-left: 10px;vertical-align:bottom">仅一素材库</span>
+                        <span class="logo" style="font-size: 20px;margin-left: 10px;vertical-align:bottom"><b>仅一素材库</b></span>
                     </div>
                 </el-col>
 
                 <el-col :span="15" class="userinfo">
-                    <el-button size="small" icon="el-icon-edit" @click="jumpToBuild"
-                               :class="{'is-active':currentPath==='/build'}"> 工作台
+                    <el-button size="small"  @click="jumpToBuild" round
+                               icon="el-icon-edit" class="interval"
+                               :class="{'is-active':currentPath.startsWith('/build')}"> 工作台
                     </el-button>
-                    <el-button size="small" icon="el-icon-tickets" @click="jumpToList"
-                               :class="{'is-active':currentPath==='/manage/list'}"
+                    <el-button size="small" icon="el-icon-tickets" @click="jumpToList" round
+                               :class="{'is-active':currentPath.startsWith('/manage/list')}"
                                style="">我的清单
                     </el-button>
-                    <el-button size="small" icon="el-icon-tickets" @click="jumpToUpload"
-                               :class="{'is-active':currentPath==='/upload/index'}"
+                    <el-button size="small" icon="el-icon-tickets" @click="jumpToUpload" round
+                               :class="{'is-active':currentPath.startsWith('/upload/index')}"
                                style="margin-right: 10px">素材上传
                     </el-button>
-                    <el-button size="small" icon="el-icon-tickets" @click="jumpToUploadManage"
+                    <el-button size="small" icon="el-icon-tickets" @click="jumpToUploadManage" round
                                v-if="userInfo.isAdmin"
-                               :class="{'is-active':currentPath==='/upload/manage'}"
+                               :class="{'is-active':currentPath.startsWith('/upload/manage')}"
                                style="margin-left:0;margin-right: 10px">素材审核
                     </el-button>
-                    <el-button size="small" icon="el-icon-tickets" @click="jumpToTranscode"
+                    <el-button size="small" icon="el-icon-tickets" @click="jumpToTranscode" round
                                v-if="userInfo.isAdmin"
-                               :class="{'is-active':currentPath==='/transcode/index'}"
+                               :class="{'is-active':currentPath.startsWith('/transcode/index')}"
                                style="margin-left:0;margin-right: 10px">转码素材管理
                     </el-button>
                     <el-popover
@@ -94,18 +95,18 @@
 <script>
 import {check, getTodayDownload, logout} from "../../api/index";
 import getNowFormatDate from "../../utils/time"
+import store from '@/store'
+import {mapActions, mapGetters} from "vuex";
 
 const localStorage = window.localStorage;
 let timer = 0;
-import store from '@/store'
-import {mapActions, mapGetters} from "vuex";
 
 export default {
     data() {
         return {
             currentPath: "",
             downloadTask: [],
-            joyeaLogo:require("@assets/joyea.png")
+            joyeaLogo: require("@assets/joyea.png"),
         }
     },
     computed: {
@@ -121,21 +122,23 @@ export default {
             'clearUserSessionFunc'
         ]),
         jumpToBuild() {
-            if (this.currentPath !== '/build') {
-                this.$router.replace("/build");
+            if (!this.currentPath.startsWith('/build')) {
+                this.$router.push("/build?_=" + (new Date()).getTime());
+            } else {
+                this.$EventBus.$emit("switchSpace","");
             }
         },
         jumpToUpload() {
-            this.$router.replace("/upload/index");
+            this.$router.replace("/upload/index?_=" + (new Date()).getTime());
         },
         jumpToList() {
-            this.$router.replace("/manage/list");
+            this.$router.replace("/manage/list?_=" + (new Date()).getTime());
         },
         jumpToUploadManage() {
-            this.$router.replace("/upload/manage");
+            this.$router.replace("/upload/manage?_=" + (new Date()).getTime());
         },
         jumpToTranscode() {
-            this.$router.replace("/transcode/index");
+            this.$router.replace("/transcode/index?_=" + (new Date()).getTime());
         },
         handleOpen() {
         },
@@ -212,7 +215,7 @@ export default {
         },
         genTodayDownloadTaskKey() {
             return "down_open_" + getNowFormatDate();
-        },
+        }
     },
     watch: {
         $route(to, from) {

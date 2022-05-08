@@ -4,44 +4,47 @@
                    @click="visible.addSrcVisible = !visible.addSrcVisible">
                         从素材库添加文件
                     </el-button>
-        <el-dialog :visible="visible.addSrcVisible" title="请选择目录" @close="handleClickClose" @opened="handleDialogOpened"
-                   :modal-append-to-body="true">
+        <el-dialog :modal-append-to-body="true" :visible="visible.addSrcVisible" title="请选择目录" @close="handleClickClose"
+                   @opened="handleDialogOpened">
           <div>
             <span>
               <span style=" color:#1f1731;font-size: 15px;cursor:pointer;"
                     @click="handleListLenovoDir('/营销素材展示','ent')">首页</span>
-              <span style="display: inline" v-for="(item,index) in dir.currentPath" v-if="item !== '营销素材展示'">/
+              <span v-for="(item,index) in dir.currentPath" v-if="item !== '营销素材展示'" style="display: inline">/
                 <span style=" color:#1f1731;font-size: 15px;cursor:pointer;"
                       @click="handleClickDirPath(item,index)">{{ item }}</span>
               </span>
             </span>
-            <el-button v-show="multipleSelection.length > 0" @click="handleSelect" type="primary" style="margin: 0 20px">选择</el-button>
+            <el-button v-show="multipleSelection.length > 0" style="margin: 0 20px" type="primary"
+                       @click="handleSelect">选择</el-button>
           </div>
           <div>
-            <el-table :data="dir.tableData"  empty-text="没有可选目录啦!"
-                      @selection-change="handleSelectionChange"
-                      @row-click="handleClickItem" v-loading="dir.loadingDir">
-                <el-table-column type="selection" width="55" style="" :selectable="selectInit"> </el-table-column>
+            <el-table v-loading="dir.loadingDir" :data="dir.tableData"
+                      empty-text="没有可选目录啦!"
+                      @selection-change="handleSelectionChange" @row-click="handleClickItem">
+
               <el-table-column label="路径">
                 <template slot-scope="scope">
                     <i v-if="scope.row.is_dir" class="el-icon-folder-opened"></i>
                     <i v-else-if="scope.row.mime_type.startsWith('video')" class="el-icon-video-camera"></i>
                     <img v-else-if="scope.row.mime_type.startsWith('image')"
-                         style="width: 60px;height: 60px;line-height: 0px"
-                         :onerror="defaultImg" preview="add_src_private_dir_image_list" :preview-text="scope.row.path"
-                         :src="genSrcPreviewUrl(scope.row.neid)">
+                         :onerror="defaultImg"
+                         :preview-text="scope.row.path" :src="genSrcPreviewUrl(scope.row.neid)" preview="add_src_private_dir_image_list"
+                         style="width: 60px;height: 60px;line-height: 0px">
                     <i v-else-if="scope.row.mime_type.startsWith('doc')" class="el-icon-tickets"></i>
                     <i v-else-if="scope.row.mime_type.startsWith('word')" class="el-icon-link"></i>
                     <i v-else class="el-icon-question"></i>
                     <span style="line-height: 30px">{{ genFileName(scope.row.path) }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="操作" width="80" align="center">
-                <template slot-scope="scope">
-                    <div v-if="scope.row.is_dir || scope.row.mime_type.startsWith('word')">-</div>
-                    <el-button v-else @click.stop="handleSelectSrc(scope.row)">选择</el-button>
-                </template>
-              </el-table-column>
+                <el-table-column :selectable="selectInit" style="" type="selection"
+                                 width="55"> </el-table-column>
+                <!--              <el-table-column label="操作" width="80" align="center">-->
+                <!--                <template slot-scope="scope">-->
+                <!--                    <div v-if="scope.row.is_dir || scope.row.mime_type.startsWith('word')">-</div>-->
+                <!--                    <el-button v-else @click.stop="handleSelectSrc(scope.row)">选择</el-button>-->
+                <!--                </template>-->
+                <!--              </el-table-column>-->
             </el-table>
           </div>
     </el-dialog>
@@ -50,7 +53,7 @@
 
 <script>
 
-import {getFileMetadata, newPrivateDirSrc,batchNewPrivateDirSrc} from "@/api";
+import {batchNewPrivateDirSrc,ftsSearch, getFileMetadata, newPrivateDirSrc} from "@/api";
 import LenovoDirSelector from "@/components/LenovoDirSelector";
 import {filterDirList, genFileName} from "@/utils/JoyeaUtil";
 import genSrcPreviewUrl from "@/utils";
@@ -73,11 +76,11 @@ export default {
             visible: {
                 addSrcVisible: false
             },
-            multipleSelection:[]
+            multipleSelection: []
         }
     },
     methods: {
-        handleSelect(){
+        handleSelect() {
             batchNewPrivateDirSrc(this.curDirNeid, this.multipleSelection.map(item => item.path)).then(resp => {
                 if (resp.code === '0') {
                     this.visible.addSrcVisible = false;
@@ -88,7 +91,7 @@ export default {
                 }
             })
         },
-        handleSelectionChange(val){
+        handleSelectionChange(val) {
             this.multipleSelection = val;
         },
         selectInit(row, index) {
@@ -134,8 +137,8 @@ export default {
         handleClickItem(item) {
             if (item.is_dir) {
                 this.handleListLenovoDir(item.path, "ent");
-            }else {
-                this.$emit("preview",item)
+            } else {
+                this.$emit("preview", item)
             }
         },
         handleListLenovoDir(path) {

@@ -26,7 +26,7 @@
             <SpaceSelector @onDirectoryTypeSelected="handleDirectoryTypeSelected"/>
         </div>
         <div
-            v-else-if="dir.currentPath.length === 1 && dir.currentPath[0] === '营销素材展示' && toCreateAlbum.list.length === 0"
+            v-else-if="curDirNeid === '541796009' && toCreateAlbum.list.length === 0"
             style="height:1080px;padding: 0 150px;background: #d1d1d1;">
             <div style="padding: 10px 10px 0 10px;height: 100%; "
                  v-loading="dir.loadingDir || loading.search"
@@ -111,7 +111,8 @@
                     <el-table-column label="管理员" align="center">
                         <template slot-scope="scope">
                             <PrivateDirectoryAdminManager
-                                v-if="hasBtnShowPermission(scope.row,'MANAGER')"
+                                v-if="userInfo.isAdmin && scope.row.is_dir
+                                && directoryType === 'SELF' && curDirNeid === '0'"
                                 :file-item="scope.row"/>
                         </template>
                     </el-table-column>
@@ -141,13 +142,13 @@
                             <RenamePrivateDirectory v-if="hasBtnShowPermission(scope.row,'RENAME')"
                                                     @onModifySuccess="handleRefreshDir"
                                                     :file-item="scope.row"/>
-                            <span>
-                                <el-button
-                                    v-if="hasBtnShowPermission(scope.row,'PRIVATE_DIR_DOWNLOAD')"
-                                    @click.stop="handleDownloadPrivateDir(scope.$index, scope.row)"
-                                    icon="el-icon-download" circle>
-                                </el-button>
-                            </span>
+<!--                            <span>-->
+<!--                                <el-button-->
+<!--                                    v-if="hasBtnShowPermission(scope.row,'PRIVATE_DIR_DOWNLOAD')"-->
+<!--                                    @click.stop="handleDownloadPrivateDir(scope.$index, scope.row)"-->
+<!--                                    icon="el-icon-download" circle>-->
+<!--                                </el-button>-->
+<!--                            </span>-->
                             <span>
                                 <el-button
                                     v-if="hasBtnShowPermission(scope.row,'PRIVATE_DIR_REMOVE_SRC')"
@@ -508,9 +509,9 @@ export default {
                         hasPermission = this.directoryType === "SELF"
                             && (this.userInfo.isAdmin || this.curDirAdminUser.filter(item => this.userInfo.email === item.joyeaId).length > 0);
                         break;
-                    case "PRIVATE_DIR_DOWNLOAD":
-                        hasPermission = this.directoryType === "SELF" && fileItem.is_dir
-                        break;
+                    // case "PRIVATE_DIR_DOWNLOAD":
+                    //     hasPermission = this.directoryType === "SELF" && fileItem.is_dir
+                    //     break;
                     case "NEW_PRIVATE_DIR":
                         hasPermission = this.directoryType === "SELF"
                             && (this.userInfo.isAdmin || this.curDirAdminUser.filter(item => this.userInfo.email === item.joyeaId).length > 0);
@@ -521,8 +522,9 @@ export default {
                             && (this.userInfo.isAdmin || fileItem.adminUser.filter(item => this.userInfo.email === item.joyeaId).length > 0);
                         break;
                     case "RENAME":
-                        hasPermission = this.userInfo.isAdmin &&
-                            this.directoryType === "SELF" && fileItem.is_dir;
+                        hasPermission =
+                            this.directoryType === "SELF" && fileItem.is_dir &&
+                            ( this.userInfo.isAdmin || this.curDirAdminUser.filter(item => this.userInfo.email === item.joyeaId).length > 0)
                         break;
                     case "TRANSCODE":
                         hasPermission = this.userInfo.isAdmin
@@ -535,7 +537,7 @@ export default {
             }catch (e) {
                 hasPermission = false;
             }
-            console.log(mode + " - " + hasPermission + " - " + JSON.stringify(fileItem));
+            //console.log(mode + " - " + hasPermission + " - " + JSON.stringify(fileItem));
             return hasPermission;
         },
         handleGetCurRedirectPath() {
@@ -1289,6 +1291,10 @@ export default {
             });
         }
         this.handleGetTopSearchKey();
+        let _this = this;
+        this.$EventBus.$on('switchSpace', function (data) {
+            _this.directoryType = data;
+        });
     }
 }
 </script>

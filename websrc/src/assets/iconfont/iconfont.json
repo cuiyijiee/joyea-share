@@ -1,0 +1,79 @@
+{
+  "id": "3385453",
+  "name": "joyea",
+  "font_family": "iconfont",
+  "css_prefix_text": "el-icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "29547726",
+      "name": "icon_me_20_20px",
+      "font_class": "icon_me_20_20px",
+      "unicode": "e602",
+      "unicode_decimal": 58882
+    },
+    {
+      "icon_id": "29547727",
+      "name": "icon_upload_20_20",
+      "font_class": "icon_sucaishangchuan_20_20px",
+      "unicode": "e603",
+      "unicode_decimal": 58883
+    },
+    {
+      "icon_id": "29547728",
+      "name": "icon_in_66_66",
+      "font_class": "icon_in_66_66",
+      "unicode": "e604",
+      "unicode_decimal": 58884
+    },
+    {
+      "icon_id": "29547729",
+      "name": "icon_home_20_20px",
+      "font_class": "icon_home_20_20px",
+      "unicode": "e605",
+      "unicode_decimal": 58885
+    },
+    {
+      "icon_id": "29547730",
+      "name": "icon_download_20_20",
+      "font_class": "icon_xiazailiebiao_20_20px",
+      "unicode": "e606",
+      "unicode_decimal": 58886
+    },
+    {
+      "icon_id": "29547731",
+      "name": "icon_self_20_20px",
+      "font_class": "icon_sucaiku_20_20px",
+      "unicode": "e607",
+      "unicode_decimal": 58887
+    },
+    {
+      "icon_id": "29547732",
+      "name": "icon_self_50_50px",
+      "font_class": "icon_sucaiku_50_50px",
+      "unicode": "e608",
+      "unicode_decimal": 58888
+    },
+    {
+      "icon_id": "29547733",
+      "name": "icon_list_20_20",
+      "font_class": "icon_wodeqingdan_20_20px",
+      "unicode": "e609",
+      "unicode_decimal": 58889
+    },
+    {
+      "icon_id": "29547734",
+      "name": "icon_self_20_20",
+      "font_class": "icon_xifenshichang_20_20px",
+      "unicode": "e60a",
+      "unicode_decimal": 58890
+    },
+    {
+      "icon_id": "29547735",
+      "name": "icon_self_50_50",
+      "font_class": "icon_xifenshichang_50_50px",
+      "unicode": "e60b",
+      "unicode_decimal": 58891
+    }
+  ]
+}

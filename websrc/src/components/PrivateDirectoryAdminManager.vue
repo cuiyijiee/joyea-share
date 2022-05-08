@@ -1,7 +1,7 @@
 <template>
 <span>
     <div class="block">
-      <el-cascader v-model="value" placeholder="请搜索" size="small"
+      <el-cascader v-model="value" placeholder="请搜索添加文件管理员" size="small"
                    :options="options" :disabled="!editable" @click.stop="console.log('123')"
                    :props="{ multiple: true }" filterable></el-cascader>
         <el-button @click.stop="handleSave" :icon="editable ? 'el-icon-check':'el-icon-edit'" circle
@@ -14,7 +14,7 @@
 
 <script>
 
-import {listPrivateDirectoryAdmin, listJoyeaUser, updatePrivateDirectoryAdmin} from "@/api";
+import {listJoyeaUser, updatePrivateDirectoryAdmin} from "@/api";
 
 export default {
     name: "PrivateDirectoryAdminManager",

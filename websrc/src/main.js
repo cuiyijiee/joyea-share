@@ -13,6 +13,7 @@ import Video from 'video.js'
 import video_zhCN from 'video.js/dist/lang/zh-CN.json'
 import video_en from  'video.js/dist/lang/en.json'
 import 'video.js/dist/video-js.css'
+import iconFont from "./assets/iconfont/iconfont.css"
 
 
 Video.addLanguage('zh-CN', video_zhCN);
@@ -27,6 +28,8 @@ import moment from "moment";
 Vue.filter('dateFormat', function (dataStr, pattern = 'YYYY-MM-DD HH:mm:ss') {
   return moment(new Date(dataStr)).format(pattern);
 })
+
+Vue.prototype.$EventBus = new Vue();
 
 new Vue({
   router,
