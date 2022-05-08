@@ -12,14 +12,14 @@
 
                 <el-col :span="15" class="userinfo">
                     <el-button size="small"  @click="jumpToBuild" round
-                               icon="el-icon-edit" class="interval"
+                               icon="iconfont el-icon-icon_home_20_20px" class="interval"
                                :class="{'is-active':currentPath.startsWith('/build')}"> 工作台
                     </el-button>
-                    <el-button size="small" icon="el-icon-tickets" @click="jumpToList" round
+                    <el-button size="small" icon="iconfont el-icon-icon_wodeqingdan_20_20px" @click="jumpToList" round
                                :class="{'is-active':currentPath.startsWith('/manage/list')}"
                                style="">我的清单
                     </el-button>
-                    <el-button size="small" icon="el-icon-tickets" @click="jumpToUpload" round
+                    <el-button size="small" icon="iconfont el-icon-icon_sucaishangchuan_20_20px" @click="jumpToUpload" round
                                :class="{'is-active':currentPath.startsWith('/upload/index')}"
                                style="margin-right: 10px">素材上传
                     </el-button>
@@ -66,8 +66,8 @@
                                 </template>
                             </el-table-column>
                         </el-table>
-                        <el-button slot="reference" size="small" circle :type="visible?'danger':''"
-                                   :icon="visible ? 'el-icon-loading' :'el-icon-download' "></el-button>
+                        <el-button slot="reference" size="small" :type="visible?'danger':''" round
+                                   :icon="visible ? 'el-icon-loading' :'iconfont el-icon-icon_xiazailiebiao_20_20px' ">下载列表</el-button>
                     </el-popover>
                     <el-dropdown trigger="hover">
                         <span class="el-dropdown-link userinfo-inner">{{ userInfo.name }}</span>
