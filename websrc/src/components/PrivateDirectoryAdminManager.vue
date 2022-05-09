@@ -4,7 +4,7 @@
       <el-cascader v-model="value" placeholder="请搜索添加文件管理员" size="small"
                    :options="options" :disabled="!editable" @click.stop="console.log('123')"
                    :props="{ multiple: true }" filterable></el-cascader>
-        <el-button @click.stop="handleSave" :icon="editable ? 'el-icon-check':'el-icon-edit'" circle
+        <el-button :disabled="!enabled" @click.stop="handleSave" :icon="editable ? 'el-icon-check':'el-icon-edit'" circle
                    type="primary" size="small"></el-button>
         <el-button @click.stop="handleReset" v-show="editable" icon="el-icon-close" circle type="danger"
                    size="small"></el-button>
@@ -18,7 +18,7 @@ import {listJoyeaUser, updatePrivateDirectoryAdmin} from "@/api";
 
 export default {
     name: "PrivateDirectoryAdminManager",
-    props: ['fileItem'],
+    props: ['fileItem','enabled'],
     data() {
         return {
             value: [],
@@ -49,6 +49,9 @@ export default {
             this.editable = false;
         },
         handleGetAllAdmin() {
+            if(!this.fileItem.adminUser) {
+                this.fileItem.adminUser = [];
+            }
             this.fileItem.adminUser.forEach(item => {
                 let tmpResult = [];
                 tmpResult.push(item.department);

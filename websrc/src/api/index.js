@@ -224,6 +224,14 @@ export function removePrivateDirSrc(parentDirId, neid) {
     })
 }
 
+export function updateSrcAlias(parentDirId, neid, alias) {
+    return service.post("apiv2/privateDir/updateAlias", {
+        parentDirId: parentDirId, neid: neid, alias:alias
+    }).then(resp => {
+        return resp.data;
+    })
+}
+
 export function listPrivateDir(parentDirId) {
     return service.post("apiv2/privateDir/list", {
         parentDirId: parentDirId,

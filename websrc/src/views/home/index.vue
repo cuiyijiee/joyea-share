@@ -11,24 +11,24 @@
                 </el-col>
 
                 <el-col :span="15" class="userinfo">
-                    <el-button size="small"  @click="jumpToBuild" round
+                    <el-button size="mini"  @click="jumpToBuild" round
                                icon="iconfont el-icon-icon_home_20_20px" class="interval"
-                               :class="{'is-active':currentPath.startsWith('/build')}"> 工作台
+                               :class="{'is-active':currentPath.startsWith('/build')}"> 首页
                     </el-button>
-                    <el-button size="small" icon="iconfont el-icon-icon_wodeqingdan_20_20px" @click="jumpToList" round
+                    <el-button size="mini" icon="iconfont el-icon-icon_wodeqingdan_20_20px" @click="jumpToList" round
                                :class="{'is-active':currentPath.startsWith('/manage/list')}"
                                style="">我的清单
                     </el-button>
-                    <el-button size="small" icon="iconfont el-icon-icon_sucaishangchuan_20_20px" @click="jumpToUpload" round
+                    <el-button size="mini" icon="iconfont el-icon-icon_sucaishangchuan_20_20px" @click="jumpToUpload" round
                                :class="{'is-active':currentPath.startsWith('/upload/index')}"
                                style="margin-right: 10px">素材上传
                     </el-button>
-                    <el-button size="small" icon="el-icon-tickets" @click="jumpToUploadManage" round
+                    <el-button size="mini" icon="iconfont el-icon-a-icon_sucaishenhe_20_20px1" @click="jumpToUploadManage" round
                                v-if="userInfo.isAdmin"
                                :class="{'is-active':currentPath.startsWith('/upload/manage')}"
                                style="margin-left:0;margin-right: 10px">素材审核
                     </el-button>
-                    <el-button size="small" icon="el-icon-tickets" @click="jumpToTranscode" round
+                    <el-button size="mini" icon="iconfont el-icon-icon_suzhuanmasucaiguanli20_20px" @click="jumpToTranscode" round
                                v-if="userInfo.isAdmin"
                                :class="{'is-active':currentPath.startsWith('/transcode/index')}"
                                style="margin-left:0;margin-right: 10px">转码素材管理
@@ -66,9 +66,10 @@
                                 </template>
                             </el-table-column>
                         </el-table>
-                        <el-button slot="reference" size="small" :type="visible?'danger':''" round
+                        <el-button slot="reference" size="mini" :type="visible?'danger':''" round
                                    :icon="visible ? 'el-icon-loading' :'iconfont el-icon-icon_xiazailiebiao_20_20px' ">下载列表</el-button>
                     </el-popover>
+                    <el-button size="mini" type="warning" style="background-color: #eb7708 " circle icon="iconfont el-icon-icon_me_20_20px"></el-button>
                     <el-dropdown trigger="hover">
                         <span class="el-dropdown-link userinfo-inner">{{ userInfo.name }}</span>
                         <el-dropdown-menu slot="dropdown">
