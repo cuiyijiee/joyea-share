@@ -1164,6 +1164,9 @@ export default {
         },
         handleListLenovoDir(path) {
             this.dir.loadingDir = true;
+            if(this.directoryType.length === 0) {
+                return;
+            }
             getFileMetadata(this.directoryType, path.replace("+", "%2B"), "").then(response => {
                 if (response.code === "0") {
                     this.curDirNeid = response.obj.neid;
@@ -1348,8 +1351,17 @@ export default {
         this.handleGetTopSearchKey();
         let _this = this;
         this.$EventBus.$on('switchSpace', function (data) {
+            let switchFlag = _this.directoryType !== data;
+            if(!data || data.length <= 0) {
+                switchFlag = false;
+            }
             _this.directoryType = data;
+            if(switchFlag) {
+                _this.handleGoRootPath();
+            }
         });
+    },
+    destroyed() {
     }
 }
 </script>

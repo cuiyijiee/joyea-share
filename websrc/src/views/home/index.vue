@@ -4,16 +4,26 @@
             <el-col :span="24" class="header">
                 <el-col :span="9">
                     <div class="main_content">
-                        <img :src="joyeaLogo" @click="jumpToBuild"
+                        <img :src="joyeaLogo" @click="jumpToBuild('')"
                              style="height: 30px;vertical-align: middle;"/>
                         <span class="logo" style="font-size: 20px;margin-left: 10px;vertical-align:bottom"><b>仅一素材库</b></span>
                     </div>
                 </el-col>
 
                 <el-col :span="15" class="userinfo">
-                    <el-button size="mini"  @click="jumpToBuild" round
+                    <el-button size="mini"  @click="jumpToBuild('')" round
                                icon="iconfont el-icon-icon_home_20_20px" class="interval"
                                :class="{'is-active':currentPath.startsWith('/build')}"> 首页
+                    </el-button>
+                    <el-button size="mini"  @click="jumpToBuild('SELF')" round
+                               v-if="currentPath.startsWith('/build')"
+                               icon="iconfont el-icon-icon_xifenshichang_20_20px" class="interval"
+                               :class="{'is-active':currentPath.startsWith('/build')}"> 细分市场
+                    </el-button>
+                    <el-button size="mini"  @click="jumpToBuild('LENOVO')" round
+                               v-if="currentPath.startsWith('/build')"
+                               icon="iconfont el-icon-icon_sucaiku_20_20px" class="interval"
+                               :class="{'is-active':currentPath.startsWith('/build')}"> 素材库
                     </el-button>
                     <el-button size="mini" icon="iconfont el-icon-icon_wodeqingdan_20_20px" @click="jumpToList" round
                                :class="{'is-active':currentPath.startsWith('/manage/list')}"
@@ -22,16 +32,6 @@
                     <el-button size="mini" icon="iconfont el-icon-icon_sucaishangchuan_20_20px" @click="jumpToUpload" round
                                :class="{'is-active':currentPath.startsWith('/upload/index')}"
                                style="margin-right: 10px">素材上传
-                    </el-button>
-                    <el-button size="mini" icon="iconfont el-icon-a-icon_sucaishenhe_20_20px1" @click="jumpToUploadManage" round
-                               v-if="userInfo.isAdmin"
-                               :class="{'is-active':currentPath.startsWith('/upload/manage')}"
-                               style="margin-left:0;margin-right: 10px">素材审核
-                    </el-button>
-                    <el-button size="mini" icon="iconfont el-icon-icon_suzhuanmasucaiguanli20_20px" @click="jumpToTranscode" round
-                               v-if="userInfo.isAdmin"
-                               :class="{'is-active':currentPath.startsWith('/transcode/index')}"
-                               style="margin-left:0;margin-right: 10px">转码素材管理
                     </el-button>
                     <el-popover
                         style="margin-right: 20px"
@@ -69,10 +69,15 @@
                         <el-button slot="reference" size="mini" :type="visible?'danger':''" round
                                    :icon="visible ? 'el-icon-loading' :'iconfont el-icon-icon_xiazailiebiao_20_20px' ">下载列表</el-button>
                     </el-popover>
-                    <el-button size="mini" type="warning" style="background-color: #eb7708 " circle icon="iconfont el-icon-icon_me_20_20px"></el-button>
+
                     <el-dropdown trigger="hover">
-                        <span class="el-dropdown-link userinfo-inner">{{ userInfo.name }}</span>
+                        <div>
+                            <el-button size="mini" type="warning" style="background-color: #eb7708 " circle icon="iconfont el-icon-icon_me_20_20px"></el-button>
+                            <span class="el-dropdown-link userinfo-inner">{{ userInfo.name }}</span>
+                        </div>
                         <el-dropdown-menu slot="dropdown">
+                            <el-dropdown-item v-if="userInfo.isAdmin" @click.native="jumpToUploadManage">素材审核</el-dropdown-item>
+                            <el-dropdown-item v-if="userInfo.isAdmin" @click.native="jumpToTranscode">转码素材管理</el-dropdown-item>
                             <el-dropdown-item @click.native="logout">注销登陆</el-dropdown-item>
                         </el-dropdown-menu>
                     </el-dropdown>
@@ -122,11 +127,11 @@ export default {
         ...mapActions('userInfo', [
             'clearUserSessionFunc'
         ]),
-        jumpToBuild() {
+        jumpToBuild(path) {
             if (!this.currentPath.startsWith('/build')) {
                 this.$router.push("/build?_=" + (new Date()).getTime());
             } else {
-                this.$EventBus.$emit("switchSpace","");
+                this.$EventBus.$emit("switchSpace",path);
             }
         },
         jumpToUpload() {
