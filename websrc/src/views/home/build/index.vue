@@ -45,7 +45,9 @@
                 <el-row class="adminContentHead">
                     <el-col :span="15">
                                 <span style=" color:#000000;font-size: 15px;cursor:pointer;"
-                                      @click="handleGoRootPath">{{ directoryType === 'SELF' ? '细分市场' : '素材库' }}</span>
+                                      @click="handleGoRootPath">{{
+                                        directoryType === 'SELF' ? '细分市场素材库' : '基础素材库'
+                                    }}</span>
                         <span v-for="(item,index) in dir.currentPath" v-if="item !== '营销素材展示'"
                               style="display: inline">/
                             <span style=" color:#000000;font-size: 15px;cursor:pointer;"
@@ -143,6 +145,11 @@
                                            @click.stop="handleUpdateAlias(scope.$index, scope.row)">
                                 </el-button>
                             </span>
+                            <el-button
+                                v-if="hasBtnShowPermission(scope.row,'PRIVATE_DIR_REMOVE_SRC')"
+                                circle
+                                icon="el-icon-delete" @click.stop="handleRemoveSrc(scope.$index, scope.row)">
+                            </el-button>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -1298,10 +1305,10 @@ export default {
             })
         },
         handleUpdateAlias(index, row) {
-            console.log("update alias: " + JSON.stringify(row));
             this.$prompt('请输入要修改的文件名', '修改提示', {
                 confirmButtonText: '确定',
-                cancelButtonText: '取消'
+                cancelButtonText: '取消',
+                inputValue: row.file_name
             }).then(({value}) => {
                 if (!value || value.length <= 0) {
                     this.$message.error("名字不能未空！");
@@ -1346,17 +1353,18 @@ export default {
             });
         }
         this.handleGetTopSearchKey();
-        let _this = this;
-        this.$EventBus.$on('switchSpace', function (data) {
-            let switchFlag = _this.directoryType !== data;
-            if (!data || data.length <= 0) {
-                switchFlag = false;
-            }
-            _this.directoryType = data;
-            if (switchFlag) {
-                _this.handleGoRootPath();
-            }
-        });
+        let queryParams = this.$route.query;
+        if (queryParams && queryParams.directoryType && queryParams.directoryType.trim().length > 0) {
+            this.directoryType = queryParams.directoryType;
+            this.handleGoRootPath();
+        }
+        // let _this = this;
+        // this.$EventBus.$on('switchSpace', function (data) {
+        //     _this.directoryType = data;
+        //     if (data && data.trim().length > 0) {
+        //         _this.handleGoRootPath();
+        //     }
+        // });
     },
     destroyed() {
     }

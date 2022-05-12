@@ -4,46 +4,51 @@
             <el-col :span="24" class="header">
                 <el-col :span="9">
                     <div class="main_content">
-                        <img class="logo" :src="joyeaLogo" @click="jumpToBuild('')"/>
+                        <img :src="joyeaLogo" class="logo" @click="jumpToBuild('')"/>
                         <span class="logo_text"><b>仅一素材库</b></span>
                     </div>
                 </el-col>
 
                 <el-col :span="15" class="userinfo">
-                    <el-button size="mini" @click="jumpToBuild('')" round
-                               icon="iconfont el-icon-icon_home_20_20px" class="interval"
-                               :class="{'is-active':currentPath.startsWith('/build')}"> 首页
+                    <el-button :class="{'is-active':currentPath.startsWith('/build')}" class="interval"
+                               icon="iconfont el-icon-icon_home_20_20px"
+                               round size="mini"
+                               @click="jumpToBuild('')"> 首页
                     </el-button>
-                    <el-button size="mini" @click="jumpToBuild('SELF')" round
-                               v-if="currentPath.startsWith('/build') && directoryType.trim() !== ''"
-                               icon="iconfont el-icon-icon_xifenshichang_20_20px" class="interval"
-                               :class="{'is-active':currentPath.startsWith('/build')}"> 细分市场
+                    <el-button v-if="!currentPath.startsWith('/build')"
+                               :class="{'is-active':currentPath.startsWith('/build')}" class="interval"
+                               icon="iconfont el-icon-icon_xifenshichang_20_20px"
+                               round size="mini"
+                               @click="jumpToBuild('SELF')"> 细分市场
                     </el-button>
-                    <el-button size="mini" @click="jumpToBuild('LENOVO')" round
-                               v-if="currentPath.startsWith('/build') && directoryType.trim() !== ''"
-                               icon="iconfont el-icon-icon_sucaiku_20_20px" class="interval"
-                               :class="{'is-active':currentPath.startsWith('/build')}"> 素材库
+                    <el-button v-if="!currentPath.startsWith('/build')"
+                               :class="{'is-active':currentPath.startsWith('/build')}" class="interval"
+                               icon="iconfont el-icon-icon_sucaiku_20_20px"
+                               round size="mini"
+                               @click="jumpToBuild('LENOVO')"> 基础素材库
                     </el-button>
-                    <el-button size="mini" icon="iconfont el-icon-icon_wodeqingdan_20_20px" @click="jumpToList" round
-                               :class="{'is-active':currentPath.startsWith('/manage/list')}"
-                               style="">我的清单
+                    <el-button :class="{'is-active':currentPath.startsWith('/manage/list')}"
+                               icon="iconfont el-icon-icon_wodeqingdan_20_20px" round size="mini"
+                               style=""
+                               @click="jumpToList">我的清单
                     </el-button>
-                    <el-button size="mini" icon="iconfont el-icon-icon_sucaishangchuan_20_20px" @click="jumpToUpload"
-                               round
-                               :class="{'is-active':currentPath.startsWith('/upload/index')}"
-                               style="margin-right: 10px">素材上传
+                    <el-button :class="{'is-active':currentPath.startsWith('/upload/index')}"
+                               icon="iconfont el-icon-icon_sucaishangchuan_20_20px" round
+                               size="mini"
+                               style="margin-right: 10px"
+                               @click="jumpToUpload">素材上传
                     </el-button>
                     <el-popover
-                        style="margin-right: 20px"
                         placement="bottom-start"
+                        style="margin-right: 20px"
+                        trigger="click"
                         width="600"
-                        @show="handleOpenDownload"
                         @hide="handleCloseDownload"
-                        trigger="click">
+                        @show="handleOpenDownload">
                         <el-table :data="downloadTask" empty-text="今日暂无下载任务">
                             <!--                            <el-table-column width="300" property="id" label="任务ID"></el-table-column>-->
-                            <el-table-column width="300" label="任务名称"
-                                             show-overflow-tooltip>
+                            <el-table-column label="任务名称" show-overflow-tooltip
+                                             width="300">
                                 <template slot-scope="scope">
                                     <div v-if="scope.row.opened" style="color: #888888">
                                         {{ scope.row.firstSrcName + ".zip" }}
@@ -53,29 +58,33 @@
                                     </div>
                                 </template>
                             </el-table-column>
-                            <el-table-column width="200" label="下载时间">
+                            <el-table-column label="下载时间" width="200">
                                 <template slot-scope="scope">
                                     {{ scope.row.startTime | dateFormat }}
                                 </template>
                             </el-table-column>
-                            <el-table-column width="100" label="状态">
+                            <el-table-column label="状态" width="100">
                                 <template slot-scope="scope">
-                                    <el-button :type="scope.row.status?'success':'danger'" size="mini"
-                                               @click="handleDownload(scope.row)"
-                                               :icon="scope.row.status?'el-icon-download':'el-icon-loading'"></el-button>
+                                    <el-button :icon="scope.row.status?'el-icon-download':'el-icon-loading'"
+                                               :type="scope.row.status?'success':'danger'"
+                                               size="mini"
+                                               @click="handleDownload(scope.row)"></el-button>
                                 </template>
                             </el-table-column>
                         </el-table>
-                        <el-button slot="reference" size="mini" :type="visible?'danger':''" round
-                                   :icon="visible ? 'el-icon-loading' :'iconfont el-icon-icon_xiazailiebiao_20_20px' ">
+                        <el-button slot="reference"
+                                   :icon="visible ? 'el-icon-loading' :'iconfont el-icon-icon_xiazailiebiao_20_20px' "
+                                   :type="visible?'danger':''" round
+                                   size="mini">
                             下载列表
                         </el-button>
                     </el-popover>
 
                     <el-dropdown trigger="click">
                         <div>
-                            <el-button size="mini" type="warning" style="background-color: #eb7708 " circle
-                                       icon="iconfont el-icon-icon_me_20_20px"></el-button>
+                            <el-button circle icon="iconfont el-icon-icon_me_20_20px" size="mini"
+                                       style="background-color: #eb7708 "
+                                       type="warning"></el-button>
                             <span class="el-dropdown-link userinfo-inner">{{ userInfo.name }}<i
                                 class="el-icon-arrow-down el-icon--right"/></span>
                         </div>
@@ -93,7 +102,7 @@
                 <section class="content-container">
                     <div class="grid-content bg-purple-light">
                         <el-col :span="24" class="content-wrapper">
-                            <transition name="fade" mode="out-in">
+                            <transition mode="out-in" name="fade">
                                 <router-view></router-view>
                             </transition>
                         </el-col>
@@ -119,7 +128,7 @@ export default {
             currentPath: "",
             downloadTask: [],
             joyeaLogo: require("@assets/joyea.png"),
-            directoryType:""
+            // directoryType:""
         }
     },
     computed: {
@@ -136,9 +145,7 @@ export default {
         ]),
         jumpToBuild(path) {
             if (!this.currentPath.startsWith('/build')) {
-                this.$router.push("/build?_=" + (new Date()).getTime());
-            } else {
-                this.$EventBus.$emit("switchSpace", path);
+                this.$router.push("/build?directoryType=" + path);
             }
         },
         jumpToUpload() {
@@ -233,7 +240,12 @@ export default {
     watch: {
         $route(to, from) {
             this.currentPath = this.$router.currentRoute.fullPath;
-        }
+        },
+        // currentPath(){
+        //     if(!this.currentPath.startsWith('/build')) {
+        //         this.directoryType = '';
+        //     }
+        // }
     },
     mounted() {
         this.currentPath = this.$router.currentRoute.fullPath;
@@ -250,14 +262,14 @@ export default {
         document.oncontextmenu = function (event) {
             event.preventDefault();
         };
-        this.$EventBus.$on("directoryTypeChanged",directoryType => {
-            this.directoryType = directoryType;
-        })
+        // this.$EventBus.$on("directoryTypeChanged",directoryType => {
+        //     this.directoryType = directoryType;
+        // })
     }
 }
 </script>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 @import '../../style/vars';
 
 .container {
@@ -297,6 +309,10 @@ export default {
             text-align: right;
             padding-right: 150px;
             float: right;
+
+            .el-button--mini {
+                font-size: 16px;
+            }
 
             .userinfo-inner {
                 cursor: pointer;
