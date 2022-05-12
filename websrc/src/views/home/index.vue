@@ -4,24 +4,23 @@
             <el-col :span="24" class="header">
                 <el-col :span="9">
                     <div class="main_content">
-                        <img :src="joyeaLogo" @click="jumpToBuild('')"
-                             style="height: 30px;vertical-align: middle;"/>
-                        <span class="logo" style="font-size: 20px;margin-left: 10px;vertical-align:bottom"><b>仅一素材库</b></span>
+                        <img class="logo" :src="joyeaLogo" @click="jumpToBuild('')"/>
+                        <span class="logo_text"><b>仅一素材库</b></span>
                     </div>
                 </el-col>
 
                 <el-col :span="15" class="userinfo">
-                    <el-button size="mini"  @click="jumpToBuild('')" round
+                    <el-button size="mini" @click="jumpToBuild('')" round
                                icon="iconfont el-icon-icon_home_20_20px" class="interval"
                                :class="{'is-active':currentPath.startsWith('/build')}"> 首页
                     </el-button>
-                    <el-button size="mini"  @click="jumpToBuild('SELF')" round
-                               v-if="currentPath.startsWith('/build')"
+                    <el-button size="mini" @click="jumpToBuild('SELF')" round
+                               v-if="currentPath.startsWith('/build') && directoryType.trim() !== ''"
                                icon="iconfont el-icon-icon_xifenshichang_20_20px" class="interval"
                                :class="{'is-active':currentPath.startsWith('/build')}"> 细分市场
                     </el-button>
-                    <el-button size="mini"  @click="jumpToBuild('LENOVO')" round
-                               v-if="currentPath.startsWith('/build')"
+                    <el-button size="mini" @click="jumpToBuild('LENOVO')" round
+                               v-if="currentPath.startsWith('/build') && directoryType.trim() !== ''"
                                icon="iconfont el-icon-icon_sucaiku_20_20px" class="interval"
                                :class="{'is-active':currentPath.startsWith('/build')}"> 素材库
                     </el-button>
@@ -29,7 +28,8 @@
                                :class="{'is-active':currentPath.startsWith('/manage/list')}"
                                style="">我的清单
                     </el-button>
-                    <el-button size="mini" icon="iconfont el-icon-icon_sucaishangchuan_20_20px" @click="jumpToUpload" round
+                    <el-button size="mini" icon="iconfont el-icon-icon_sucaishangchuan_20_20px" @click="jumpToUpload"
+                               round
                                :class="{'is-active':currentPath.startsWith('/upload/index')}"
                                style="margin-right: 10px">素材上传
                     </el-button>
@@ -67,17 +67,23 @@
                             </el-table-column>
                         </el-table>
                         <el-button slot="reference" size="mini" :type="visible?'danger':''" round
-                                   :icon="visible ? 'el-icon-loading' :'iconfont el-icon-icon_xiazailiebiao_20_20px' ">下载列表</el-button>
+                                   :icon="visible ? 'el-icon-loading' :'iconfont el-icon-icon_xiazailiebiao_20_20px' ">
+                            下载列表
+                        </el-button>
                     </el-popover>
 
-                    <el-dropdown trigger="hover">
+                    <el-dropdown trigger="click">
                         <div>
-                            <el-button size="mini" type="warning" style="background-color: #eb7708 " circle icon="iconfont el-icon-icon_me_20_20px"></el-button>
-                            <span class="el-dropdown-link userinfo-inner">{{ userInfo.name }}</span>
+                            <el-button size="mini" type="warning" style="background-color: #eb7708 " circle
+                                       icon="iconfont el-icon-icon_me_20_20px"></el-button>
+                            <span class="el-dropdown-link userinfo-inner">{{ userInfo.name }}<i
+                                class="el-icon-arrow-down el-icon--right"/></span>
                         </div>
                         <el-dropdown-menu slot="dropdown">
-                            <el-dropdown-item v-if="userInfo.isAdmin" @click.native="jumpToUploadManage">素材审核</el-dropdown-item>
-                            <el-dropdown-item v-if="userInfo.isAdmin" @click.native="jumpToTranscode">转码素材管理</el-dropdown-item>
+                            <el-dropdown-item v-if="userInfo.isAdmin" @click.native="jumpToUploadManage">素材审核
+                            </el-dropdown-item>
+                            <el-dropdown-item v-if="userInfo.isAdmin" @click.native="jumpToTranscode">转码素材管理
+                            </el-dropdown-item>
                             <el-dropdown-item @click.native="logout">注销登陆</el-dropdown-item>
                         </el-dropdown-menu>
                     </el-dropdown>
@@ -113,6 +119,7 @@ export default {
             currentPath: "",
             downloadTask: [],
             joyeaLogo: require("@assets/joyea.png"),
+            directoryType:""
         }
     },
     computed: {
@@ -131,7 +138,7 @@ export default {
             if (!this.currentPath.startsWith('/build')) {
                 this.$router.push("/build?_=" + (new Date()).getTime());
             } else {
-                this.$EventBus.$emit("switchSpace",path);
+                this.$EventBus.$emit("switchSpace", path);
             }
         },
         jumpToUpload() {
@@ -243,6 +250,9 @@ export default {
         document.oncontextmenu = function (event) {
             event.preventDefault();
         };
+        this.$EventBus.$on("directoryTypeChanged",directoryType => {
+            this.directoryType = directoryType;
+        })
     }
 }
 </script>
@@ -258,9 +268,30 @@ export default {
 
     .header {
         height: 60px;
-        line-height: 60px;
         background: #E9E9E9;
-        color: #000;
+        padding-top: 20px;
+
+        .main_content {
+
+            padding-left: 150px;
+
+            .logo {
+                cursor: pointer;
+                vertical-align: middle;
+                height: 30px;
+            }
+
+            .logo_text {
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+                margin-left: 10px;
+
+                font-size: 20px;
+                vertical-align: bottom;
+            }
+        }
 
         .userinfo {
             text-align: right;
@@ -270,6 +301,7 @@ export default {
             .userinfo-inner {
                 cursor: pointer;
                 color: #000;
+                padding-left: 10px;
 
                 img {
                     width: 40px;
@@ -279,31 +311,6 @@ export default {
                     float: right;
                 }
             }
-        }
-
-        .main_content {
-            margin: 0 150px;
-        }
-
-        .logo {
-            height: 60px;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-
-            .txt {
-                color: #fff;
-            }
-        }
-
-
-        .tools {
-            padding: 0px 23px;
-            width: 14px;
-            height: 60px;
-            line-height: 60px;
-            cursor: pointer;
         }
     }
 

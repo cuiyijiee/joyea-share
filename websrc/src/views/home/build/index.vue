@@ -1,16 +1,15 @@
 <template>
-
     <section id="build">
         <!--工具条-->
         <div style="padding: 10px 150px 0 150px;background: #E9E9E9;">
             <el-input v-model="search.key" class="my-input" placeholder="请输入关键字"
                       @keyup.enter.native="handleSearch">
                 <el-button slot="append" class="search-button"
-                           icon="el-icon-search" style="margin: 0px -20px !important;"
+                           icon="el-icon-search" style=""
                            v-on:click="handleSearch"/>
             </el-input>
             <div style="padding:15px 0;color: #808080">热门搜索:
-                <span v-for="key in topSearchKey" style="padding: 5px"
+                <span v-for="key in topSearchKey" style="padding: 15px;cursor: pointer"
                       @click="handleClickTopSearchKey(key)"><u><b>{{ key }}</b></u></span>
             </div>
         </div>
@@ -44,23 +43,16 @@
             <el-col :span="18" class="bg-purple">
                 <!--文件路径显示-->
                 <el-row class="adminContentHead">
-                    <el-col :span="3">
-                        <el-select v-model="directoryType" placeholder="请选择" size="small"
-                                   @change="handleDirectoryTypeSelected">
-                            <el-option key="SELF" label="细分市场" value="SELF"/>
-                            <el-option key="LENOVO" label="素材库" value="LENOVO"/>
-                        </el-select>
-                    </el-col>
                     <el-col :span="15">
                                 <span style=" color:#000000;font-size: 15px;cursor:pointer;"
-                                      @click="handleGoRootPath">首页</span>
+                                      @click="handleGoRootPath">{{ directoryType === 'SELF' ? '细分市场' : '素材库' }}</span>
                         <span v-for="(item,index) in dir.currentPath" v-if="item !== '营销素材展示'"
                               style="display: inline">/
                             <span style=" color:#000000;font-size: 15px;cursor:pointer;"
                                   @click="handleClickDirPath(item,index)">{{ item }}</span>
                         </span>
                     </el-col>
-                    <el-col :span="6" style="text-align: right">
+                    <el-col :span="9" style="text-align: right">
                         <span>
                             共{{ dir.tableData.length }}个资源
                         </span>
@@ -502,6 +494,11 @@ export default {
         ...mapGetters({
             'userInfo': 'userInfo/userInfo'
         })
+    },
+    watch: {
+        directoryType() {
+            this.$EventBus.$emit("directoryTypeChanged", this.directoryType);
+        }
     },
     methods: {
         hasBtnShowPermission(fileItem, mode) {
@@ -1164,7 +1161,7 @@ export default {
         },
         handleListLenovoDir(path) {
             this.dir.loadingDir = true;
-            if(this.directoryType.length === 0) {
+            if (this.directoryType.length === 0) {
                 return;
             }
             getFileMetadata(this.directoryType, path.replace("+", "%2B"), "").then(response => {
@@ -1352,11 +1349,11 @@ export default {
         let _this = this;
         this.$EventBus.$on('switchSpace', function (data) {
             let switchFlag = _this.directoryType !== data;
-            if(!data || data.length <= 0) {
+            if (!data || data.length <= 0) {
                 switchFlag = false;
             }
             _this.directoryType = data;
-            if(switchFlag) {
+            if (switchFlag) {
                 _this.handleGoRootPath();
             }
         });
