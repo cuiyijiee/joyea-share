@@ -146,6 +146,8 @@ export default {
         jumpToBuild(path) {
             if (!this.currentPath.startsWith('/build')) {
                 this.$router.push("/build?directoryType=" + path);
+            }else{
+                this.$EventBus.$emit('switchSpace',path);
             }
         },
         jumpToUpload() {

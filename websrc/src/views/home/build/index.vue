@@ -1358,13 +1358,13 @@ export default {
             this.directoryType = queryParams.directoryType;
             this.handleGoRootPath();
         }
-        // let _this = this;
-        // this.$EventBus.$on('switchSpace', function (data) {
-        //     _this.directoryType = data;
-        //     if (data && data.trim().length > 0) {
-        //         _this.handleGoRootPath();
-        //     }
-        // });
+        let _this = this;
+        this.$EventBus.$on('switchSpace', function (data) {
+            _this.directoryType = data;
+            if (data && data.trim().length > 0) {
+                _this.handleGoRootPath();
+            }
+        });
     },
     destroyed() {
     }
