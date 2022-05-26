@@ -1,7 +1,7 @@
 <template>
     <section id="build">
         <!--工具条-->
-        <div style="padding: 10px 150px 0 150px;background: #E9E9E9;">
+        <div style="padding: 10px 80px 0 80px;background: #E9E9E9;">
             <el-input v-model="search.key" class="my-input" placeholder="请输入关键字"
                       @keyup.enter.native="handleSearch">
                 <el-button slot="append" class="search-button"
@@ -26,7 +26,7 @@
         </div>
         <div
             v-else-if="curDirNeid === '541796009' && toCreateAlbum.list.length === 0"
-            style="height:1080px;padding: 0 150px;background: #d1d1d1;">
+            style="height:1080px;padding: 0 80px;background: #d1d1d1;">
             <div v-loading="dir.loadingDir || loading.search"
                  element-loading-background="rgba(209, 209, 209)"
                  style="padding: 10px 10px 0 10px;height: 100%; ">
@@ -39,7 +39,7 @@
                 </el-row>
             </div>
         </div>
-        <el-row v-else :gutter="20" style="margin:0 150px;padding: 10px 0 0 0;height:1080px;">
+        <el-row v-else :gutter="20" style="margin:0 80px;padding: 10px 0 0 0;height:1080px;">
             <el-col :span="18" class="bg-purple">
                 <!--文件路径显示-->
                 <el-row class="adminContentHead">
@@ -198,17 +198,18 @@
                     <el-row :class="{no_display:toCreateAlbum.list.length === 0}" :gutter="5" class="load_more_bt">
                         <el-col :span="8">
                             <el-button :loading="loading.saveList" class="load_more_bt" icon="el-icon-folder-add"
+                                       size="mini"
                                        type="info" @click.stop="handleSaveList">保存清单
                             </el-button>
                         </el-col>
                         <el-col :span="8">
                             <el-button v-loading="loading.downloadLoading" class="load_more_bt" icon="el-icon-suitcase"
-                                       type="info"
+                                       type="info" size="mini"
                                        @click.stop="handleDownloadSrc(true)">下载准备
                             </el-button>
                         </el-col>
                         <el-col :span="8">
-                            <el-button class="load_more_bt" icon="el-icon-delete" type="info"
+                            <el-button class="load_more_bt" icon="el-icon-delete" type="info" size="mini"
                                        @click.stop="handleClearList">清空
                             </el-button>
                         </el-col>
@@ -825,7 +826,7 @@ export default {
             })
         },
         handleDownloadPrivateDir(index, row) {
-            getFileMetadata(this.directoryType, row.path.replace("+", "%2B"), "").then(response => {
+            getFileMetadata(this.directoryType, row.path, "").then(response => {
                 if (!response.obj.content) {
                     this.$message.error("当前文件夹可供下载文件为空！");
                     return;
@@ -1159,19 +1160,21 @@ export default {
             this.handleGoRootPath();
             const table = document.querySelector('#toSortTable .el-table__body-wrapper tbody');
             const self = this;
-            Sortable.create(table, {
-                onEnd({newIndex, oldIndex}) {
-                    const targetRow = self.toCreateAlbum.list.splice(oldIndex, 1)[0];
-                    self.toCreateAlbum.list.splice(newIndex, 0, targetRow);
-                }
-            });
+            if(table) {
+                Sortable.create(table, {
+                    onEnd({newIndex, oldIndex}) {
+                        const targetRow = self.toCreateAlbum.list.splice(oldIndex, 1)[0];
+                        self.toCreateAlbum.list.splice(newIndex, 0, targetRow);
+                    }
+                });
+            }
         },
         handleListLenovoDir(path) {
             this.dir.loadingDir = true;
             if (this.directoryType.length === 0) {
                 return;
             }
-            getFileMetadata(this.directoryType, path.replace("+", "%2B"), "").then(response => {
+            getFileMetadata(this.directoryType, path, "").then(response => {
                 if (response.code === "0") {
                     this.curDirNeid = response.obj.neid;
                     this.curDirAdminUser = response.obj.adminUser;

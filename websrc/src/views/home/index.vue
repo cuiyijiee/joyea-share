@@ -15,23 +15,23 @@
                                round size="mini"
                                @click="jumpToBuild('')"> 首页
                     </el-button>
-                    <el-button v-if="!currentPath.startsWith('/build')"
+                    <el-button v-if="!currentPath.startsWith('/build') || (currentPath.startsWith('/build') && directoryType.trim().length > 0)"
                                :class="{'is-active':currentPath.startsWith('/build')}" class="interval"
                                icon="iconfont el-icon-icon_xifenshichang_20_20px"
                                round size="mini"
                                @click="jumpToBuild('SELF')"> 细分市场
                     </el-button>
-                    <el-button v-if="!currentPath.startsWith('/build')"
+                    <el-button v-if="!currentPath.startsWith('/build') || (currentPath.startsWith('/build') && directoryType.trim().length > 0)"
                                :class="{'is-active':currentPath.startsWith('/build')}" class="interval"
                                icon="iconfont el-icon-icon_sucaiku_20_20px"
                                round size="mini"
                                @click="jumpToBuild('LENOVO')"> 基础素材库
                     </el-button>
-                    <el-button :class="{'is-active':currentPath.startsWith('/manage/list')}"
-                               icon="iconfont el-icon-icon_wodeqingdan_20_20px" round size="mini"
-                               style=""
-                               @click="jumpToList">我的清单
-                    </el-button>
+<!--                    <el-button :class="{'is-active':currentPath.startsWith('/manage/list')}"-->
+<!--                               icon="iconfont el-icon-icon_wodeqingdan_20_20px" round size="mini"-->
+<!--                               style=""-->
+<!--                               @click="jumpToList">我的清单-->
+<!--                    </el-button>-->
                     <el-button :class="{'is-active':currentPath.startsWith('/upload/index')}"
                                icon="iconfont el-icon-icon_sucaishangchuan_20_20px" round
                                size="mini"
@@ -89,6 +89,8 @@
                                 class="el-icon-arrow-down el-icon--right"/></span>
                         </div>
                         <el-dropdown-menu slot="dropdown">
+                            <el-dropdown-item @click.native="jumpToList">我的清单
+                            </el-dropdown-item>
                             <el-dropdown-item v-if="userInfo.isAdmin" @click.native="jumpToUploadManage">素材审核
                             </el-dropdown-item>
                             <el-dropdown-item v-if="userInfo.isAdmin" @click.native="jumpToTranscode">转码素材管理
@@ -128,7 +130,7 @@ export default {
             currentPath: "",
             downloadTask: [],
             joyeaLogo: require("@assets/joyea.png"),
-            // directoryType:""
+            directoryType:""
         }
     },
     computed: {
@@ -146,6 +148,7 @@ export default {
         jumpToBuild(path) {
             if (!this.currentPath.startsWith('/build')) {
                 this.$router.push("/build?directoryType=" + path);
+                this.directoryType = "";
             }else{
                 this.$EventBus.$emit('switchSpace',path);
             }
@@ -264,9 +267,9 @@ export default {
         document.oncontextmenu = function (event) {
             event.preventDefault();
         };
-        // this.$EventBus.$on("directoryTypeChanged",directoryType => {
-        //     this.directoryType = directoryType;
-        // })
+        this.$EventBus.$on("directoryTypeChanged",directoryType => {
+            this.directoryType = directoryType;
+        })
     }
 }
 </script>
@@ -287,7 +290,7 @@ export default {
 
         .main_content {
 
-            padding-left: 150px;
+            padding-left: 80px;
 
             .logo {
                 cursor: pointer;
@@ -309,7 +312,7 @@ export default {
 
         .userinfo {
             text-align: right;
-            padding-right: 150px;
+            padding-right: 80px;
             float: right;
 
             .el-button--mini {

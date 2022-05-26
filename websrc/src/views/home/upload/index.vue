@@ -1,6 +1,6 @@
 <template>
   <div style="text-align: center" v-loading="uploadLoading">
-    <div style="padding: 10px 150px 0 150px;">
+    <div style="padding: 10px 80px 0 80px;">
       <el-upload ref="upload" action="upload" list-type="picture-card" multiple :auto-upload="false"
                  :on-change="handleUploadFileChange">
         <i slot="default" class="el-icon-plus"></i>

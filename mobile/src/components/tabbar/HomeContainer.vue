@@ -257,16 +257,6 @@ export default {
                     + window.location.host + "/api/redirectPath?id=" + resp.id;
                 _this.redirectPath = redirectPath;
                 _this.redirectPathVisible = true;
-                // this.$copyText(redirectPath,function (e) {
-                //
-                // })
-                // var input = document.createElement("input");
-                // input.value = redirectPath;
-                // document.body.appendChild(input);
-                // input.select();
-                // input.setSelectionRange(0, input.value.length), document.execCommand('Copy');
-                // document.body.removeChild(input);
-                //_this.$dialog({message: "获取成功，已复制到剪贴板！\n\n" + redirectPath});
             })
         },
         copyRedirectText() {

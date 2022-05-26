@@ -13,3 +13,4 @@ websrc/yarn.lock
 mobile/dist
 mobile/package-lock.json
 mobile/yarn.lock
+yarn-error.log

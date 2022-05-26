@@ -70,7 +70,7 @@ export default {
         },
         handleListLenovoDir(path, pathType) {
             this.dir.loadingDir = true;
-            getFileMetadata("LENOVO",path.replace("+", "%2B"),"").then(response => {
+            getFileMetadata("LENOVO",path,"").then(response => {
                 if (response.code === "0") {
                     this.currentTypeActive = 0;
                     this.dir.tableData = [];

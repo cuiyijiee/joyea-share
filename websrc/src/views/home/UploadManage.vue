@@ -1,9 +1,9 @@
 <template>
-    <div style="padding: 10px 150px 0 150px;">
-        <h1 v-if="recordList.length === 0">暂时没有需要审核的上传文件！</h1>
+    <div style="padding: 10px 70px 0 70px;">
+        <el-empty v-if="recordList.length === 0" :image-size="200" description="暂时没有需要审核的上传文件！"></el-empty>
         <el-row>
             <el-col :span="8" v-for="(record, index) in recordList" :key="index">
-                <el-card style="margin: 20px">
+                <el-card style="padding: 10px;margin: 10px">
                     <div @click="handleGoToPreview(record)">
                         <img v-if="record.srcType.startsWith('image')"
                              preview="dir_image_list" :preview-text="record.srcNeid"

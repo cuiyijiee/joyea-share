@@ -1,6 +1,6 @@
 <template>
-    <div style="padding: 10px 150px 0 150px;">
-        <h1 style="color: #303133;padding: 10px" v-if="albumList.length === 0">您暂时没有创建的清单！</h1>
+    <div style="padding: 10px 80px 0 80px;">
+        <el-empty v-if="albumList.length === 0" :image-size="200" description="您暂时没有创建的清单！"></el-empty>
         <section v-else style="padding: 10px">
             <!--工具条-->
             <el-input placeholder="输入清单名称查找" v-model="search.key" class="input-with-select px10_divider"
