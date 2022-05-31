@@ -268,3 +268,11 @@ export function addRedirectPath(path){
             return resp.data;
         })
 }
+
+export function getFileMetadata(directoryType, path, parentDirId) {
+    return service.post("apiv2/lenovo/fileMetadata", {
+        directoryType: directoryType, path: path, parentDirId: parentDirId,
+    }).then(resp => {
+        return resp.data;
+    })
+}

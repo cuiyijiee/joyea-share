@@ -69,7 +69,7 @@
                                 <van-col span="16">
                                     {{ item.path.substr(item.path.lastIndexOf('/') + 1) }}
                                     <van-tag style="margin-right: 2px" mark v-for="tag in item.tags">
-                                        {{ tag.replace(markReg, "") }}
+                                        {{ tag.name.replace(markReg, "") }}
                                     </van-tag>
                                 </van-col>
                                 <van-col span="4">
@@ -91,7 +91,7 @@
                             <van-col span="20">
                                 {{ item.path.substr(item.path.lastIndexOf('/') + 1) }}
                                 <van-tag style="margin-right: 2px" mark v-for="tag in item.tags">
-                                    {{ tag.replace(markReg, "") }}
+                                    {{ tag.name.replace(markReg, "") }}
                                 </van-tag>
                             </van-col>
                         </van-cell>
@@ -115,7 +115,7 @@
                                     {{ item.path.substr(item.path.lastIndexOf('/') + 1) }}
                                 </div>
                                 <van-tag style="margin-right: 2px" mark v-for="tag in item.tags">
-                                    {{ tag.replace(markReg, "") }}
+                                    {{ tag.name.replace(markReg, "") }}
                                 </van-tag>
                             </div>
                         </van-grid-item>
@@ -134,7 +134,7 @@
                                 <van-col span="16">
                                     {{ item.path.substr(item.path.lastIndexOf('/') + 1) }}
                                     <van-tag style="margin-right: 2px" mark v-for="tag in item.tags">
-                                        {{ tag.replace(markReg, "") }}
+                                        {{ tag.name.replace(markReg, "") }}
                                     </van-tag>
                                 </van-col>
                                 <van-col span="4">
@@ -158,7 +158,7 @@
                                 <van-col span="16">
                                     {{ item.path.substr(item.path.lastIndexOf('/') + 1) }}
                                     <van-tag style="margin-right: 2px" mark v-for="tag in item.tags">
-                                        {{ tag.replace(markReg, "") }}
+                                        {{ tag.name.replace(markReg, "") }}
                                     </van-tag>
                                 </van-col>
                                 <van-col span="4">
@@ -181,8 +181,8 @@
     </div>
 </template>
 <script>
-import api, {getDefaultJoyeaDesc, getTopSearchKey, addRedirectPath} from "../../api/";
-import {genSrcPreviewSrc, getDocumentImage, handleGoToPreview} from "../../util/JoyeaUtil"
+import {getDefaultJoyeaDesc, getTopSearchKey, addRedirectPath, getFileMetadata} from "@/api";
+import {genSrcPreviewSrc, getDocumentImage, handleGoToPreview} from "@/util/JoyeaUtil"
 import {mapGetters} from "vuex"
 import eventBus from "../../service/eventbus";
 import VmBackTop from 'vue-multiple-back-top'
@@ -200,6 +200,7 @@ export default {
     },
     data() {
         return {
+            directoryType:"LENOVO",
             topSearchKey: [],
             canGoBackSearch: false,
             markReg: /<mark>|<\/mark>/g,
@@ -253,9 +254,8 @@ export default {
                 currentFullPath = currentFullPath + "/" + tmp
             })
             addRedirectPath(currentFullPath).then(resp => {
-                let redirectPath = window.location.protocol + "//"
+                _this.redirectPath = window.location.protocol + "//"
                     + window.location.host + "/api/redirectPath?id=" + resp.id;
-                _this.redirectPath = redirectPath;
                 _this.redirectPathVisible = true;
             })
         },
@@ -352,33 +352,30 @@ export default {
                 forbidClick: true,
                 message: '拼命加载中...',
             });
-            api({
-                action: 'listLenovoDir',
-                path: path.replace("+", "%2B"),
-                path_type: pathType === undefined ? 'ent' : pathType
-            }).then(response => {
+
+            getFileMetadata(this.directoryType,path,"").then(response => {
                 toast.clear();
-                if (response.result) {
+                if (response.code === "0") {
                     this.currentTypeActive = 0;
                     this.dir.tableData = [];
-                    if (response.data.content) {
-                        response.data.content.forEach(item => {
+                    if (response.obj.content) {
+                        response.obj.content.forEach(item => {
                             item.joyeaDesc = "";
                             item.isModify = false;
                             this.dir.tableData.push(item)
                         });
                         this.dir.currentPath = [];
-                        response.data.path.split('/').forEach(item => {
+                        response.obj.path.split('/').forEach(item => {
                             if (item.length !== 0) {
                                 this.dir.currentPath.push(item)
                             }
                         });
                     }
-                } else {
+                }else{
                     console.log('文件夹列表获取失败' + response.msg)
                 }
                 this.dir.loadingDir = false;
-            });
+            })
         },
     },
     mounted() {

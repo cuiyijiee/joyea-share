@@ -25,7 +25,7 @@
 </template>
 
 <script>
-import api, {getFileMetadata} from "@/api";
+import {getFileMetadata} from "@/api";
 import {genFileName, filterDirList} from "../utils/JoyeaUtil";
 
 export default {
