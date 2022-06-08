@@ -63,13 +63,13 @@
                         </span>
                     </el-col>
                 </el-row>
-                <div v-if="hasBtnShowPermission(null,'NEW_PRIVATE_DIR')" class="adminContentHead"
+                <div class="adminContentHead"
                      style="text-align: right">
-                    <AddSrcToPrivateDir v-if="directoryType==='SELF'" :curDirNeid="curDirNeid"
+                    <AddSrcToPrivateDir v-if="hasBtnShowPermission(null,'NEW_PRIVATE_DIR')" :curDirNeid="curDirNeid"
                                         @onAddSuccess="handleRefreshDir" @preview="handleClickDirItem"/>
-                    <AddPrivateDirectory v-if="directoryType==='SELF'"
+                    <AddPrivateDirectory v-if="hasBtnShowPermission(null,'NEW_PRIVATE_DIR')"
                                          :curDirNeid="curDirNeid" @onAddSuccess="handleRefreshDir"/>
-                    <el-button class="search-button" size="small"
+                    <el-button class="search-button" size="small" v-if="hasBtnShowPermission(null,'WORD_MANAGER')"
                                @click="visible.addWordDialogVisible = !visible.addWordDialogVisible">
                         管理小白板
                     </el-button>
@@ -523,6 +523,9 @@ export default {
                     case "NEW_PRIVATE_DIR":
                         hasPermission = this.directoryType === "SELF"
                             && (this.userInfo.isAdmin || this.curDirAdminUser.filter(item => this.userInfo.email === item.joyeaId).length > 0);
+                        break;
+                    case "WORD_MANAGER":
+                        hasPermission = (this.userInfo.isAdmin || this.curDirAdminUser.filter(item => this.userInfo.email === item.joyeaId).length > 0);
                         break;
                     case "MANAGER":
                         hasPermission = this.directoryType === "SELF" && fileItem.path === '/' + fileItem.file_name
