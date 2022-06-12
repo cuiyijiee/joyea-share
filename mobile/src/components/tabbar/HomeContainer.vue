@@ -68,7 +68,7 @@
                                 </van-col>
                                 <van-col span="16">
                                     {{ item.path.substr(item.path.lastIndexOf('/') + 1) }}
-                                    <van-tag style="margin-right: 2px" mark v-for="tag in item.desc.split(' ')">
+                                    <van-tag style="margin-right: 2px" mark v-for="tag in item.desc.split(' ')">
                                         {{ tag.replace(markReg, "") }}
                                     </van-tag>
                                 </van-col>
@@ -90,7 +90,7 @@
                             </van-col>
                             <van-col span="20">
                                 {{ item.path.substr(item.path.lastIndexOf('/') + 1) }}
-                                <van-tag style="margin-right: 2px" mark v-for="tag in item.desc.split(' ')">
+                                <van-tag style="margin-right: 2px" mark v-for="tag in item.desc.split(' ')">
                                     {{ tag.replace(markReg, "") }}
                                 </van-tag>
                             </van-col>
@@ -114,7 +114,7 @@
                                 <div style="font-size:10px;-webkit-text-size-adjust: none;">
                                     {{ item.path.substr(item.path.lastIndexOf('/') + 1) }}
                                 </div>
-                                <van-tag style="margin-right: 2px" mark v-for="tag in item.desc.split(' ')">
+                                <van-tag style="margin-right: 2px" mark v-for="tag in item.desc.split(' ')">
                                     {{ tag.replace(markReg, "") }}
                                 </van-tag>
                             </div>
@@ -133,7 +133,7 @@
                                 </van-col>
                                 <van-col span="16">
                                     {{ item.path.substr(item.path.lastIndexOf('/') + 1) }}
-                                    <van-tag style="margin-right: 2px" mark v-for="tag in item.desc.split(' ')">
+                                    <van-tag style="margin-right: 2px" mark v-for="tag in item.desc.split(' ')">
                                         {{ tag.replace(markReg, "") }}
                                     </van-tag>
                                 </van-col>
@@ -157,7 +157,7 @@
                                 </van-col>
                                 <van-col span="16">
                                     {{ item.path.substr(item.path.lastIndexOf('/') + 1) }}
-                                    <van-tag style="margin-right: 2px" mark v-for="tag in item.desc.split(' ')">
+                                    <van-tag style="margin-right: 2px" mark v-for="tag in item.desc.split(' ')">
                                         {{ tag.replace(markReg, "") }}
                                     </van-tag>
                                 </van-col>

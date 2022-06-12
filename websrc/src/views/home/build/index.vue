@@ -95,7 +95,7 @@
                                 <span v-else style="vertical-align:center;color: #333333">
                                     {{ ' ' + scope.row.file_name }}</span>
                                 <div v-if="scope.row.desc">
-                                    <el-tag v-for="tag in scope.row.desc.split(' ')" size="mini" style="margin-right: 2px"
+                                    <el-tag v-for="tag in scope.row.desc.split(' ')" size="mini" style="margin-right: 2px"
                                             type="info">{{ tag.replace(markReg, "") }}
                                     </el-tag>
                                 </div>
@@ -293,7 +293,7 @@
                                 <i v-else class="el-icon-question"></i>
                                 {{ scope.row.path.substr(scope.row.path.lastIndexOf("/") + 1) }}</h4>
                             <div v-if="scope.row.desc">
-                                <el-tag v-for="tag in scope.row.desc.split(' ')" size="mini" style="margin-right: 2px"
+                                <el-tag v-for="tag in scope.row.desc.split(' ')" size="mini" style="margin-right: 2px"
                                         type="info">{{ tag.replace(markReg, "") }}
                                 </el-tag>
                             </div>
