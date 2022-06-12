@@ -94,9 +94,9 @@
                                     {{ ' ' + scope.row.path }}</span>
                                 <span v-else style="vertical-align:center;color: #333333">
                                     {{ ' ' + scope.row.file_name }}</span>
-                                <div v-if="scope.row.tags">
-                                    <el-tag v-for="tag in scope.row.tags" size="mini" style="margin-right: 2px"
-                                            type="info">{{ tag.name.replace(markReg, "") }}
+                                <div v-if="scope.row.desc">
+                                    <el-tag v-for="tag in scope.row.desc.split(' ')" size="mini" style="margin-right: 2px"
+                                            type="info">{{ tag.replace(markReg, "") }}
                                     </el-tag>
                                 </div>
                             </div>
@@ -292,8 +292,8 @@
                                    class="el-icon-tickets"></i>
                                 <i v-else class="el-icon-question"></i>
                                 {{ scope.row.path.substr(scope.row.path.lastIndexOf("/") + 1) }}</h4>
-                            <div v-if="scope.row.tags">
-                                <el-tag v-for="tag in scope.row.tags.split(' ')" size="mini" style="margin-right: 2px"
+                            <div v-if="scope.row.desc">
+                                <el-tag v-for="tag in scope.row.desc.split(' ')" size="mini" style="margin-right: 2px"
                                         type="info">{{ tag.replace(markReg, "") }}
                                 </el-tag>
                             </div>

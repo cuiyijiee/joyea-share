@@ -1,7 +1,7 @@
 import {convertItem, GenImageListView} from "./ImageViewUtil";
 import store from "../store";
 import {Dialog} from 'vant';
-import {previewFile} from "../api";
+import {previewFile} from "@/api";
 
 export function genSrcPreviewSrc(neid, hash, rev, previewType, sessionId) {
     return 'https://console.box.lenovo.com/v2/preview_router?type=' + previewType + '&root=databox&path=&path_type=ent&from=&neid='
@@ -127,14 +127,26 @@ export function setLastReadUploadRecordId(myUid, readId) {
 }
 
 export function getVideoPreviewUrl(neid, times) {
-
+    console.log("start check preview:" + neid)
     let _res, _rej;
     const promise = new Promise(function (resolve, reject) {
         _res = resolve;
         _rej = reject;
 
         function attempt() {
-            previewFile(neid).then(resolve).catch(function (err) {
+            previewFile(neid).then(function (previewUrl) {
+                console.log(previewUrl)
+                if(previewUrl.code) {
+                    if (0 === times) {
+                        reject(err)
+                    } else {
+                        times--;
+                        setTimeout(attempt, 1000)
+                    }
+                } else{
+                    resolve(previewUrl)
+                }
+            }).catch(function (err) {
                 console.log("第" + times + "次尝试获取视频预览地址")
                 if (0 === times) {
                     reject(err)
@@ -151,6 +163,7 @@ export function getVideoPreviewUrl(neid, times) {
     return {
         promise,
         abort: (opt = {}) => {
+            times = 0;
             _rej({
                 name: "abort",
                 message: "the promise is aborted",

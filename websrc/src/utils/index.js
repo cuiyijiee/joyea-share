@@ -5,14 +5,26 @@ export default function genSrcPreviewUrl(neid) {
 }
 
 export function getVideoPreviewUrl(neid, times) {
-
+    console.log("start check preview:" + neid)
     let _res, _rej;
     const promise = new Promise(function (resolve, reject) {
         _res = resolve;
         _rej = reject;
 
         function attempt() {
-            previewFile(neid).then(resolve).catch(function (err) {
+            previewFile(neid).then(function (previewUrl) {
+                console.log(previewUrl)
+                if(previewUrl.code) {
+                    if (0 === times) {
+                        reject(err)
+                    } else {
+                        times--;
+                        setTimeout(attempt, 1000)
+                    }
+                } else{
+                    resolve(previewUrl)
+                }
+            }).catch(function (err) {
                 console.log("第" + times + "次尝试获取视频预览地址")
                 if (0 === times) {
                     reject(err)

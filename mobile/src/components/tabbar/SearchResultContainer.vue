@@ -23,7 +23,7 @@
                             </van-col>
                             <van-col span="16">
                                 {{ item.path.substr(item.path.lastIndexOf('/') + 1) }}
-                                <van-tag mark style="margin-right: 2px" v-for="tag in item.tags">
+                                <van-tag mark style="margin-right: 2px" v-for="tag in item.desc.split(' ')">
                                     {{ tag.replace(markReg, "") }}
                                 </van-tag>
                             </van-col>
@@ -45,7 +45,7 @@
                               :key="item.path" @click="handleClickItem(item)">
                         <van-icon class="my_icon" name="credit-pay"/>
                         {{ item.path.substr(item.path.lastIndexOf('/') + 1) }}
-                        <van-tag mark style="margin-right: 2px" v-for="tag in item.tags">{{ tag.replace(markReg, "") }}
+                        <van-tag mark style="margin-right: 2px" v-for="tag in item.desc.split(' ')">{{ tag.replace(markReg, "") }}
                         </van-tag>
                     </van-cell>
                 </van-list>
@@ -72,7 +72,7 @@
                                 <div style="font-size:10px;-webkit-text-size-adjust: none;">
                                     {{ item.path.substr(item.path.lastIndexOf('/') + 1) }}
                                 </div>
-                                <van-tag mark style="margin-right: 2px" v-for="tag in item.tags">
+                                <van-tag mark style="margin-right: 2px" v-for="tag in item.desc.split(' ')">
                                     {{ tag.replace(markReg, "") }}
                                 </van-tag>
                             </div>
@@ -96,7 +96,7 @@
                             </van-col>
                             <van-col span="16">
                                 {{ item.path.substr(item.path.lastIndexOf('/') + 1) }}
-                                <van-tag mark style="margin-right: 2px" v-for="tag in item.tags">
+                                <van-tag mark style="margin-right: 2px" v-for="tag in item.desc.split(' ')">
                                     {{ tag.replace(markReg, "") }}
                                 </van-tag>
                             </van-col>
@@ -124,7 +124,7 @@
                             </van-col>
                             <van-col span="16">
                                 {{ item.path.substr(item.path.lastIndexOf('/') + 1) }}
-                                <van-tag mark style="margin-right: 2px" v-for="tag in item.tags">
+                                <van-tag mark style="margin-right: 2px" v-for="tag in item.desc.split(' ')">
                                     {{ tag.replace(markReg, "") }}
                                 </van-tag>
                             </van-col>
