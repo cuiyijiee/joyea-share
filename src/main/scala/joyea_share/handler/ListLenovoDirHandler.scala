@@ -52,7 +52,7 @@ class ListLenovoDirHandler extends IAction {
             //                                SrcCollect.findByUserIdAndNeid(userId = SessionUtil.getUserId(context), neid = srcNeid)
             //                            }
             //                        }, MySQLSettings.MYSQL_READ_TIMEOUT)
-            val descArr = new JsonArray()
+            //            val descArr = new JsonArray()
             //                        Await.result(AsyncDB.withPool {
             //                            implicit tx =>
             //                                AlbumSrc.findByNeid(srcNeid)
@@ -61,51 +61,59 @@ class ListLenovoDirHandler extends IAction {
             //                                descArr.add(src.toJson)
             //                            }
             //                        })
-            content.add("desc", descArr)
+            //            content.add("desc", descArr)
             content.add("collect", optionSrc.isDefined)
             val downloadNum = Await.result(RedisService.findFileDownloadNum(srcNeid.toString), Duration.Inf)
             content.add("download_num", downloadNum)
             val refNum = Await.result(AlbumSrc.countByNeid(srcNeid), Duration.Inf)
             content.add("ref_num", refNum)
           })
-          LenovoUtil.getExtraMeta(DownloadManager.getAdminToken, neidList, new CommonListener[JsonObject] {
-            override def onSuccess(metaJson: JsonObject): Unit = {
-              filteredContent.foreach(contentValue => {
-                val content = contentValue.asObject()
-                val srcNeid = content.getLong("neid", -1)
-                val metaData = metaJson.get(srcNeid.toString).asObject()
-                val tagJsonArr = metaData.get("tags").asArray()
-                if (tagJsonArr.size() != 0) {
-                  val handledTagArr = new JsonArray()
-                  metaData.get("tags").asArray().forEach(value => {
-                    handledTagArr.add(value.asObject().get("name").asString())
-                  })
-                  content.add("tags", handledTagArr)
-                }
+          //          LenovoUtil.getExtraMeta(DownloadManager.getAdminToken, neidList, new CommonListener[JsonObject] {
+          //            override def onSuccess(metaJson: JsonObject): Unit = {
+          //              filteredContent.foreach(contentValue => {
+          //                val content = contentValue.asObject()
+          //                val srcNeid = content.getLong("neid", -1)
+          //                val metaData = metaJson.get(srcNeid.toString).asObject()
+          //                val tagJsonArr = metaData.get("tags").asArray()
+          //                if (tagJsonArr.size() != 0) {
+          //                  val handledTagArr = new JsonArray()
+          //                  metaData.get("tags").asArray().forEach(value => {
+          //                    handledTagArr.add(value.asObject().get("name").asString())
+          //                  })
+          //                  content.add("tags", handledTagArr)
+          //                }
+          //              })
+          //            }
+          //
+          //            override def onError(error: String): Unit = {
+          //              listener.onError("搜索失败：" + obj.toString(WriterConfig.PRETTY_PRINT))
+          //            }
+          //          })
+          //尝试进行排序，如果跑出异常则不进行排序
+          try {
+            val keySet = tempMap.keySet()
+            val keyArr = keySet.toArray()
+            util.Arrays.sort(keyArr)
+            val newContentArr = new JsonArray()
+            keyArr.foreach(key => {
+              def content = tempMap.get(key)
+              def descStr = content.getString("desc","")
+              def tags = descStr.split(" ")
+              def tagArr = new JsonArray()
+              tags.foreach(tag => {
+                tagArr.add(tag)
               })
-              //尝试进行排序，如果跑出异常则不进行排序
-              try {
-                val keySet = tempMap.keySet()
-                val keyArr = keySet.toArray()
-                util.Arrays.sort(keyArr)
-                val newContentArr = new JsonArray()
-                keyArr.foreach(key => {
-                  newContentArr.add(tempMap.get(key))
-                })
-                obj.set("content", newContentArr)
-                listener.onSuccess(respJson = resJson.add("data", obj))
-              } catch {
-                case e: Exception => {
-                  e.printStackTrace()
-                  listener.onSuccess(respJson = resJson.add("data", obj))
-                }
-              }
+              content.set("tags",tagArr)
+              newContentArr.add(content)
+            })
+            obj.set("content", newContentArr)
+            listener.onSuccess(respJson = resJson.add("data", obj))
+          } catch {
+            case e: Exception => {
+              e.printStackTrace()
+              listener.onSuccess(respJson = resJson.add("data", obj))
             }
-
-            override def onError(error: String): Unit = {
-              listener.onError("搜索失败：" + obj.toString(WriterConfig.PRETTY_PRINT))
-            }
-          })
+          }
         } else {
           listener.onSuccess(respJson = resJson.add("data", obj))
         }
