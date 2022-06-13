@@ -23,11 +23,11 @@
                             </van-col>
                             <van-col span="16">
                                 {{ item.path.substr(item.path.lastIndexOf('/') + 1) }}
-<!--                                <span v-if="item.desc">-->
-<!--                                    <van-tag mark style="margin-right: 2px" v-for="tag in item.desc.split(' ')">-->
-<!--                                    {{ tag.replace(markReg, "") }}-->
-<!--                                    </van-tag>-->
-<!--                                </span>-->
+                                <span v-if="item.desc">
+                                    <van-tag mark style="margin-right: 2px" v-for="tag in item.desc.split(' ')">
+                                    {{ tag.replace(markReg, "") }}
+                                    </van-tag>
+                                </span>
                             </van-col>
                             <van-col span="4">
                                 <van-button v-if="!item['is_dir']" icon="plus" size="small" type="danger" plain
@@ -46,11 +46,11 @@
                     <van-cell v-for="item in searchResultList" v-if="item.is_dir"
                               :key="item.path" @click="handleClickItem(item)">
                         <van-icon class="my_icon" name="credit-pay"/>
-<!--                        {{ item.path.substr(item.path.lastIndexOf('/') + 1) }}-->
-<!--                        <span v-if="item.desc">-->
-<!--                            <van-tag mark style="margin-right: 2px" v-for="tag in item.desc.split(' ')">{{ tag.replace(markReg, "") }}-->
-<!--                        </van-tag>-->
-<!--                        </span>-->
+                        {{ item.path.substr(item.path.lastIndexOf('/') + 1) }}
+                        <span v-if="item.desc">
+                            <van-tag mark style="margin-right: 2px" v-for="tag in item.desc.split(' ')">{{ tag.replace(markReg, "") }}
+                        </van-tag>
+                        </span>
                     </van-cell>
                 </van-list>
             </van-tab>
@@ -76,11 +76,11 @@
                                 <div style="font-size:10px;-webkit-text-size-adjust: none;">
                                     {{ item.path.substr(item.path.lastIndexOf('/') + 1) }}
                                 </div>
-<!--                                <span v-if="item.desc">-->
-<!--                                    <van-tag mark style="margin-right: 2px" v-for="tag in item.desc.split(' ')">-->
-<!--                                    {{ tag.replace(markReg, "") }}-->
-<!--                                </van-tag>-->
-<!--                                </span>-->
+                                <span v-if="item.desc">
+                                    <van-tag mark style="margin-right: 2px" v-for="tag in item.desc.split(' ')">
+                                    {{ tag.replace(markReg, "") }}
+                                </van-tag>
+                                </span>
                             </div>
                         </van-grid-item>
                     </van-grid>
@@ -102,11 +102,11 @@
                             </van-col>
                             <van-col span="16">
                                 {{ item.path.substr(item.path.lastIndexOf('/') + 1) }}
-<!--                                <span v-if="item.desc">-->
-<!--                                    <van-tag mark style="margin-right: 2px" v-for="tag in item.desc.split(' ')">-->
-<!--                                    {{ tag.replace(markReg, "") }}-->
-<!--                                </van-tag>-->
-<!--                                </span>-->
+                                <span v-if="item.desc">
+                                    <van-tag mark style="margin-right: 2px" v-for="tag in item.desc.split(' ')">
+                                    {{ tag.replace(markReg, "") }}
+                                </van-tag>
+                                </span>
                             </van-col>
                             <van-col span="4">
                                 <van-button v-if="!item['is_dir']" icon="plus" size="small" type="danger" plain
@@ -132,11 +132,11 @@
                             </van-col>
                             <van-col span="16">
                                 {{ item.path.substr(item.path.lastIndexOf('/') + 1) }}
-<!--                                <span v-if="item.desc">-->
-<!--                                    <van-tag mark style="margin-right: 2px" v-for="tag in item.desc.split(' ')">-->
-<!--                                        {{ tag.replace(markReg, "") }}-->
-<!--                                    </van-tag>-->
-<!--                                </span>-->
+                                <span v-if="item.desc">
+                                    <van-tag mark style="margin-right: 2px" v-for="tag in item.desc.split(' ')">
+                                        {{ tag.replace(markReg, "") }}
+                                    </van-tag>
+                                </span>
                             </van-col>
                             <van-col span="4">
                                 <van-button v-if="!item['is_dir']" icon="plus" size="small" type="danger" plain

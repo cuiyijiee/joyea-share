@@ -51,13 +51,13 @@ class SearchHandler extends IAction {
                             implicit tx =>
                                 AlbumSrc.findByNeid(srcNeid)
                         }, MySQLSettings.MYSQL_READ_TIMEOUT)
-                        val descArr = new JsonArray()
-                        usedSrcList.foreach(src => {
-                            if (src.srcDesc != null && src.srcDesc.trim.length > 0) {
-                                descArr.add(src.toJson)
-                            }
-                        })
-                        content.add("desc", descArr)
+//                        val descArr = new JsonArray()
+//                        usedSrcList.foreach(src => {
+//                            if (src.srcDesc != null && src.srcDesc.trim.length > 0) {
+//                                descArr.add(src.toJson)
+//                            }
+//                        })
+//                        content.add("desc", descArr)
                         content.add("collect", optionSrc.isDefined)
 
                         //转换tag格式，原格式为字符串
