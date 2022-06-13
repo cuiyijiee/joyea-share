@@ -68,9 +68,11 @@
                                 </van-col>
                                 <van-col span="16">
                                     {{ item.path.substr(item.path.lastIndexOf('/') + 1) }}
-                                    <van-tag style="margin-right: 2px" mark v-for="tag in item.desc.split(' ')">
+                                    <span v-if="item.desc">
+                                        <van-tag style="margin-right: 2px" mark v-for="tag in item.desc.split(' ')">
                                         {{ tag.replace(markReg, "") }}
                                     </van-tag>
+                                    </span>
                                 </van-col>
                                 <van-col span="4">
                                     <van-button v-if="!item['is_dir'] " icon="plus" size="small" type="danger" plain
@@ -90,9 +92,11 @@
                             </van-col>
                             <van-col span="20">
                                 {{ item.path.substr(item.path.lastIndexOf('/') + 1) }}
-                                <van-tag style="margin-right: 2px" mark v-for="tag in item.desc.split(' ')">
+                                <span v-if="item.desc">
+                                    <van-tag style="margin-right: 2px" mark v-for="tag in item.desc.split(' ')">
                                     {{ tag.replace(markReg, "") }}
                                 </van-tag>
+                                </span>
                             </van-col>
                         </van-cell>
                     </van-list>
@@ -114,9 +118,12 @@
                                 <div style="font-size:10px;-webkit-text-size-adjust: none;">
                                     {{ item.path.substr(item.path.lastIndexOf('/') + 1) }}
                                 </div>
-                                <van-tag style="margin-right: 2px" mark v-for="tag in item.desc.split(' ')">
+                                <span v-if="item.desc">
+                                    <van-tag style="margin-right: 2px" mark
+                                             v-for="tag in item.desc.split(' ')">
                                     {{ tag.replace(markReg, "") }}
                                 </van-tag>
+                                </span>
                             </div>
                         </van-grid-item>
                     </van-grid>
@@ -133,9 +140,11 @@
                                 </van-col>
                                 <van-col span="16">
                                     {{ item.path.substr(item.path.lastIndexOf('/') + 1) }}
-                                    <van-tag style="margin-right: 2px" mark v-for="tag in item.desc.split(' ')">
+                                    <span v-if="item.desc">
+                                        <van-tag style="margin-right: 2px" mark v-for="tag in item.desc.split(' ')">
                                         {{ tag.replace(markReg, "") }}
                                     </van-tag>
+                                    </span>
                                 </van-col>
                                 <van-col span="4">
                                     <van-button v-if="!item['is_dir']" icon="plus" size="small" type="danger" plain
@@ -157,9 +166,11 @@
                                 </van-col>
                                 <van-col span="16">
                                     {{ item.path.substr(item.path.lastIndexOf('/') + 1) }}
-                                    <van-tag style="margin-right: 2px" mark v-for="tag in item.desc.split(' ')">
+                                    <span v-if="item.desc">
+                                        <van-tag style="margin-right: 2px" mark v-for="tag in item.desc.split(' ')">
                                         {{ tag.replace(markReg, "") }}
                                     </van-tag>
+                                    </span>
                                 </van-col>
                                 <van-col span="4">
                                     <van-button v-if="!item['is_dir']" icon="plus" size="small" type="danger" plain
@@ -172,10 +183,13 @@
                 </van-tab>
             </van-tabs>
         </div>
-        <van-dialog v-model:show="redirectPathVisible" title="获取短链成功！" :show-confirm-button="false" :show-cancel-button="false">
+        <van-dialog v-model:show="redirectPathVisible" title="获取短链成功！" :show-confirm-button="false"
+                    :show-cancel-button="false">
             <div style="margin: 0 auto;padding: 1rem">
-                <textarea rows="3" style="width: 100%;color: #8c939d;border: solid 0px" id="copyVal">{{redirectPath}}</textarea>
-                <van-button round style="width: 100%;margin-top: 10px" type="primary" @click="copyRedirectText">复制到剪贴板</van-button>
+                <textarea rows="3" style="width: 100%;color: #8c939d;border: solid 0px"
+                          id="copyVal">{{redirectPath}}</textarea>
+                <van-button round style="width: 100%;margin-top: 10px" type="primary" @click="copyRedirectText">复制到剪贴板
+                </van-button>
             </div>
         </van-dialog>
     </div>
@@ -200,7 +214,7 @@ export default {
     },
     data() {
         return {
-            directoryType:"LENOVO",
+            directoryType: "LENOVO",
             topSearchKey: [],
             canGoBackSearch: false,
             markReg: /<mark>|<\/mark>/g,
@@ -353,7 +367,7 @@ export default {
                 message: '拼命加载中...',
             });
 
-            getFileMetadata(this.directoryType,path,"").then(response => {
+            getFileMetadata(this.directoryType, path, "").then(response => {
                 toast.clear();
                 if (response.code === "0") {
                     this.currentTypeActive = 0;
@@ -371,7 +385,7 @@ export default {
                             }
                         });
                     }
-                }else{
+                } else {
                     console.log('文件夹列表获取失败' + response.msg)
                 }
                 this.dir.loadingDir = false;
