@@ -4,8 +4,10 @@ import {Dialog} from 'vant';
 import {previewFile} from "@/api";
 
 export function genSrcPreviewSrc(neid, hash, rev, previewType, sessionId) {
-    return 'https://console.box.lenovo.com/v2/preview_router?type=' + previewType + '&root=databox&path=&path_type=ent&from=&neid='
+    let url = 'https://console.box.lenovo.com/v2/preview_router?type=' + previewType + '&root=databox&path=&path_type=ent&from=&neid='
         + neid + "&rev=&X-LENOVO-SESS-ID=" + sessionId + "&xxoo=" + new Date().getTime();
+    console.log("preview url: " + url);
+    return url;
 }
 
 export function genSrcOriginSrc(path, neid, sessionId) {

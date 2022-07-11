@@ -26,6 +26,7 @@
 import {mapActions, mapGetters} from 'vuex'
 import {check, getLoginTicket, getUserProfile} from "./api";
 import store from "@/store";
+import VConsole from "vconsole";
 
 export default {
     name: "App",
@@ -52,39 +53,66 @@ export default {
         handleTestLogin() {
             let _this = this;
             this.isLogin = true;
-            getLoginTicket().then(resp => {
-                callNextPlusLogin(resp.data, authCode => {
-                    getUserProfile(authCode).then(resp => {
-                        this.$notify({type: 'success', message: '欢迎回来，' + resp.data.profile.name + '！'});
-                        _this.clearFunc();
-                        if (!resp.data.joyeaUser) {
-                            this.$router.push({
-                                path: "/user/bind",
-                                query: {ytmId: resp.data.profile['ytmId'], ytmMobile: resp.data.profile['phone']}
-                            })
-                        } else {
-                            _this.isLogin = false;
-                            this.$router.replace({
-                                name: "/",
-                                params: {checked: true}
-                            });
-                            _this.updateUserInfoFunc({
-                                session: resp.data['session'],
-                                name: resp.data.profile['name'],
-                                email: resp.data.joyeaUser.joyeaId,
-                                isBind: true
-                            }).then(() => {
-                            })
-                            _this.checkLogin();
-                        }
-                    })
+            if (process.env.NODE_ENV !== 'production') {
+                getUserProfile("test").then(resp => {
+                    this.$notify({type: 'success', message: '欢迎回来，' + resp.data.profile.name + '！'});
+                    _this.clearFunc();
+                    if (!resp.data.joyeaUser) {
+                        this.$router.push({
+                            path: "/user/bind",
+                            query: {ytmId: resp.data.profile['ytmId'], ytmMobile: resp.data.profile['phone']}
+                        })
+                    } else {
+                        _this.isLogin = false;
+                        this.$router.replace({
+                            name: "/",
+                            params: {checked: true}
+                        });
+                        _this.updateUserInfoFunc({
+                            session: resp.data['session'],
+                            name: resp.data.profile['name'],
+                            email: resp.data.joyeaUser.joyeaId,
+                            isBind: true
+                        }).then(() => {
+                        })
+                        _this.checkLogin();
+                    }
                 })
-            }).catch(e => {
-                console.error("exist error: " + e)
-            }).finally(ctx => {
-                // this.checkLogin();
-                // //this.isLogin = false;
-            })
+            }else{
+                getLoginTicket().then(resp => {
+                    callNextPlusLogin(resp.data, authCode => {
+                        getUserProfile(authCode).then(resp => {
+                            this.$notify({type: 'success', message: '欢迎回来，' + resp.data.profile.name + '！'});
+                            _this.clearFunc();
+                            if (!resp.data.joyeaUser) {
+                                this.$router.push({
+                                    path: "/user/bind",
+                                    query: {ytmId: resp.data.profile['ytmId'], ytmMobile: resp.data.profile['phone']}
+                                })
+                            } else {
+                                _this.isLogin = false;
+                                this.$router.replace({
+                                    name: "/",
+                                    params: {checked: true}
+                                });
+                                _this.updateUserInfoFunc({
+                                    session: resp.data['session'],
+                                    name: resp.data.profile['name'],
+                                    email: resp.data.joyeaUser.joyeaId,
+                                    isBind: true
+                                }).then(() => {
+                                })
+                                _this.checkLogin();
+                            }
+                        })
+                    })
+                }).catch(e => {
+                    console.error("exist error: " + e)
+                }).finally(ctx => {
+                    // this.checkLogin();
+                    // //this.isLogin = false;
+                })
+            }
         },
         _checkLogin() {
             let _this = this;

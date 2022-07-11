@@ -12,7 +12,11 @@ export default {
         let queryParams = this.$route.query;
         if (queryParams && queryParams.path) {
             let redirectPath = queryParams.path;
-            window.localStorage.setItem("redirectPath", redirectPath)
+            let redirectType = queryParams.type;
+            window.localStorage.setItem("redirectPath", JSON.stringify({
+                path: redirectPath,
+                type: redirectType
+            }))
             this.$router.push("/")
         }
     }

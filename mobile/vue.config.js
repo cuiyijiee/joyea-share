@@ -8,6 +8,9 @@ module.exports = {
     lintOnSave: true,
     productionSourceMap: false,
     devServer: {
+        allowedHosts: [
+            '.in.ngrok.io'   // .是二级域名的通配符
+        ],
         proxy: {
             'api/preview': {
                 target: 'http://localhost:8080',
