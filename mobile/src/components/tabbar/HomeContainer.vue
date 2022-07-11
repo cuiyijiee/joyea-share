@@ -469,6 +469,7 @@ export default {
     },
     activated() {
         eventBus.$on('showDir', function (data) {
+            this.directoryType = "LENOVO"
             this.handleListLenovoDir(data.path, "ent");
         }.bind(this));
         eventBus.$on('goRoot', function (data) {
