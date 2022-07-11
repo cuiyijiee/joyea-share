@@ -1,20 +1,24 @@
 <template>
-    <div id="home" style="background-color: #f7f8fa;">
+    <div id="home" style="background-color: #f7f8fa;height: 100%">
         <vm-back-top :bottom="100" :duration="1000" :timing="'ease'"></vm-back-top>
-        <van-search v-model="searchKey" placeholder="请输入搜索要搜索的资源"
-                    background="#1f1731" shape="round"
-                    @search="onSearch" :show-action="canGoBackSearch">
+        <van-search v-model="searchKey" :show-action="canGoBackSearch"
+                    background="#1f1731" placeholder="请输入搜索要搜索的资源"
+                    shape="round" @search="onSearch">
             <template #action>
-                <van-icon name="exchange" @click="goBackSearch" style="margin-top: 3px" size="20"/>
+                <van-icon name="exchange" size="20" style="margin-top: 3px" @click="goBackSearch"/>
             </template>
         </van-search>
         <div v-if="directoryType.length === 0">
             <van-image :src="background" style="position: fixed"/>
-            <div style="text-align: center">
-                <van-image :src="lenovoSpaceBg" style="width: 90%; padding: 20px;"
-                           @click="handleDirectoryTypeSelected('LENOVO')"/>
-                <van-image :src="selfSpaceBg" style="width: 90%;padding: 20px"
-                           @click="handleDirectoryTypeSelected('SELF')"/>
+            <div id="space-selector">
+                <div style="text-align: center; ">
+                    <van-image :src="lenovoSpaceBg" height="200px" radius="30"
+                               style="width: 90%;"
+                               @click="handleDirectoryTypeSelected('LENOVO')"/>
+                    <van-image id="space_img" :src="selfSpaceBg" height="200px" radius="30"
+                               style="width: 90%;"
+                               @click="handleDirectoryTypeSelected('SELF')"/>
+                </div>
             </div>
         </div>
         <div v-else>
@@ -27,7 +31,7 @@
             </div>
             <div v-if="dir.currentPath.length === 1 && dir.currentPath[0] === '营销素材展示'" style="margin-bottom: 50px">
                 <van-grid :column-num="2">
-                    <van-grid-item class="my_van-grid-item" v-for="menu in menuPath"
+                    <van-grid-item v-for="menu in menuPath" class="my_van-grid-item"
                                    @click="handleClickRootMenu(menu.path)">
                         <div class="menu-content">
                             <van-image :src="menu.icon" fit="contain"
@@ -41,10 +45,8 @@
                 <van-sticky :offset-top="46">
                     <van-row style="background-color: #fff;padding: 8px 0">
                         <van-col span="3">
-                            <van-icon class="my_icon" name="arrow-left"
-                                      style="padding: 5px 10px 5px 10px"
-                                      v-if="dir.currentPath.length !== 0"
-                                      @click="handleClickBackDir" size="20"/>
+                            <van-icon v-if="dir.currentPath.length !== 0" class="my_icon" name="arrow-left" size="20"
+                                      style="padding: 5px 10px 5px 10px" @click="handleClickBackDir"/>
                         </van-col>
                         <van-col span="18">
                             <v-touch v-on:press="handleAddRedirectPath">
@@ -56,9 +58,8 @@
                             </v-touch>
                         </van-col>
                         <van-col span="3">
-                            <van-icon class="my_icon" name="wap-home-o" @click="handleClickRootDir"
-                                      style="padding: 5px 10px 5px 10px"
-                                      v-if="dir.currentPath.length !== 0" size="20"/>
+                            <van-icon class="my_icon" name="wap-home-o" size="20"
+                                      style="padding: 5px 10px 5px 10px" @click="handleClickRootDir"/>
                         </van-col>
                     </van-row>
                 </van-sticky>
@@ -66,49 +67,53 @@
                     <van-tab title="全部">
                         <van-empty v-if="dir.tableData.length === 0" description="当前路径没有文件"/>
                         <van-list>
-                            <van-cell v-for="item in dir.tableData" @click="handleClickItem(item)" :key="item.path">
+                            <van-cell v-for="item in dir.tableData" :key="item.path" @click="handleClickItem(item)">
                                 <van-row style="display:flex; justify-content:center;align-items:center;">
                                     <van-col span="4">
-                                        <van-icon size="30" v-if="item['is_dir']" class="my_icon" name="credit-pay"/>
-                                        <van-icon size="30" v-else-if="item.mime_type.startsWith('video')"
-                                                  class="my_icon"
-                                                  name="video-o"/>
-                                        <img v-else-if="item.mime_type.startsWith('image')" class="my_icon my_icon_size"
-                                             :src="genPreviewUrl(item.neid,item.hash,item.rev,item.mime_type)"/>
-                                        <van-image style="width: 40px" v-else-if="item.mime_type.startsWith('doc')"
-                                                   :src="handleGetDocumentImage(item.mime_type)"/>
-                                        <van-image style="width: 27px" v-else-if="item.mime_type.startsWith('word')"
-                                                   :src="handleGetDocumentImage(item.mime_type)"/>
-                                        <van-icon size="30" v-else class="my_icon" name="info-o"/>
+                                        <van-icon v-if="item['is_dir']" class="my_icon" name="credit-pay" size="30"/>
+                                        <van-icon v-else-if="item.mime_type.startsWith('video')" class="my_icon"
+                                                  name="video-o"
+                                                  size="30"/>
+                                        <img v-else-if="item.mime_type.startsWith('image')"
+                                             :src="genPreviewUrl(item.neid,item.hash,item.rev,item.mime_type)"
+                                             class="my_icon my_icon_size"/>
+                                        <van-image v-else-if="item.mime_type.startsWith('doc')"
+                                                   :src="handleGetDocumentImage(item.mime_type)"
+                                                   style="width: 40px"/>
+                                        <van-image v-else-if="item.mime_type.startsWith('word')"
+                                                   :src="handleGetDocumentImage(item.mime_type)"
+                                                   style="width: 27px"/>
+                                        <van-icon v-else class="my_icon" name="info-o" size="30"/>
                                     </van-col>
                                     <van-col span="16">
                                         {{ item.path.substr(item.path.lastIndexOf('/') + 1) }}
                                         <span v-if="item.desc">
-                                        <van-tag style="margin-right: 2px" mark v-for="tag in item.desc.split(' ')">
+                                        <van-tag v-for="tag in item.desc.split(' ')" mark style="margin-right: 2px">
                                         {{ tag.replace(markReg, "") }}
                                     </van-tag>
                                     </span>
                                     </van-col>
                                     <van-col span="4">
-                                        <van-button v-if="!item['is_dir'] " icon="plus" size="small" type="danger" plain
+                                        <van-button v-if="!item['is_dir'] " icon="plus" plain size="small"
                                                     style="border: #ffffff"
+                                                    type="danger"
                                                     @click="handleClickAddItem(item)"/>
                                     </van-col>
                                 </van-row>
                             </van-cell>
                         </van-list>
                     </van-tab>
-                    <van-tab title="文件夹" :badge="dir.tableData.filter(item => item.is_dir).length">
+                    <van-tab :badge="dir.tableData.filter(item => item.is_dir).length" title="文件夹">
                         <van-list>
                             <van-cell v-for="item in dir.tableData" v-if="item.is_dir"
                                       :key="item.path" @click="handleClickItem(item)">
                                 <van-col span="4">
-                                    <van-icon size="30" class="my_icon" name="credit-pay"/>
+                                    <van-icon class="my_icon" name="credit-pay" size="30"/>
                                 </van-col>
                                 <van-col span="20">
                                     {{ item.path.substr(item.path.lastIndexOf('/') + 1) }}
                                     <span v-if="item.desc">
-                                    <van-tag style="margin-right: 2px" mark v-for="tag in item.desc.split(' ')">
+                                    <van-tag v-for="tag in item.desc.split(' ')" mark style="margin-right: 2px">
                                     {{ tag.replace(markReg, "") }}
                                 </van-tag>
                                 </span>
@@ -116,27 +121,28 @@
                             </van-cell>
                         </van-list>
                     </van-tab>
-                    <van-tab title="图片"
-                             :badge="dir.tableData.filter(item => !item.is_dir && item.mime_type.startsWith('image')).length">
+                    <van-tab
+                        :badge="dir.tableData.filter(item => !item.is_dir && item.mime_type.startsWith('image')).length"
+                        title="图片">
                         <van-grid :border="false" :column-num="3">
                             <van-grid-item
-                                @click="handleClickItem(item)"
-                                v-for="item in dir.tableData.filter(item => !item.is_dir && item.mime_type.startsWith('image'))">
+                                v-for="item in dir.tableData.filter(item => !item.is_dir && item.mime_type.startsWith('image'))"
+                                @click="handleClickItem(item)">
                                 <div>
-                                    <img class="my_icon my_icon_size_large"
-                                         :src="genPreviewUrl(item.neid,item.hash,item.rev,item.mime_type)"/>
-                                    <van-button @click="handleClickAddItem(item)" round plain hairline type="danger"
+                                    <img :src="genPreviewUrl(item.neid,item.hash,item.rev,item.mime_type)"
+                                         class="my_icon my_icon_size_large"/>
+                                    <van-button hairline icon="plus" plain round size="small"
                                                 style="position: absolute; top: 0px; left: 0px; border:#ffffff"
-                                                icon="plus"
-                                                size="small"/>
+                                                type="danger"
+                                                @click="handleClickAddItem(item)"/>
                                 </div>
                                 <div>
                                     <div style="font-size:10px;-webkit-text-size-adjust: none;">
                                         {{ item.path.substr(item.path.lastIndexOf('/') + 1) }}
                                     </div>
                                     <span v-if="item.desc">
-                                    <van-tag style="margin-right: 2px" mark
-                                             v-for="tag in item.desc.split(' ')">
+                                    <van-tag v-for="tag in item.desc.split(' ')" mark
+                                             style="margin-right: 2px">
                                     {{ tag.replace(markReg, "") }}
                                 </van-tag>
                                 </span>
@@ -144,54 +150,58 @@
                             </van-grid-item>
                         </van-grid>
                     </van-tab>
-                    <van-tab title="视频"
-                             :badge="dir.tableData.filter(item => !item.is_dir && item.mime_type.startsWith('video')).length">
+                    <van-tab
+                        :badge="dir.tableData.filter(item => !item.is_dir && item.mime_type.startsWith('video')).length"
+                        title="视频">
                         <van-list>
                             <van-cell v-for="item in dir.tableData"
                                       v-if="!item.is_dir && item.mime_type.startsWith('video')"
                                       :key="item.path" @click="handleClickItem(item)">
                                 <van-row>
                                     <van-col span="4">
-                                        <van-icon size="30" class="my_icon" name="video-o"/>
+                                        <van-icon class="my_icon" name="video-o" size="30"/>
                                     </van-col>
                                     <van-col span="16">
                                         {{ item.path.substr(item.path.lastIndexOf('/') + 1) }}
                                         <span v-if="item.desc">
-                                        <van-tag style="margin-right: 2px" mark v-for="tag in item.desc.split(' ')">
+                                        <van-tag v-for="tag in item.desc.split(' ')" mark style="margin-right: 2px">
                                         {{ tag.replace(markReg, "") }}
                                     </van-tag>
                                     </span>
                                     </van-col>
                                     <van-col span="4">
-                                        <van-button v-if="!item['is_dir']" icon="plus" size="small" type="danger" plain
+                                        <van-button v-if="!item['is_dir']" icon="plus" plain size="small"
                                                     style="border: #ffffff"
+                                                    type="danger"
                                                     @click="handleClickAddItem(item)"/>
                                     </van-col>
                                 </van-row>
                             </van-cell>
                         </van-list>
                     </van-tab>
-                    <van-tab title="文档"
-                             :badge="dir.tableData.filter(item => !item.is_dir && item.mime_type.startsWith('doc')).length">
+                    <van-tab
+                        :badge="dir.tableData.filter(item => !item.is_dir && item.mime_type.startsWith('doc')).length"
+                        title="文档">
                         <van-list>
                             <van-cell v-for="item in dir.tableData"
                                       v-if="!item.is_dir && item.mime_type.startsWith('doc')"
                                       :key="item.path" @click="handleClickItem(item)">
                                 <van-row>
                                     <van-col span="4">
-                                        <van-image style="width: 40px" :src="handleGetDocumentImage(item.mime_type)"/>
+                                        <van-image :src="handleGetDocumentImage(item.mime_type)" style="width: 40px"/>
                                     </van-col>
                                     <van-col span="16">
                                         {{ item.path.substr(item.path.lastIndexOf('/') + 1) }}
                                         <span v-if="item.desc">
-                                        <van-tag style="margin-right: 2px" mark v-for="tag in item.desc.split(' ')">
+                                        <van-tag v-for="tag in item.desc.split(' ')" mark style="margin-right: 2px">
                                         {{ tag.replace(markReg, "") }}
                                     </van-tag>
                                     </span>
                                     </van-col>
                                     <van-col span="4">
-                                        <van-button v-if="!item['is_dir']" icon="plus" size="small" type="danger" plain
+                                        <van-button v-if="!item['is_dir']" icon="plus" plain size="small"
                                                     style="border: #ffffff"
+                                                    type="danger"
                                                     @click="handleClickAddItem(item)"/>
                                     </van-col>
                                 </van-row>
@@ -201,11 +211,11 @@
                 </van-tabs>
             </div>
         </div>
-        <van-dialog v-model:show="redirectPathVisible" title="获取短链成功！" :show-confirm-button="false"
-                    :show-cancel-button="false">
+        <van-dialog v-model:show="redirectPathVisible" :show-cancel-button="false" :show-confirm-button="false"
+                    title="获取短链成功！">
             <div style="margin: 0 auto;padding: 1rem">
-                <textarea rows="3" style="width: 100%;color: #8c939d;border: solid 0px"
-                          id="copyVal">{{redirectPath}}</textarea>
+                <textarea id="copyVal" rows="3"
+                          style="width: 100%;color: #8c939d;border: solid 0px">{{redirectPath}}</textarea>
                 <van-button round style="width: 100%;margin-top: 10px" type="primary" @click="copyRedirectText">复制到剪贴板
                 </van-button>
             </div>
@@ -213,7 +223,7 @@
     </div>
 </template>
 <script>
-import {getDefaultJoyeaDesc, getTopSearchKey, addRedirectPath, getFileMetadata} from "@/api";
+import {addRedirectPath, getDefaultJoyeaDesc, getFileMetadata, getTopSearchKey} from "@/api";
 import {genSrcPreviewSrc, getDocumentImage, handleGoToPreview} from "@/util/JoyeaUtil"
 import {mapGetters} from "vuex"
 import eventBus from "../../service/eventbus";
@@ -364,7 +374,6 @@ export default {
             }
         },
         handleClickRootDir() {
-            //this.handleListLenovoDir("/营销素材展示");
             this.directoryType = "";
             this.currentTypeActive = 0;
         },
@@ -373,10 +382,11 @@ export default {
         },
         handleClickBackDir() {
             if (this.dir.currentPath.length > 0) {
-                let backPath = "/";
+                let backPath = "";
                 for (let i = 0; i < this.dir.currentPath.length - 1; i++) {
-                    backPath = backPath + this.dir.currentPath[i] + "/"
+                    backPath = backPath + "/" + this.dir.currentPath[i]
                 }
+                if (backPath.length === 0) backPath = "/";
                 this.handleListLenovoDir(backPath);
             }
         },
@@ -426,6 +436,15 @@ export default {
                 this.dir.loadingDir = false;
             })
         },
+        initStyle() {
+            this.$nextTick(() => {
+                let screenHeight = window.screen.height;
+                let bodyHeight = screenHeight - 200;
+                let spaceSelectorDiv = document.getElementById("space-selector");
+                spaceSelectorDiv.style.paddingTop = (bodyHeight - spaceSelectorDiv.clientHeight) / 3 + "px";
+                document.getElementById("space_img").style.marginTop = (bodyHeight - spaceSelectorDiv.clientHeight) / 3 + "px";
+            })
+        }
     },
     mounted() {
         let redirectPath = window.localStorage.getItem("redirectPath")
@@ -439,17 +458,28 @@ export default {
         } else {
             //this.handleListLenovoDir("/营销素材展示", "ent");
         }
+        this.initStyle();
+    },
+    watch: {
+        directoryType: function (val) {
+            if(val.length === 0) {
+                this.initStyle();
+            }
+        }
     },
     activated() {
         eventBus.$on('showDir', function (data) {
             this.handleListLenovoDir(data.path, "ent");
+        }.bind(this));
+        eventBus.$on('goRoot', function (data) {
+            this.directoryType = '';
         }.bind(this));
         this.handleGetTopSearchKey();
     }
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .top {
     padding: 10px;
     background: #ee0a24;

@@ -4,15 +4,17 @@ import {Dialog} from 'vant';
 import {previewFile} from "@/api";
 
 export function genSrcPreviewSrc(neid, hash, rev, previewType, sessionId) {
-    let url = 'https://console.box.lenovo.com/v2/preview_router?type=' + previewType + '&root=databox&path=&path_type=ent&from=&neid='
-        + neid + "&rev=&X-LENOVO-SESS-ID=" + sessionId + "&xxoo=" + new Date().getTime();
-    console.log("preview url: " + url);
-    return url;
+    // let url = 'https://console.box.lenovo.com/v2/preview_router?type=' + previewType + '&root=databox&path=&path_type=ent&from=&neid='
+    //     + neid + "&rev=&X-LENOVO-SESS-ID=" + sessionId + "&xxoo=" + new Date().getTime();
+    // console.log("preview url: " + url);
+    // return url;
+    return "/apiv2/imagePreview?neid=" + neid + "&thumbtail=false"
 }
 
 export function genSrcOriginSrc(path, neid, sessionId) {
-    return 'https://console.box.lenovo.com/v2/dl_router/databox/' + path +
-        '?neid=' + neid + '&rev=&_=' + new Date().getTime() + "&X-LENOVO-SESS-ID=" + sessionId;
+    // return 'https://console.box.lenovo.com/v2/dl_router/databox/' + path +
+    //     '?neid=' + neid + '&rev=&_=' + new Date().getTime() + "&X-LENOVO-SESS-ID=" + sessionId;
+    return "/apiv2/imagePreview?neid=" + neid + "&thumbtail=false"
 }
 
 let videoLoading = false;

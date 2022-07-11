@@ -26,7 +26,6 @@
 import {mapActions, mapGetters} from 'vuex'
 import {check, getLoginTicket, getUserProfile} from "./api";
 import store from "@/store";
-import VConsole from "vconsole";
 
 export default {
     name: "App",

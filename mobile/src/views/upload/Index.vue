@@ -1,21 +1,22 @@
 <template>
     <div>
         <div style="margin: 10px;color: #1f1731;">请选择要上传的文件(最多可选9个文件)</div>
-        <van-uploader v-model="filePreviewList" multiple accept="*" max-count="9" :after-read="afterRead"
-                      :preview-full-image="false">
+        <van-uploader v-model="filePreviewList" :after-read="afterRead" :preview-full-image="false" accept="*"
+                      max-count="9"
+                      multiple>
         </van-uploader>
         <van-cell-group>
             <div v-for="(file,index) in filePreviewList">
                 <van-divider :style="{borderColor:'#000000'}">
                     {{ '文件 ' + (index + 1) }}
                 </van-divider>
-                <van-field v-model="file.desc" label="审核说明:"
-                           :key=file.name type="textarea" autosize rows="2"
-                           :placeholder='fileDescPlaceholder'/>
+                <van-field :key=file.name v-model="file.desc"
+                           :placeholder='fileDescPlaceholder' autosize label="审核说明:" rows="2"
+                           type="textarea"/>
             </div>
         </van-cell-group>
-        <van-button type="info" round block style="margin-top: 100px" @click="handleClickUpload">开始上传</van-button>
-        <van-button type="primary" round block style="margin-top: 10px" @click="handleClickUploadRecord">上传记录
+        <van-button block round style="margin-top: 100px" type="info" @click="handleClickUpload">开始上传</van-button>
+        <van-button block round style="margin-top: 10px" type="primary" @click="handleClickUploadRecord">上传记录
         </van-button>
     </div>
 </template>

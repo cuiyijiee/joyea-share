@@ -7,8 +7,8 @@
   </div>
 </template>
 <script>
-import {mapGetters, mapActions} from "vuex"
-import {check, previewFile} from "./api";
+import {mapActions, mapGetters} from "vuex"
+import {check} from "./api";
 
 export default {
   name: 'App',

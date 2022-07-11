@@ -39,7 +39,7 @@ export default new Router({
             children: [
                 {
                     path: 'home',
-                    name: '仅一素材库系统',
+                    name: '工作台',
                     component: HomeContainer,
                     meta: {
                         allowBack: false,
