@@ -44,10 +44,12 @@
                 <!--文件路径显示-->
                 <el-row class="adminContentHead">
                     <el-col :span="15">
-                                <span style=" color:#000000;font-size: 15px;cursor:pointer;"
-                                      @click="handleGoRootPath">{{
-                                        directoryType === 'SELF' ? '细分市场素材库' : '基础素材库'
-                                    }}</span>
+                        <el-button icon="el-icon-back" size="mini" style="margin: 0 10px 0 10px" type=""
+                                   @click="handleBackMenuPath"></el-button>
+                        <span style=" color:#000000;font-size: 15px;cursor:pointer;"
+                              @click="handleGoRootPath">{{
+                                directoryType === 'SELF' ? '细分市场素材库' : '基础素材库'
+                            }}</span>
                         <span v-for="(item,index) in dir.currentPath" v-if="item !== '营销素材展示'"
                               style="display: inline">/
                             <span style=" color:#000000;font-size: 15px;cursor:pointer;"
@@ -69,7 +71,7 @@
                                         @onAddSuccess="handleRefreshDir" @preview="handleClickDirItem"/>
                     <AddPrivateDirectory v-if="hasBtnShowPermission(null,'NEW_PRIVATE_DIR')"
                                          :curDirNeid="curDirNeid" @onAddSuccess="handleRefreshDir"/>
-                    <el-button class="search-button" size="small" v-if="hasBtnShowPermission(null,'WORD_MANAGER')"
+                    <el-button v-if="hasBtnShowPermission(null,'WORD_MANAGER')" class="search-button" size="small"
                                @click="visible.addWordDialogVisible = !visible.addWordDialogVisible">
                         管理小白板
                     </el-button>
@@ -95,7 +97,8 @@
                                 <span v-else style="vertical-align:center;color: #333333">
                                     {{ ' ' + scope.row.file_name }}</span>
                                 <div v-if="scope.row.desc">
-                                    <el-tag v-for="tag in scope.row.desc.split(' ')" size="mini" style="margin-right: 2px"
+                                    <el-tag v-for="tag in scope.row.desc.split(' ')" size="mini"
+                                            style="margin-right: 2px"
                                             type="info">{{ tag.replace(markReg, "") }}
                                     </el-tag>
                                 </div>
@@ -204,12 +207,12 @@
                         </el-col>
                         <el-col :span="8">
                             <el-button v-loading="loading.downloadLoading" class="load_more_bt" icon="el-icon-suitcase"
-                                       type="info" size="mini"
+                                       size="mini" type="info"
                                        @click.stop="handleDownloadSrc(true)">下载准备
                             </el-button>
                         </el-col>
                         <el-col :span="8">
-                            <el-button class="load_more_bt" icon="el-icon-delete" type="info" size="mini"
+                            <el-button class="load_more_bt" icon="el-icon-delete" size="mini" type="info"
                                        @click.stop="handleClearList">清空
                             </el-button>
                         </el-col>
@@ -1163,7 +1166,7 @@ export default {
             this.handleGoRootPath();
             const table = document.querySelector('#toSortTable .el-table__body-wrapper tbody');
             const self = this;
-            if(table) {
+            if (table) {
                 Sortable.create(table, {
                     onEnd({newIndex, oldIndex}) {
                         const targetRow = self.toCreateAlbum.list.splice(oldIndex, 1)[0];
@@ -1296,6 +1299,15 @@ export default {
                 this.handleListLenovoDir("/");
             } else {
                 this.handleListLenovoDir("/营销素材展示");
+            }
+        },
+        handleBackMenuPath() {
+            if (this.dir.currentPath.length === 0) {
+                this.directoryType = ""
+            } else if (this.dir.currentPath.length === 1) {
+                this.handleGoRootPath();
+            } else {
+                this.handleClickDirPath(undefined, this.dir.currentPath.length - 2 )
             }
         },
         handleAddSrcToPrivateDir(item) {

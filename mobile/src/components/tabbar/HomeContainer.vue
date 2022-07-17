@@ -9,14 +9,14 @@
             </template>
         </van-search>
         <div v-if="directoryType.length === 0">
-            <van-image :src="background" style="position: fixed"/>
+<!--            <van-image :src="background" style="position: fixed"/>-->
             <div id="space-selector">
-                <div style="text-align: center; ">
-                    <van-image :src="lenovoSpaceBg" height="200px" radius="30"
-                               style="width: 90%;"
+                <div style="text-align: center; background-color: #ffffff">
+                    <van-image :src="lenovoSpaceBg"
+                               style="padding: 10px 10px 0 10px"
                                @click="handleDirectoryTypeSelected('LENOVO')"/>
-                    <van-image id="space_img" :src="selfSpaceBg" height="200px" radius="30"
-                               style="width: 90%;"
+                    <van-image id="space_img" :src="selfSpaceBg"
+                               style="padding: 10px 10px 0 10px"
                                @click="handleDirectoryTypeSelected('SELF')"/>
                 </div>
             </div>
@@ -436,15 +436,15 @@ export default {
                 this.dir.loadingDir = false;
             })
         },
-        initStyle() {
-            this.$nextTick(() => {
-                let screenHeight = window.screen.height;
-                let bodyHeight = screenHeight - 200;
-                let spaceSelectorDiv = document.getElementById("space-selector");
-                spaceSelectorDiv.style.paddingTop = (bodyHeight - spaceSelectorDiv.clientHeight) / 3 + "px";
-                document.getElementById("space_img").style.marginTop = (bodyHeight - spaceSelectorDiv.clientHeight) / 3 + "px";
-            })
-        }
+        // initStyle() {
+        //     this.$nextTick(() => {
+        //         let screenHeight = window.screen.height;
+        //         let bodyHeight = screenHeight - 200;
+        //         let spaceSelectorDiv = document.getElementById("space-selector");
+        //         spaceSelectorDiv.style.paddingTop = (bodyHeight - spaceSelectorDiv.clientHeight) / 3 + "px";
+        //         document.getElementById("space_img").style.marginTop = (bodyHeight - spaceSelectorDiv.clientHeight) / 3 + "px";
+        //     })
+        // }
     },
     mounted() {
         let redirectPath = window.localStorage.getItem("redirectPath")
@@ -457,14 +457,6 @@ export default {
             }, 5000)
         } else {
             //this.handleListLenovoDir("/营销素材展示", "ent");
-        }
-        this.initStyle();
-    },
-    watch: {
-        directoryType: function (val) {
-            if(val.length === 0) {
-                this.initStyle();
-            }
         }
     },
     activated() {
