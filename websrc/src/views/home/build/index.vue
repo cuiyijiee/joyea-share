@@ -43,16 +43,20 @@
             <el-col :span="18" class="bg-purple">
                 <!--文件路径显示-->
                 <el-row class="adminContentHead">
-                    <el-col :span="15">
-                        <el-button icon="el-icon-back" size="mini" style="margin: 0 10px 0 10px" type=""
-                                   @click="handleBackMenuPath"></el-button>
-                        <span style=" color:#000000;font-size: 15px;cursor:pointer;"
+                    <el-col :span="15" style="color:#000000;font-size: 15px;">
+                        <span style="cursor:pointer;"
+                              @click="handleBackMenuPath"><b>返回</b></span>
+                        <span
+                            style="cursor:pointer;margin: 0 8px;position: relative;top: -0.1em;"
+                            @click="handleGoRootPath">|</span>
+                        <span style="cursor:pointer;"
                               @click="handleGoRootPath">{{
                                 directoryType === 'SELF' ? '细分市场素材库' : '基础素材库'
                             }}</span>
                         <span v-for="(item,index) in dir.currentPath" v-if="item !== '营销素材展示'"
-                              style="display: inline">/
-                            <span style=" color:#000000;font-size: 15px;cursor:pointer;"
+                              style="display: inline">
+                            <span style="position: relative;top: -0.025em;margin: 0 4px;font-size: 15px;">/</span>
+                            <span style="cursor:pointer;"
                                   @click="handleClickDirPath(item,index)">{{ item }}</span>
                         </span>
                     </el-col>
@@ -1307,7 +1311,7 @@ export default {
             } else if (this.dir.currentPath.length === 1) {
                 this.handleGoRootPath();
             } else {
-                this.handleClickDirPath(undefined, this.dir.currentPath.length - 2 )
+                this.handleClickDirPath(undefined, this.dir.currentPath.length - 2)
             }
         },
         handleAddSrcToPrivateDir(item) {
