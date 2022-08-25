@@ -21,6 +21,11 @@ import {renamePrivateDir} from "@/api";
 export default {
     name: "RenamePrivateDirectory",
     props: ['fileItem'],
+    watch:{
+        fileItem(){
+            this.newPrivateDirName = this.fileItem.file_name;
+        }
+    },
     data() {
         return {
             visible: false,

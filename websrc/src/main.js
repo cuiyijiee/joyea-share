@@ -3,7 +3,7 @@ import App from './App.vue'
 import router from './router/index'
 import ElementUI from 'element-ui'
 import VueClipboard from 'vue-clipboard2'
-import 'element-ui/lib/theme-chalk/index.css';
+//import 'element-ui/lib/theme-chalk/index.css';
 import preview from 'vue-photo-preview';
 import 'vue-photo-preview/dist/skin.css';
 import './style/vars.scss'

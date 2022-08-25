@@ -280,67 +280,9 @@
                 </div>
             </el-image>
         </el-dialog>
-        <el-dialog :title="'【' + search.key + '】的搜索结果'" :visible.sync="visible.searchDialogVisible" @close="">
-            <el-table v-loading="loading.search" :data="searchResult" empty-text="暂没有搜索数据" height="500"
-                      stripe style="width: 100%"
-                      @row-click="handleClickSearch">
-                <el-table-column label="素材名" show-overflow-tooltip>
-                    <template slot-scope="scope">
-                        <div @click="handleGoToPreview(scope.row)">
-                            <h4 style="margin: 2px">
-                                <i v-if="scope.row.is_dir" class="el-icon-folder-opened"></i>
-                                <i v-else-if="scope.row.mime_type.startsWith('video')"
-                                   class="el-icon-video-camera"></i>
-                                <img v-else-if="scope.row.mime_type.startsWith('image')" :onerror="defaultImg"
-                                     :preview-text="scope.row.path" :src="genPreviewUrl(scope.row.neid)"
-                                     class="preview_img" preview="search_image_list"
-                                     style="height: 60px;width: 60px">
-                                <i v-else-if="scope.row.mime_type.startsWith('doc')"
-                                   class="el-icon-tickets"></i>
-                                <i v-else class="el-icon-question"></i>
-                                {{ scope.row.path.substr(scope.row.path.lastIndexOf("/") + 1) }}</h4>
-                            <div v-if="scope.row.desc">
-                                <el-tag v-for="tag in scope.row.desc.split(' ')" size="mini" style="margin-right: 2px"
-                                        type="info">{{ tag.replace(markReg, "") }}
-                                </el-tag>
-                            </div>
-                        </div>
-                    </template>
-                </el-table-column>
-                <el-table-column label="引用次数" width="100">
-                    <template slot-scope="scope">
-                        <span>{{ scope.row.is_dir ? '-' : scope.row.ref_num }}</span>
-                    </template>
-                </el-table-column>
-                <el-table-column label="下载次数" width="100">
-                    <template slot-scope="scope">
-                        <span>{{ scope.row.is_dir ? '-' : scope.row.download_num }}</span>
-                    </template>
-                </el-table-column>
-                <el-table-column label="操作" width="220">
-                    <template slot-scope="scope">
-                        <div v-if="scope.row.is_dir">
-                            <el-button circle icon="el-icon-folder-opened" type="primary"
-                                       @click.stop="handleClickSearch(scope.row)"/>
-                        </div>
-                        <div v-else>
-                            <el-button circle icon="el-icon-plus"
-                                       type=""
-                                       @click.stop="handleAdd(scope.$index, scope.row)"/>
+        <SearchResultDialog>
 
-                            <el-button v-if="directoryType === 'SELF'" @click="handleAddSrcToPrivateDir(scope.row)">
-                                添加到细分市场
-                            </el-button>
-                        </div>
-                    </template>
-                </el-table-column>
-            </el-table>
-            <el-button :class="{no_display:!search.hasNext}" :loading="loading.searchMore"
-                       class="load_more_bt"
-                       style="margin-top: 30px"
-                       @click.stop="handleLoadMore">加载更多
-            </el-button>
-        </el-dialog>
+        </SearchResultDialog>
         <el-dialog :close-on-click-modal="false" :visible.sync="visible.addWordDialogVisible" title="小白板管理"
                    @open="handleFilterCurDirWordList">
             <div style="text-align: right">
@@ -412,6 +354,7 @@ import AddSrcToPrivateDir from "@/components/AddSrcToPrivateDir";
 import RenamePrivateDirectory from "@/components/RenamePrivateDirectory";
 import PrivateDirectoryAdminManager from "@/components/PrivateDirectoryAdminManager";
 import SpaceSelector from "@/components/SpaceSelector";
+import SearchResultDialog from "@/components/SearchResultDialog"
 
 export default {
     name: "index",
@@ -422,7 +365,8 @@ export default {
         AddSrcToPrivateDir,
         RenamePrivateDirectory,
         PrivateDirectoryAdminManager,
-        SpaceSelector
+        SpaceSelector,
+        SearchResultDialog
     },
     data() {
         return {
@@ -436,7 +380,6 @@ export default {
                 loadingDir: false
             },
             markReg: /<mark>|<\/mark>/g,
-            searchTabName: "dir", // dir ,pan ,list
             search: {
                 type: '',
                 key: '',
@@ -738,63 +681,35 @@ export default {
             if (_this.search.key.trim().length === 0) {
                 _this.$message.warning("请输入搜索的关键字！")
             } else {
-                if (_this.searchTabName === 'list') {
-                    _this.loading.searchList = true;
-                    api({
-                        action: "searchList",
-                        searchKey: searchKey
-                    }).then(response => {
-                        _this.loading.searchList = false;
-                        if (response.result) {
-                            _this.searchListResult = [];
-                            if (response.list.length === 0) {
-                                _this.$message.error("没有搜索到与【" + _this.search.key + "】有关的清单！")
-                            } else {
-                                response.list.forEach(list => {
-                                    _this.searchListResult.push(list)
-                                })
-                            }
-                        } else {
-                            _this.$notify.error({
-                                title: '搜索出错',
-                                message: '搜索过程出现错误：' + response.msg
-                            });
-                            console.log(response.msg)
+                _this.loading.search = true;
+                ftsSearch(_this.search.key, 0).then(response => {
+                    if (response.code === "0") {
+                        _this.search.hasNext = response.obj["has_more"];
+                        if (_this.search.hasNext) {
+                            _this.loadMoreForm.key = _this.search.key;
+                            _this.loadMoreForm.nextOffset = response.obj["next_offset"];
                         }
-                    });
-                    _this.searchTabName = "list";
-                } else {
-                    _this.loading.search = true;
-                    ftsSearch(_this.search.key, 0).then(response => {
-                        if (response.code === "0") {
-                            _this.search.hasNext = response.obj["has_more"];
-                            if (_this.search.hasNext) {
-                                _this.loadMoreForm.key = _this.search.key;
-                                _this.loadMoreForm.nextOffset = response.obj["next_offset"];
-                            }
-                            _this.searchResult = [];
-                            if (response.obj.content.length === 0) {
-                                _this.$message.error("没有搜索到与【" + _this.search.key + "】有关的文件或文件夹！")
-                            } else {
-                                _this.visible.searchDialogVisible = true;
-                                response.obj.content.forEach(item => {
-                                    item.joyeaDesc = "";
-                                    item.isModify = false;
-                                    _this.searchResult.push(item)
-                                })
-                            }
+                        _this.searchResult = [];
+                        if (response.obj.content.length === 0) {
+                            _this.$message.error("没有搜索到与【" + _this.search.key + "】有关的文件或文件夹！")
                         } else {
-                            _this.$notify.error({
-                                title: '搜索出错',
-                                message: '搜索过程出现错误：' + response.msg
-                            });
-                            console.log(response.msg)
+                            _this.visible.searchDialogVisible = true;
+                            response.obj.content.forEach(item => {
+                                item.joyeaDesc = "";
+                                item.isModify = false;
+                                _this.searchResult.push(item)
+                            })
                         }
-                    }).finally(() => {
-                        _this.loading.search = false
-                    });
-                    _this.searchTabName = "pan";
-                }
+                    } else {
+                        _this.$notify.error({
+                            title: '搜索出错',
+                            message: '搜索过程出现错误：' + response.msg
+                        });
+                        console.log(response.msg)
+                    }
+                }).finally(() => {
+                    _this.loading.search = false
+                });
             }
         },
         handleLoadMore() {
@@ -1224,7 +1139,6 @@ export default {
         },
         handleClickDirItem(row) {
             this.visible.searchDialogVisible = false;
-            this.searchTabName = "dir";
             if (row.is_dir) {
                 this.handleListLenovoDir(row.path)
             } else {

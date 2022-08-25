@@ -1,4 +1,7 @@
-$color-primary: #20a0ff; //#18c79c
+$--color-primary: #eb7708;
+$--font-path: '~element-ui/lib/theme-chalk/fonts';
+@import "~element-ui/packages/theme-chalk/src/index";
+
 
 ::-webkit-scrollbar{
   display:none;
@@ -12,10 +15,6 @@ $color-primary: #20a0ff; //#18c79c
   max-height: 100px;
   width: 150px;
   object-fit: contain;
-}
-
-.pswp {
-  z-index: 99999;
 }
 
 .search-button {
