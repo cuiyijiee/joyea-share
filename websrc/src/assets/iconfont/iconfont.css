@@ -1,6 +1,8 @@
 @font-face {
   font-family: "iconfont"; /* Project id 3388350 */
-  src: url('iconfont.woff?t=1652101825666') format('woff');
+  src: url('iconfont.woff2?t=1661766125550') format('woff2'),
+       url('iconfont.woff?t=1661766125550') format('woff'),
+       url('iconfont.ttf?t=1661766125550') format('truetype');
 }
 
 .iconfont {
@@ -9,6 +11,90 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.el-icon-icon_vedio:before {
+  content: "\e629";
+}
+
+.el-icon-icon_file:before {
+  content: "\e62a";
+}
+
+.el-icon-icon_folder:before {
+  content: "\e62b";
+}
+
+.el-icon-icon_pic:before {
+  content: "\e62c";
+}
+
+.el-icon-icon_arrow_right:before {
+  content: "\e618";
+}
+
+.el-icon-icon_arrow_down-1:before {
+  content: "\e619";
+}
+
+.el-icon-a-icon_addtomarketsegments:before {
+  content: "\e61a";
+}
+
+.el-icon-Checkbo_default:before {
+  content: "\e61b";
+}
+
+.el-icon-icon_arrow_down:before {
+  content: "\e61c";
+}
+
+.el-icon-a-icon_addtolist:before {
+  content: "\e61d";
+}
+
+.el-icon-icon_close_default:before {
+  content: "\e61e";
+}
+
+.el-icon-Checkbox_checked:before {
+  content: "\e61f";
+}
+
+.el-icon-a-icon_getshortchain:before {
+  content: "\e620";
+}
+
+.el-icon-icon_arrow_left:before {
+  content: "\e621";
+}
+
+.el-icon-Checkbox_hover:before {
+  content: "\e622";
+}
+
+.el-icon-Checkbox_indeterminate:before {
+  content: "\e623";
+}
+
+.el-icon-a-icon_jumptothelocation:before {
+  content: "\e624";
+}
+
+.el-icon-icon_close_hover:before {
+  content: "\e625";
+}
+
+.el-icon-icon_sort:before {
+  content: "\e626";
+}
+
+.el-icon-icon_right:before {
+  content: "\e627";
+}
+
+.el-icon-icon_loading:before {
+  content: "\e628";
 }
 
 .el-icon-icon_home_20_20px:before {

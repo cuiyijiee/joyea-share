@@ -176,9 +176,9 @@ export function getFileMetadata(directoryType, path, parentDirId) {
     })
 }
 
-export function ftsSearch(searchKey, offset) {
+export function ftsSearch(searchKey, offset, limit) {
     return service.post("apiv2/lenovo/ftsSearch", {
-        searchKey: searchKey, offset: offset
+        searchKey: searchKey, offset: offset, limit: limit
     }).then(resp => {
         return resp.data;
     })
@@ -226,7 +226,7 @@ export function removePrivateDirSrc(parentDirId, neid) {
 
 export function updateSrcAlias(parentDirId, neid, alias) {
     return service.post("apiv2/privateDir/updateAlias", {
-        parentDirId: parentDirId, neid: neid, alias:alias
+        parentDirId: parentDirId, neid: neid, alias: alias
     }).then(resp => {
         return resp.data;
     })

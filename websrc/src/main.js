@@ -14,6 +14,7 @@ import video_zhCN from 'video.js/dist/lang/zh-CN.json'
 import video_en from  'video.js/dist/lang/en.json'
 import 'video.js/dist/video-js.css'
 import iconFont from "./assets/iconfont/iconfont.css"
+import iconFontColor from "./assets/iconfont-color/iconfont.css"
 
 
 Video.addLanguage('zh-CN', video_zhCN);

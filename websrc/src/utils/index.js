@@ -14,14 +14,14 @@ export function getVideoPreviewUrl(neid, times) {
         function attempt() {
             previewFile(neid).then(function (previewUrl) {
                 console.log(previewUrl)
-                if(previewUrl.code) {
+                if (previewUrl.code) {
                     if (0 === times) {
                         reject(err)
                     } else {
                         times--;
                         setTimeout(attempt, 1000)
                     }
-                } else{
+                } else {
                     resolve(previewUrl)
                 }
             }).catch(function (err) {
@@ -49,4 +49,16 @@ export function getVideoPreviewUrl(neid, times) {
             })
         }
     }
+}
+
+export function formatFileShowType(searchResultRow) {
+    let defaultType = "--";
+    if (searchResultRow.is_dir) {
+        defaultType = "文件夹"
+    } else if (!searchResultRow.is_dir && searchResultRow.mime_type) {
+        let filePath = searchResultRow.path
+        let fileExtension = filePath.slice((filePath.lastIndexOf(".") - 1 >>> 0) + 2)
+        defaultType = fileExtension.toLowerCase() + "文件"
+    }
+    return defaultType;
 }
