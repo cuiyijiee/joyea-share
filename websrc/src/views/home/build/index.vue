@@ -131,7 +131,7 @@
                         <template slot-scope="scope">
                             <span v-if="!scope.row.is_dir">
                                 <el-button circle icon="el-icon-plus" type=""
-                                           @click.stop="handleAdd(scope.$index, scope.row)"/>
+                                           @click.stop="handleAdd(scope.row)"/>
                             </span>
                             <span v-if="hasBtnShowPermission(scope.row,'TRANSCODE')">
                                 <el-button circle icon="el-icon-link"
@@ -280,8 +280,12 @@
                 </div>
             </el-image>
         </el-dialog>
-        <SearchResultDialog>
-
+        <SearchResultDialog
+            ref="searchDialog"
+            :directoryType="directoryType"
+            @addSrcToPrivateDir="handleAddSrcToPrivateDir"
+            @goToDir="handleClickSearch"
+            @handleAdd="handleAdd">
         </SearchResultDialog>
         <el-dialog :close-on-click-modal="false" :visible.sync="visible.addWordDialogVisible" title="小白板管理"
                    @open="handleFilterCurDirWordList">
@@ -518,11 +522,12 @@ export default {
             addRedirectPath(currentFullPath, this.directoryType).then(resp => {
                 let redirectPath = window.location.protocol + "//"
                     + window.location.host + "/api/redirectPath?id=" + resp.id;
-                var input = document.createElement("input");
+                let input = document.createElement("input");
                 input.value = redirectPath;
                 document.body.appendChild(input);
                 input.select();
-                input.setSelectionRange(0, input.value.length), document.execCommand('Copy');
+                input.setSelectionRange(0, input.value.length);
+                document.execCommand('Copy');
                 document.body.removeChild(input);
                 _this.$message.success("获取成功，已复制到剪贴板！");
             })
@@ -531,7 +536,6 @@ export default {
             if (row.mime_type.startsWith("video")) {
                 this.handlePlayVideo(row);
                 return
-            } else if (row.mime_type.startsWith("doc")) {
             }
             let url = genSrcPreviewSrc(row.neid);
             if (row.mime_type.startsWith("video")) {
@@ -674,43 +678,8 @@ export default {
             })
         },
         handleSearch(searchKey) {
-            let _this = this;
-            if (searchKey !== undefined && typeof (searchKey) == 'string') {
-                _this.search.key = searchKey;
-            }
-            if (_this.search.key.trim().length === 0) {
-                _this.$message.warning("请输入搜索的关键字！")
-            } else {
-                _this.loading.search = true;
-                ftsSearch(_this.search.key, 0).then(response => {
-                    if (response.code === "0") {
-                        _this.search.hasNext = response.obj["has_more"];
-                        if (_this.search.hasNext) {
-                            _this.loadMoreForm.key = _this.search.key;
-                            _this.loadMoreForm.nextOffset = response.obj["next_offset"];
-                        }
-                        _this.searchResult = [];
-                        if (response.obj.content.length === 0) {
-                            _this.$message.error("没有搜索到与【" + _this.search.key + "】有关的文件或文件夹！")
-                        } else {
-                            _this.visible.searchDialogVisible = true;
-                            response.obj.content.forEach(item => {
-                                item.joyeaDesc = "";
-                                item.isModify = false;
-                                _this.searchResult.push(item)
-                            })
-                        }
-                    } else {
-                        _this.$notify.error({
-                            title: '搜索出错',
-                            message: '搜索过程出现错误：' + response.msg
-                        });
-                        console.log(response.msg)
-                    }
-                }).finally(() => {
-                    _this.loading.search = false
-                });
-            }
+            this.$refs.searchDialog.handleSearch(searchKey);
+            return;
         },
         handleLoadMore() {
             let _this = this;
@@ -865,7 +834,7 @@ export default {
                 });
             }
         },
-        handleAdd(index, row) {
+        handleAdd(row) {
             let isIn = false;
             this.toCreateAlbum.list.forEach(item => {
                 if (item.neid === row.neid) {
