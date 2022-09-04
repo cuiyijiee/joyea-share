@@ -678,8 +678,14 @@ export default {
             })
         },
         handleSearch(searchKey) {
-            this.$refs.searchDialog.handleSearch(searchKey);
-            return;
+            if (searchKey !== undefined && typeof (searchKey) == 'string') {
+                this.search.key = searchKey;
+            }
+            if (this.search.key.trim().length === 0) {
+                this.$message.warning("请输入搜索的关键字！");
+                return
+            }
+            this.$refs.searchDialog.handleSearch(this.search.key);
         },
         handleLoadMore() {
             let _this = this;
