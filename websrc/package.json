@@ -9,7 +9,7 @@
   "dependencies": {
     "axios": "^0.26.1",
     "core-js": "^3.21.1",
-    "element-ui": "^2.15.7",
+    "element-ui": "^2.15.9",
     "moment": "^2.29.1",
     "sortablejs": "^1.15.0",
     "video.js": "7.18.1",
@@ -23,7 +23,7 @@
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.13",
     "@vue/cli-service": "~4.5.13",
-    "node-sass": "^6.0.1",
+    "sass": "~1.32.6",
     "sass-loader": "^10.0.1",
     "vue-template-compiler": "^2.6.14"
   },

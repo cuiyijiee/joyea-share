@@ -185,7 +185,7 @@ export default {
 
 <style lang="scss" scoped>
 
-/deep/ .el-dialog {
+ ::v-deep .el-dialog {
 
     margin-top: 8vh !important;
     width: 80%;
@@ -200,10 +200,9 @@ export default {
     }
 }
 
-/deep/ .el-tabs {
+ ::v-deep .el-tabs {
     background-color: #EAE8EB;
     padding: 0 20px 0px 20px;
-
 }
 
 .function-block {
@@ -225,7 +224,7 @@ export default {
     height: 40px;
 }
 
-/deep/ .el-table-column--selection {
+ ::v-deep .el-table-column--selection {
     .cell {
         padding: 0 14px !important;
     }
