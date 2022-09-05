@@ -3,7 +3,6 @@ import App from './App.vue'
 import router from './router/index'
 import ElementUI from 'element-ui'
 import VueClipboard from 'vue-clipboard2'
-//import 'element-ui/lib/theme-chalk/index.css';
 import preview from 'vue-photo-preview';
 import 'vue-photo-preview/dist/skin.css';
 import './style/vars.scss'
@@ -13,8 +12,8 @@ import Video from 'video.js'
 import video_zhCN from 'video.js/dist/lang/zh-CN.json'
 import video_en from  'video.js/dist/lang/en.json'
 import 'video.js/dist/video-js.css'
-import iconFont from "./assets/iconfont/iconfont.css"
-import iconFontColor from "./assets/iconfont-color/iconfont.css"
+import "./assets/iconfont/iconfont.css"
+import "./assets/iconfont-color/iconfont.css"
 
 
 Video.addLanguage('zh-CN', video_zhCN);
