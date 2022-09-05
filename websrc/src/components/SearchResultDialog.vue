@@ -81,12 +81,14 @@
                                     <el-icon class="iconfont el-icon-a-icon_getshortchain file-type-icon"
                                              @click.native="handleGetCurRedirectPath(scope.row)"></el-icon>
                                 </el-tooltip>
-                                <el-tooltip v-if="directoryType === 'LENOVO'" :open-delay="defaultOpenDelay" placement="top">
+                                <el-tooltip v-if="directoryType === 'LENOVO'" :open-delay="defaultOpenDelay"
+                                            placement="top">
                                     <div slot="content">加入清单</div>
                                     <el-icon class="iconfont el-icon-a-icon_addtolist file-type-icon"
                                              @click.native="handleAdd(scope.row)"></el-icon>
                                 </el-tooltip>
-                                <el-tooltip v-if="directoryType === 'PRIVATE'" :open-delay="defaultOpenDelay" placement="top">
+                                <el-tooltip v-if="directoryType === 'PRIVATE'" :open-delay="defaultOpenDelay"
+                                            placement="top">
                                     <div slot="content">加入细分市场</div>
                                     <el-icon class="iconfont el-icon-a-icon_addtomarketsegments file-type-icon"
                                              @click.native="handleAddSrcToPrivateDir(scope.row)"></el-icon>
@@ -106,19 +108,8 @@
                         </template>
                     </el-table-column>
                 </el-table>
-                <el-button-group class="search-result-page-switch">
-                    <el-button :disabled="search.currentOffset === 0"
-                               icon="el-icon-arrow-left"
-                               type="primary"
-                               @click="handleStartSearch(-1)">上一页
-                    </el-button>
-                    <el-button :disabled="!search.hasNext"
-                               type="primary"
-                               @click="handleStartSearch(1)">
-                        下一页
-                        <i class="el-icon-arrow-right el-icon--right"></i>
-                    </el-button>
-                </el-button-group>
+                <el-button type="primary" size="small" plain
+                           class="search-result-page-switch">加载更多</el-button>
             </div>
         </el-dialog>
         <el-image-viewer
@@ -150,7 +141,7 @@ export default {
     },
     data() {
         return {
-            defaultOpenDelay:1000,
+            defaultOpenDelay: 1000,
             imageViewVisible: false,
             imageViewUrl: [],
             markReg: /<mark>|<\/mark>/g,
@@ -233,7 +224,7 @@ export default {
                 nextLoadOffset = this.search.currentOffset - this.search.defaultLimit;
             } else if (isNext === 1) {
                 nextLoadOffset = this.search.nextOffset;
-            }else {
+            } else {
                 this.search.currentIndex = 0;
             }
             ftsSearch(this.search.key, nextLoadOffset, this.search.defaultLimit).then(response => {
@@ -308,7 +299,7 @@ export default {
 
 <style lang="scss" scoped>
 
- ::v-deep .el-dialog {
+::v-deep .el-dialog {
 
     margin-top: 8vh !important;
     width: 75%;
@@ -323,7 +314,7 @@ export default {
     }
 }
 
- ::v-deep .el-tabs {
+::v-deep .el-tabs {
     background-color: #EAE8EB;
     padding: 0 20px 0px 20px;
 }
@@ -347,18 +338,15 @@ export default {
     height: 40px;
 }
 
- ::v-deep .el-table-column--selection {
+::v-deep .el-table-column--selection {
     .cell {
         padding: 0 14px !important;
     }
 }
 
 .search-result-page-switch {
-    margin-top: 40px;
-
-    button {
-        width: 200px;
-    }
+    margin-top: 20px;
+    width: 300px;
 }
 
 .file-icon {
