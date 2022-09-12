@@ -285,7 +285,10 @@
             :directoryType="directoryType"
             @addSrcToPrivateDir="handleAddSrcToPrivateDir"
             @goToDir="handleClickSearch"
-            @handleAdd="handleAdd">
+            @handleAdd="handleAdd"
+            @handleBatchAdd="handleBatchAdd"
+            @batchAddSrcToPrivateDir="batchAddSrcToPrivateDir"
+        >
         </SearchResultDialog>
         <el-dialog :close-on-click-modal="false" :visible.sync="visible.addWordDialogVisible" title="小白板管理"
                    @open="handleFilterCurDirWordList">
@@ -334,7 +337,7 @@
 import api, {
     addRedirectPath,
     addTranscodeVideo,
-    addWordToDir,
+    addWordToDir, batchNewPrivateDirSrc,
     ftsSearch,
     getFileMetadata,
     getMyWordList,
@@ -840,14 +843,22 @@ export default {
                 });
             }
         },
-        handleAdd(row) {
+        handleBatchAdd(multiRow) {
+            if (multiRow instanceof Array && multiRow.length > 0) {
+                multiRow.forEach(item => {
+                    this.handleAdd(item, false)
+                });
+                this.$message.success("成功添加【" + multiRow.length +"】条数据到清单！")
+            }
+        },
+        handleAdd(row, needFilter) {
             let isIn = false;
             this.toCreateAlbum.list.forEach(item => {
                 if (item.neid === row.neid) {
                     isIn = true;
                 }
             });
-            if (isIn) {
+            if (isIn && needFilter) {
                 this.$confirm('编辑列表中已经存在该记录，是否继续添加?', '提示', {
                     confirmButtonText: '继续添加',
                     cancelButtonText: '取消添加',
@@ -1212,6 +1223,17 @@ export default {
                     this.handleRefreshDir();
                 } else {
                     this.$message.error("添加文件失败：" + resp.msg);
+                }
+            })
+        },
+        batchAddSrcToPrivateDir(multiRow){
+            batchNewPrivateDirSrc(this.curDirNeid, multiRow.map(item => item.path)).then(resp => {
+                if (resp.code === '0') {
+                    this.visible.addSrcVisible = false;
+                    this.$message.success("批量添加文件成功！");
+                    this.handleRefreshDir();
+                } else {
+                    this.$message.error("添加文件失败: " + resp.msg);
                 }
             })
         },

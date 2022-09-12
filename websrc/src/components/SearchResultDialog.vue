@@ -2,7 +2,7 @@
     <div>
         <el-dialog :close-on-click-modal="false"
                    :close-on-press-escape="false"
-                   :title="'【' + search.key + '】的搜索结果'"
+                   :title="'【' + search.keyword + '】的搜索结果'"
                    :visible.sync="visible.searchDialogVisible"
                    class="search-dialog"
                    @close="">
@@ -14,15 +14,43 @@
                 <el-tab-pane key="3" label="视频"></el-tab-pane>
                 <el-tab-pane key="4" label="文档"></el-tab-pane>
             </el-tabs>
-            <div v-loading="loading.searchMore" class="search-result-content">
+            <!--            <div v-loading="loading.searchMore" class="search-result-content">-->
+            <div class="search-result-content">
                 <div class="function-block">
-                    <el-button icon="iconfont el-icon-a-icon_addtolist" size="mini" type="primary">加入清单</el-button>
-                    <el-button icon="iconfont el-icon-a-icon_addtomarketsegments" size="mini" type="primary">加入细分市场
+                    <el-button icon="iconfont el-icon-a-icon_addtolist" size="mini" type="primary"
+                               :disabled="directoryType === ''"
+                               @click="handleBatchAddToList">加入清单
                     </el-button>
+                    <el-button icon="iconfont el-icon-a-icon_addtomarketsegments" :disabled="directoryType!=='SELF'"
+                               size="mini" type="primary" @click="handleBatchAddToPrivate">加入细分市场
+                    </el-button>
+                    <span>
+                        <el-popover
+                            placement="bottom-end"
+                            trigger="click">
+                            <div class="sort-item" @click="handleSortTypeSelected(1)">
+                                <i class="iconfont el-icon-icon_right sort-icon"
+                                   :style="{visibility : sortType === 1 ? 'visible' : 'hidden'}"></i>文件名</div>
+                            <div class="sort-item" @click="handleSortTypeSelected(2)">
+                                <i class="iconfont el-icon-icon_right sort-icon"
+                                   :style="{visibility : sortType === 2 ? 'visible' : 'hidden'}"></i>文件类型</div>
+                            <el-divider></el-divider>
+                            <div class="sort-item" @click="handleSortOrderSelected(1)">
+                                <i class="iconfont el-icon-icon_right sort-icon"
+                                   :style="{visibility : sortOrder === 1 ? 'visible' : 'hidden'}"></i>升序</div>
+                            <div class="sort-item" @click="handleSortOrderSelected(2)">
+                                <i class="iconfont el-icon-icon_right sort-icon"
+                                   :style="{visibility : sortOrder === 2 ? 'visible' : 'hidden'}"></i>降序</div>
+                            <el-button slot="reference" size="mini" class="function-block-sort"
+                                       icon="iconfont el-icon-icon_sort">排序</el-button>
+                        </el-popover>
+                    </span>
                 </div>
-                <el-table v-loading="loading.search" :data="searchShowResult"
-                          empty-text="暂没有搜索数据" height="500" style="width: 100%">
-                    <el-table-column type="selection" width="55"></el-table-column>
+                <el-table v-loading="loading.search" :data="searchShowResult" @selection-change="handleSelectionChange"
+                          empty-text="暂没有搜索数据" height="500" style="width: 100%" ref="multipleTable">
+                    <!--多选框，屏蔽文件夹，使其不可选中-->
+                    <el-table-column type="selection" width="55"
+                                     :selectable="(row) => {return !row.is_dir}"></el-table-column>
                     <el-table-column label="文件名" show-overflow-tooltip>
                         <template slot-scope="scope">
                             <div>
@@ -81,13 +109,15 @@
                                     <el-icon class="iconfont el-icon-a-icon_getshortchain file-type-icon"
                                              @click.native="handleGetCurRedirectPath(scope.row)"></el-icon>
                                 </el-tooltip>
-                                <el-tooltip v-if="directoryType === 'LENOVO'" :open-delay="defaultOpenDelay"
+                                <el-tooltip v-if="directoryType === 'LENOVO' && !scope.row.is_dir"
+                                            :open-delay="defaultOpenDelay"
                                             placement="top">
                                     <div slot="content">加入清单</div>
                                     <el-icon class="iconfont el-icon-a-icon_addtolist file-type-icon"
                                              @click.native="handleAdd(scope.row)"></el-icon>
                                 </el-tooltip>
-                                <el-tooltip v-if="directoryType === 'PRIVATE'" :open-delay="defaultOpenDelay"
+
+                                <el-tooltip v-if="directoryType === 'SELF'" :open-delay="defaultOpenDelay"
                                             placement="top">
                                     <div slot="content">加入细分市场</div>
                                     <el-icon class="iconfont el-icon-a-icon_addtomarketsegments file-type-icon"
@@ -108,8 +138,12 @@
                         </template>
                     </el-table-column>
                 </el-table>
-                <el-button type="primary" size="small" plain
-                           class="search-result-page-switch">加载更多</el-button>
+                <el-button type="primary" size="small" plain :disabled="!search.hasNext"
+                           class="search-result-page-switch" @click="handleStartSearch">
+                    <span v-show="loading.searchMore" class="rotate_bg">
+                        <i class="iconfont el-icon-icon_loading rotateImages"></i></span>
+                    <span style="font-size: 16px;line-height: 1">{{ loading.searchMore ? "加载中" : "加载更多" }}</span>
+                </el-button>
             </div>
         </el-dialog>
         <el-image-viewer
@@ -147,15 +181,13 @@ export default {
             markReg: /<mark>|<\/mark>/g,
             search: {
                 type: '',
-                key: '新时代',
+                keyword: '',
                 hasNext: false,
-                currentOffset: 0,
                 nextOffset: 0,
 
                 currentIndex: 0,
-                defaultLimit: 20,
-                resultShowType: "0",
-                currentIndexImageList: []
+                defaultLimit: 30,
+                resultShowType: "0"
             },
             searchResult: [],
             searchShowResult: [],
@@ -166,6 +198,9 @@ export default {
                 searchMore: false
             },
             defaultImg: 'this.src="' + require('@assets/error.png') + '"', //默认图地址
+            multipleSelection: [],
+            sortType: 1,
+            sortOrder: 2
         }
     },
     methods: {
@@ -216,27 +251,12 @@ export default {
         handleAddSrcToPrivateDir(fileItem) {
             this.$emit("addSrcToPrivateDir", fileItem);
         },
-        handleStartSearch(isNext) { //isNext: 0-首页，-1-上一页，1-下一页
+        handleStartSearch() {
             this.loading.searchMore = true;
-            //计算入参索引
-            let nextLoadOffset = 0;
-            if (isNext === -1) {
-                nextLoadOffset = this.search.currentOffset - this.search.defaultLimit;
-            } else if (isNext === 1) {
-                nextLoadOffset = this.search.nextOffset;
-            } else {
-                this.search.currentIndex = 0;
-            }
-            ftsSearch(this.search.key, nextLoadOffset, this.search.defaultLimit).then(response => {
+            ftsSearch(this.search.keyword, this.search.nextOffset, this.search.defaultLimit).then(response => {
                 if (response.code === "0") {
-                    this.search.currentIndex += isNext;
                     this.search.hasNext = response.obj["has_more"];
-
-                    //保存索引
-                    this.search.currentOffset = this.search.currentIndex * this.search.defaultLimit;
-                    this.search.nextOffset = (this.search.currentIndex + 1) * this.search.defaultLimit;
-
-                    this.searchResult = [];
+                    this.search.nextOffset = response.obj["next_offset"];
                     response.obj.content.forEach(item => {
                         item.joyeaDesc = "";
                         item.isModify = false;
@@ -244,13 +264,9 @@ export default {
                     })
                     //过滤当前所选标签文件
                     this.handleFilterSearchResult();
-
-                    //生成图片预览url列表
-                    this.search.currentIndexImageList = this.searchResult.filter(temp => {
-                        return !temp.is_dir && temp.mime_type.startsWith("image")
-                    }).map(temp => {
-                        return genSrcPreviewSrc(temp.neid)
-                    })
+                    if (this.search.nextOffset <= this.search.defaultLimit) {
+                        this.handleSortShowResult();
+                    }
                 } else {
                     this.$notify.error({
                         title: '搜索出错',
@@ -270,28 +286,139 @@ export default {
                     this.searchShowResult = this.searchResult.filter(temp => {
                         return temp.is_dir;
                     });
-                    break
+                    break;
                 case "2":
                     this.searchShowResult = this.searchResult.filter(temp => {
-                        return !temp.is_dir && temp.mime_type.startsWith('image')
+                        return !temp.is_dir && temp.mime_type.startsWith('image');
                     });
-                    break
+                    break;
                 case "3":
                     this.searchShowResult = this.searchResult.filter(temp => {
-                        return !temp.is_dir && temp.mime_type.startsWith('video')
+                        return !temp.is_dir && temp.mime_type.startsWith('video');
                     });
-                    break
+                    break;
                 case "4":
                     this.searchShowResult = this.searchResult.filter(temp => {
-                        return !temp.is_dir && temp.mime_type.startsWith('doc')
+                        return !temp.is_dir && temp.mime_type.startsWith('doc');
                     });
-                    break
+                    break;
             }
         },
         handleSearch(searchKey) {
-            this.search.key = searchKey;
+            this.search.keyword = searchKey;
+            this.search.nextOffset = 0;
             this.visible.searchDialogVisible = true;
-            this.handleStartSearch(0);
+            this.handleStartSearch();
+        },
+        handleSelectionChange(val) {
+            this.multipleSelection = val;
+        },
+        handleBatchAddToList() {
+            this.$emit("handleBatchAdd", this.multipleSelection)
+        },
+        handleBatchAddToPrivate() {
+            this.$emit("batchAddSrcToPrivateDir", this.multipleSelection);
+        },
+        handleSortTypeSelected(val) {
+            this.sortType = val;
+            this.handleSortShowResult();
+        },
+        handleSortOrderSelected(val) {
+            this.sortOrder = val;
+            this.handleSortShowResult();
+        },
+        handleSortShowResult() {
+
+            let dirList = [];
+            let picList = [];
+            let videoList = [];
+            let docList = [];
+            let otherList = [];
+
+            this.searchShowResult.forEach(item => {
+                if (item.is_dir) {
+                    dirList.push(item)
+                } else if (item.mime_type && item.mime_type.startsWith("image")) {
+                    picList.push(item)
+                } else if (item.mime_type && item.mime_type.startsWith("video")) {
+                    videoList.push(item)
+                } else if (item.mime_type && item.mime_type.startsWith("doc")) {
+                    docList.push(item)
+                } else {
+                    otherList.push(item)
+                }
+            });
+
+            dirList = dirList.sort((file1, file2) => {
+                let fileNameA = file1.path.substr(file1.path.lastIndexOf("/") + 1).substr(0, 1);
+                let fileNameB = file2.path.substr(file2.path.lastIndexOf("/") + 1).substr(0, 1);
+                return fileNameA.localeCompare(fileNameB);
+            });
+            picList = picList.sort((file1, file2) => {
+                let fileNameA = file1.path.substr(file1.path.lastIndexOf("/") + 1).substr(0, 1);
+                let fileNameB = file2.path.substr(file2.path.lastIndexOf("/") + 1).substr(0, 1);
+                return fileNameA.localeCompare(fileNameB);
+            });
+            videoList = videoList.sort((file1, file2) => {
+                let fileNameA = file1.path.substr(file1.path.lastIndexOf("/") + 1).substr(0, 1);
+                let fileNameB = file2.path.substr(file2.path.lastIndexOf("/") + 1).substr(0, 1);
+                return fileNameA.localeCompare(fileNameB);
+            });
+            docList = docList.sort((file1, file2) => {
+                let fileNameA = file1.path.substr(file1.path.lastIndexOf("/") + 1).substr(0, 1);
+                let fileNameB = file2.path.substr(file2.path.lastIndexOf("/") + 1).substr(0, 1);
+                return fileNameA.localeCompare(fileNameB);
+            });
+            otherList = otherList.sort((file1, file2) => {
+                let fileNameA = file1.path.substr(file1.path.lastIndexOf("/") + 1).substr(0, 1);
+                let fileNameB = file2.path.substr(file2.path.lastIndexOf("/") + 1).substr(0, 1);
+                return fileNameA.localeCompare(fileNameB);
+            });
+
+            this.searchShowResult = [];
+            if (this.sortType === 1) {
+                //降序
+                if (this.sortOrder === 2) {
+                    dirList = dirList.reverse();
+                    picList = picList.reverse();
+                    videoList = videoList.reverse();
+                    docList = docList.reverse();
+                    otherList = otherList.reverse();
+                }
+                this.searchShowResult = this.searchShowResult.concat(dirList)
+                    .concat(picList)
+                    .concat(videoList)
+                    .concat(docList)
+                    .concat(otherList);
+            } else if (this.sortType === 2) {
+                //降序
+                if (this.sortOrder === 2) {
+                    this.searchShowResult = this.searchShowResult.concat(dirList)
+                        .concat(picList)
+                        .concat(videoList)
+                        .concat(docList)
+                        .concat(otherList);
+                } else if (this.sortOrder === 1) {
+                    this.searchShowResult = this.searchShowResult.concat(otherList)
+                        .concat(docList)
+                        .concat(videoList)
+                        .concat(picList)
+                        .concat(dirList);
+                }
+            }
+        }
+    },
+    watch: {
+        "search.keyword": {
+            immediate: true,
+            handler(v1, v2) {
+                if (v1 !== '' || v1 !== v2) {
+                    this.$nextTick(() => {
+                        this.searchResult = [];
+                        this.searchShowResult = [];
+                    });
+                }
+            }
         }
     }
 }
@@ -327,6 +454,12 @@ export default {
         border-radius: 0px;
         font-size: 14px;
     }
+}
+
+.function-block-sort {
+    position: absolute;
+    right: 30px;
+    margin-top: 8px;
 }
 
 .search-result-content {
@@ -393,4 +526,44 @@ export default {
     color: #EB7708;
 }
 
+.sort-icon {
+    margin: 0 10px;
+}
+
+.sort-item {
+    margin: 5px 0;
+}
+
+.rotate_bg {
+}
+
+.rotate_bg i.rotateImages {
+    -webkit-animation: myRotate 1s linear infinite;
+    animation: myRotate 1s linear infinite;
+    padding: 0 15px;
+}
+
+@-webkit-keyframes myRotate {
+    0% {
+        -webkit-transform: rotate(0deg);
+    }
+    50% {
+        -webkit-transform: rotate(180deg);
+    }
+    100% {
+        -webkit-transform: rotate(360deg);
+    }
+}
+
+@keyframes myRotate {
+    0% {
+        -webkit-transform: rotate(0deg);
+    }
+    50% {
+        -webkit-transform: rotate(180deg);
+    }
+    100% {
+        -webkit-transform: rotate(360deg);
+    }
+}
 </style>

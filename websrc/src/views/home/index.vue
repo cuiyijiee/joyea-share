@@ -393,4 +393,8 @@ export default {
         }
     }
 }
+
+::-webkit-scrollbar{
+    display:none !important;
+}
 </style>
