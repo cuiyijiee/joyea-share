@@ -106,10 +106,16 @@
                                             type="info">{{ tag.replace(markReg, "") }}
                                     </el-tag>
                                 </div>
+                                <div v-else-if="scope.row.tags">
+                                    <el-tag v-for="tag in scope.row.tags" size="mini"
+                                            style="margin-right: 2px"
+                                            type="info">{{ tag.name.replace(markReg, "") }}
+                                    </el-tag>
+                                </div>
                             </div>
                         </template>
                     </el-table-column>
-                    <el-table-column align="center" label="管理员">
+                    <el-table-column align="center" label="管理员" v-if="directoryType === 'SELF'">
                         <template slot-scope="scope">
                             <PrivateDirectoryAdminManager
                                 v-if="scope.row.is_dir && curDirNeid === '0'"
@@ -848,7 +854,7 @@ export default {
                 multiRow.forEach(item => {
                     this.handleAdd(item, false)
                 });
-                this.$message.success("成功添加【" + multiRow.length +"】条数据到清单！")
+                this.$message.success("成功添加【" + multiRow.length + "】条数据到清单！")
             }
         },
         handleAdd(row, needFilter) {
@@ -1226,7 +1232,7 @@ export default {
                 }
             })
         },
-        batchAddSrcToPrivateDir(multiRow){
+        batchAddSrcToPrivateDir(multiRow) {
             batchNewPrivateDirSrc(this.curDirNeid, multiRow.map(item => item.path)).then(resp => {
                 if (resp.code === '0') {
                     this.visible.addSrcVisible = false;

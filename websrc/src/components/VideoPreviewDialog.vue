@@ -123,7 +123,7 @@ export default {
     border: 0;
     display: block;
     width: 100%;
-    height: 960px;
+    height: 720px;
     outline: none !important;
 }
 

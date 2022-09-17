@@ -117,7 +117,8 @@
                                              @click.native="handleAdd(scope.row)"></el-icon>
                                 </el-tooltip>
 
-                                <el-tooltip v-if="directoryType === 'SELF'" :open-delay="defaultOpenDelay"
+                                <el-tooltip v-if="directoryType === 'SELF' && !scope.row.is_dir"
+                                            :open-delay="defaultOpenDelay"
                                             placement="top">
                                     <div slot="content">加入细分市场</div>
                                     <el-icon class="iconfont el-icon-a-icon_addtomarketsegments file-type-icon"
@@ -307,6 +308,9 @@ export default {
         handleSearch(searchKey) {
             this.search.keyword = searchKey;
             this.search.nextOffset = 0;
+            this.search.resultShowType = "0";
+            this.searchResult = [];
+            this.searchShowResult = [];
             this.visible.searchDialogVisible = true;
             this.handleStartSearch();
         },
