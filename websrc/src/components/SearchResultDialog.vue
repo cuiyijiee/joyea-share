@@ -201,7 +201,7 @@ export default {
             defaultImg: 'this.src="' + require('@assets/error.png') + '"', //默认图地址
             multipleSelection: [],
             sortType: 1,
-            sortOrder: 2
+            sortOrder: 1
         }
     },
     methods: {
@@ -354,28 +354,28 @@ export default {
             });
 
             dirList = dirList.sort((file1, file2) => {
-                let fileNameA = file1.path.substr(file1.path.lastIndexOf("/") + 1).substr(0, 1);
-                let fileNameB = file2.path.substr(file2.path.lastIndexOf("/") + 1).substr(0, 1);
+                let fileNameA = file1.path.substr(file1.path.lastIndexOf("/") + 1);
+                let fileNameB = file2.path.substr(file2.path.lastIndexOf("/") + 1);
                 return fileNameA.localeCompare(fileNameB);
             });
             picList = picList.sort((file1, file2) => {
-                let fileNameA = file1.path.substr(file1.path.lastIndexOf("/") + 1).substr(0, 1);
-                let fileNameB = file2.path.substr(file2.path.lastIndexOf("/") + 1).substr(0, 1);
+                let fileNameA = file1.path.substr(file1.path.lastIndexOf("/") + 1);
+                let fileNameB = file2.path.substr(file2.path.lastIndexOf("/") + 1);
                 return fileNameA.localeCompare(fileNameB);
             });
             videoList = videoList.sort((file1, file2) => {
-                let fileNameA = file1.path.substr(file1.path.lastIndexOf("/") + 1).substr(0, 1);
-                let fileNameB = file2.path.substr(file2.path.lastIndexOf("/") + 1).substr(0, 1);
+                let fileNameA = file1.path.substr(file1.path.lastIndexOf("/") + 1);
+                let fileNameB = file2.path.substr(file2.path.lastIndexOf("/") + 1);
                 return fileNameA.localeCompare(fileNameB);
             });
             docList = docList.sort((file1, file2) => {
-                let fileNameA = file1.path.substr(file1.path.lastIndexOf("/") + 1).substr(0, 1);
-                let fileNameB = file2.path.substr(file2.path.lastIndexOf("/") + 1).substr(0, 1);
+                let fileNameA = file1.path.substr(file1.path.lastIndexOf("/") + 1);
+                let fileNameB = file2.path.substr(file2.path.lastIndexOf("/") + 1);
                 return fileNameA.localeCompare(fileNameB);
             });
             otherList = otherList.sort((file1, file2) => {
-                let fileNameA = file1.path.substr(file1.path.lastIndexOf("/") + 1).substr(0, 1);
-                let fileNameB = file2.path.substr(file2.path.lastIndexOf("/") + 1).substr(0, 1);
+                let fileNameA = file1.path.substr(file1.path.lastIndexOf("/") + 1);
+                let fileNameB = file2.path.substr(file2.path.lastIndexOf("/") + 1);
                 return fileNameA.localeCompare(fileNameB);
             });
 
@@ -430,7 +430,7 @@ export default {
 
 <style lang="scss" scoped>
 
-::v-deep .el-dialog {
+:deep(.el-dialog) {
 
     margin-top: 8vh !important;
     width: 75%;
@@ -445,7 +445,7 @@ export default {
     }
 }
 
-::v-deep .el-tabs {
+:deep(.el-tabs) {
     background-color: #EAE8EB;
     padding: 0 20px 0px 20px;
 }
@@ -475,7 +475,7 @@ export default {
     height: 40px;
 }
 
-::v-deep .el-table-column--selection {
+:deep(.el-table-column--selection) {
     .cell {
         padding: 0 14px !important;
     }
@@ -504,6 +504,7 @@ export default {
 
 .file-type-icon {
     margin: 0 5px;
+    font-size: 20px;
 }
 
 .file-type-icon:hover {

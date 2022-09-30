@@ -127,7 +127,7 @@ export default {
     outline: none !important;
 }
 
-::v-deep .el-dialog {
+:deep(.el-dialog) {
     .el-dialog__body {
         padding: 0 0 0 0 !important;
         text-align: center;
