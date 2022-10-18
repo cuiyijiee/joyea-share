@@ -1005,13 +1005,13 @@ export default {
     color: #ffffff !important;
 }
 
-/deep/ .el-input-group__append {
+::v-deep .el-input-group__append {
     background: #ffffff;
     border-bottom-right-radius: 100px !important;
     border-top-right-radius: 100px !important;
 }
 
-/deep/ .search-button--default {
+::v-deep .search-button--default {
     border-bottom-right-radius: 100px !important;
     border-top-right-radius: 100px !important;
 }
