@@ -10,11 +10,12 @@ module.exports = {
     devServer: {
         proxy: {
             'api/preview': {
-                target: 'http://sck.joyea.cn:8000/',
+                target: 'http://sck.joyea.cn:9000/',
                 changeOrigin: true
             },
             '/': {
-                target: 'http://localhost:8000',
+                //target: 'http://localhost:8000',
+                target: 'http://sck.joyea.cn:9000/',
                 changeOrigin: true
             }
         }
