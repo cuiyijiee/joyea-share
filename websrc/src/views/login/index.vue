@@ -20,6 +20,7 @@
 <script>
 import {login} from "../../api";
 import {mapActions} from "vuex"
+import {getQueryParam} from "@/utils/JoyeaUtil";
 
 const localStorage = window.localStorage;
 
@@ -107,7 +108,7 @@ export default {
         if (userInfoOpt) {
             this.loginForm = JSON.parse(atob(userInfoOpt))
         }
-        let nextPlusToken =  this.$route.query.access_token;
+        let nextPlusToken =  getQueryParam("access_token");
         if(nextPlusToken){
           localStorage.setItem("nextx_token",nextPlusToken);
         }

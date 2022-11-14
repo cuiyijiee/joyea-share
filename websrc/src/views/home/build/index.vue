@@ -358,7 +358,7 @@ import api, {
 import genSrcPreviewSrc, {getVideoPreviewUrl} from "../../../utils"
 import Sortable from 'sortablejs';
 import videojs from 'video.js'
-import {getDocumentImage, getFileNameWithoutExtension, joyeaMenuPath} from "@/utils/JoyeaUtil";
+import {getDocumentImage, getFileNameWithoutExtension, getQueryParam, joyeaMenuPath} from "@/utils/JoyeaUtil";
 import {mapGetters} from "vuex";
 import LenovoDirSelector from "@/components/LenovoDirSelector";
 import LenovoDirDrawer from "@/components/LenovoDirDrawer";
@@ -1309,10 +1309,10 @@ export default {
                 _this.handleGoRootPath();
             }
         });
-      let nextPlusToken =  this.$route.query.access_token;
-      if(nextPlusToken){
-        localStorage.setItem("nextx_token",nextPlusToken);
-      }
+        let nextPlusToken =  getQueryParam("access_token");
+        if(nextPlusToken){
+          localStorage.setItem("nextx_token",nextPlusToken);
+        }
     },
     destroyed() {
     }
