@@ -107,6 +107,10 @@ export default {
         if (userInfoOpt) {
             this.loginForm = JSON.parse(atob(userInfoOpt))
         }
+        let nextPlusToken =  this.$route.query.access_token;
+        if(nextPlusToken){
+          localStorage.setItem("nextx_token",nextPlusToken);
+        }
     }
 }
 </script>

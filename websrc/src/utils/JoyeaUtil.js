@@ -24,9 +24,6 @@ export let joyeaMenuPath = [
     {
         name: "泡罩线", path: "/营销素材展示/泡罩线", icon: "menu-icon/15.png"
     },
-    // {
-    //     name: "软双铝线", path: "/营销素材展示/软双铝线", icon: "menu-icon/13.png"
-    // },
     {
         name: "制粒线", path: "/营销素材展示/制粒线", icon: "menu-icon/14.png"
     },
@@ -41,6 +38,12 @@ export let joyeaMenuPath = [
     },
     {
         name: "友商信息", path: "/营销素材展示/友商信息", icon: "menu-icon/17.png"
+    },
+    {
+        name: "一家园素材库", path: "/营销素材展示/一家园素材库", icon: "menu-icon/20.png"
+    },
+    {
+        name: "元一素材库", path: "/营销素材展示/元一素材库", icon: "menu-icon/21.png"
     }
 ]
 

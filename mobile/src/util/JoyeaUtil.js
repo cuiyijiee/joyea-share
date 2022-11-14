@@ -1,5 +1,4 @@
 import {convertItem, GenImageListView} from "./ImageViewUtil";
-import store from "../store";
 import {Dialog} from 'vant';
 import {previewFile} from "@/api";
 
@@ -28,13 +27,10 @@ export function handleGoToPreview(context, row, session, itemList) {
     } else if (row.mime_type.startsWith("video")) {
         previewType = 'av'
     }
-    let isRealImage = store.state.showRealImage;
-    let url = isRealImage ?
-        genSrcOriginSrc(row.path, row.neid, session) :
-        genSrcPreviewSrc(row.neid, row.hash, row.rev, previewType, session);
+    let url = genSrcOriginSrc(row.path, row.neid, session)
     if (row.mime_type.startsWith("video")) {
         videoLoading = true;
-        const {promise,abort} = getVideoPreviewUrl(row.neid, 30)
+        const {promise, abort} = getVideoPreviewUrl(row.neid, 30)
         promise.then(resp => {
             if (videoLoading) {
                 callNextPlusPreview(fileName, resp);
@@ -47,7 +43,7 @@ export function handleGoToPreview(context, row, session, itemList) {
             allowHtml: true,
             showConfirmButton: true,
             confirmButtonText: '取消'
-        }).then(()=>{
+        }).then(() => {
             abort();
         })
         //callNextPlusPreview(fileName, url)
@@ -140,14 +136,14 @@ export function getVideoPreviewUrl(neid, times) {
         function attempt() {
             previewFile(neid).then(function (previewUrl) {
                 console.log(previewUrl)
-                if(previewUrl.code) {
+                if (previewUrl.code) {
                     if (0 === times) {
                         reject(err)
                     } else {
                         times--;
                         setTimeout(attempt, 1000)
                     }
-                } else{
+                } else {
                     resolve(previewUrl)
                 }
             }).catch(function (err) {
@@ -165,13 +161,10 @@ export function getVideoPreviewUrl(neid, times) {
     });
 
     return {
-        promise,
-        abort: (opt = {}) => {
+        promise, abort: (opt = {}) => {
             times = 0;
             _rej({
-                name: "abort",
-                message: "the promise is aborted",
-                aborted: true,
+                name: "abort", message: "the promise is aborted", aborted: true,
             })
         }
     }
