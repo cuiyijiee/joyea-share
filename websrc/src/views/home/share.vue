@@ -12,7 +12,7 @@
                 <!--                    </span>-->
             </div>
             <el-row>
-                <el-col :md="8" :xs="24" v-for="(img,fileIndex) in album.list">
+                <el-col :md="8" :xs="24" v-for="(img,fileIndex) in album.list" :key="fileIndex">
                     <el-card style="padding: 2px;margin: 5px;text-align:center;">
                         <img :src="img.url" style="width:100%;object-fit: contain;" :preview="album.name"
                              :onerror="defaultImg"

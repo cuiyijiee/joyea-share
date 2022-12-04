@@ -9,7 +9,7 @@
             </el-input>
 
             <div class="px10_divider">
-                <el-card v-for="(album,index) in albumList" style="margin-bottom: 10px">
+                <el-card v-for="(album,index) in albumList" style="margin-bottom: 10px" :key="index">
                     <div slot="header" class="clearfix">
                         <span style="color: #fff;font-weight:bold;">{{ album.name }}</span>
                         <span style="float: right">
@@ -30,7 +30,7 @@
                     </span>
                     </div>
                     <el-row>
-                        <el-col :md="8" :xs="24" v-for="(img,fileIndex) in album.list">
+                        <el-col :md="8" :xs="24" v-for="(img,fileIndex) in album.list" :key="fileIndex">
                             <el-card style="padding: 2px;margin: 5px;text-align:center;height: 273px;">
                                 <img v-if="img.mime_type.startsWith('video')" src="video.png"
                                      @click="handleGoToPreview(img)" class="album_img">

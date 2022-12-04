@@ -2,7 +2,6 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './router/index'
 import ElementUI from 'element-ui'
-import VueClipboard from 'vue-clipboard2'
 import preview from 'vue-photo-preview';
 import 'vue-photo-preview/dist/skin.css';
 import './style/vars.scss'
@@ -22,7 +21,6 @@ Video.addLanguage('en', video_en);
 Vue.config.productionTip = false;
 Vue.use(ElementUI);
 Vue.use(preview);
-Vue.use(VueClipboard)
 
 import moment from "moment";
 Vue.filter('dateFormat', function (dataStr, pattern = 'YYYY-MM-DD HH:mm:ss') {

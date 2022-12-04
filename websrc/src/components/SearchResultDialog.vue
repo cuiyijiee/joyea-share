@@ -69,8 +69,8 @@
                                         <b>{{ scope.row.path.substr(scope.row.path.lastIndexOf("/") + 1) }}</b>
                                     </span>
                                     <div v-if="scope.row.desc" class="file-desc">
-                                        <el-tag v-for="tag in scope.row.desc.split(' ')" size="mini"
-                                                style="margin-right: 2px"
+                                        <el-tag v-for="(tag,index) in scope.row.desc.split(' ')" size="mini"
+                                                style="margin-right: 2px" :key="index"
                                                 type="info">{{ tag.replace(markReg, "") }}
                                         </el-tag>
                                     </div>

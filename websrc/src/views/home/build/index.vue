@@ -31,7 +31,7 @@
                  element-loading-background="rgba(209, 209, 209)"
                  style="padding: 10px 10px 0 10px;height: 100%; ">
                 <el-row :gutter="10" align="middle" justify="center">
-                    <el-col v-for="menu in menuPath" :lg="6" :md="6" :sm="12" :xl="6" :xs="24">
+                    <el-col v-for="(menu,index) in menuPath" :key="index" :lg="6" :md="6" :sm="12" :xl="6" :xs="24">
                         <div class="menu-content" style="border: #000000 3px" @click="handleListLenovoDir(menu.path)">
                             <img :src="menu.icon" style=""/>
                         </div>
@@ -88,10 +88,11 @@
                                 <i v-if="scope.row.is_dir" class="el-icon-folder-opened"></i>
                                 <i v-else-if="scope.row.mime_type.startsWith('video')" class="el-icon-video-camera"></i>
                                 <img v-else-if="scope.row.mime_type.startsWith('image')"
-                                     :onerror="defaultImg"
-                                     :preview-text="scope.row.path" :src="genPreviewUrl(scope.row.neid)"
-                                     preview="dir_image_list"
-                                     style="width: 60px;height: 60px;line-height: 30px">
+                                          :onerror="defaultImg"
+                                          :preview-text="scope.row.path"
+                                          :src="genPreviewUrl(scope.row.neid)"
+                                          fit="contain" preview="dir_image_list"
+                                          style="width: 120px; height: 90px; line-height: 30px; background-color:#DCDCDC"/>
                                 <i v-else-if="scope.row.mime_type.startsWith('doc')" class="el-icon-tickets"></i>
                                 <i v-else-if="scope.row.mime_type.startsWith('word')" class="el-icon-link"></i>
                                 <i v-else class="el-icon-question"></i>
@@ -101,21 +102,21 @@
                                 <span v-else style="vertical-align:center;color: #333333">
                                     {{ ' ' + scope.row.file_name }}</span>
                                 <div v-if="scope.row.desc">
-                                    <el-tag v-for="tag in scope.row.desc.split(' ')" size="mini"
-                                            style="margin-right: 2px"
+                                    <el-tag v-for="(tag,index) in scope.row.desc.split(' ')" size="mini"
+                                            style="margin-right: 2px" :key="index"
                                             type="info">{{ tag.replace(markReg, "") }}
                                     </el-tag>
                                 </div>
                                 <div v-else-if="scope.row.tags">
-                                    <el-tag v-for="tag in scope.row.tags" size="mini"
-                                            style="margin-right: 2px"
+                                    <el-tag v-for="(tag,index) in scope.row.tags" size="mini"
+                                            style="margin-right: 2px" :key="index"
                                             type="info">{{ tag.name.replace(markReg, "") }}
                                     </el-tag>
                                 </div>
                             </div>
                         </template>
                     </el-table-column>
-                    <el-table-column align="center" label="管理员" v-if="directoryType === 'SELF'">
+                    <el-table-column v-if="directoryType === 'SELF'" align="center" label="管理员">
                         <template slot-scope="scope">
                             <PrivateDirectoryAdminManager
                                 v-if="scope.row.is_dir && curDirNeid === '0'"
@@ -135,7 +136,7 @@
                     </el-table-column>
                     <el-table-column align="center" label="操作" width="160">
                         <template slot-scope="scope">
-                            <span v-if="!scope.row.is_dir">
+                            <span v-if="!scope.row.is_dir && !scope.row.mime_type.startsWith('word')">
                                 <el-button circle icon="el-icon-plus" type=""
                                            @click.stop="handleAdd(scope.row)"/>
                             </span>
@@ -290,10 +291,10 @@
             ref="searchDialog"
             :directoryType="directoryType"
             @addSrcToPrivateDir="handleAddSrcToPrivateDir"
+            @batchAddSrcToPrivateDir="batchAddSrcToPrivateDir"
             @goToDir="handleClickSearch"
             @handleAdd="handleAdd"
             @handleBatchAdd="handleBatchAdd"
-            @batchAddSrcToPrivateDir="batchAddSrcToPrivateDir"
         >
         </SearchResultDialog>
         <el-dialog :close-on-click-modal="false" :visible.sync="visible.addWordDialogVisible" title="小白板管理"
@@ -343,7 +344,8 @@
 import api, {
     addRedirectPath,
     addTranscodeVideo,
-    addWordToDir, batchNewPrivateDirSrc,
+    addWordToDir,
+    batchNewPrivateDirSrc,
     ftsSearch,
     getFileMetadata,
     getMyWordList,
@@ -478,7 +480,8 @@ export default {
                 switch (mode) {
                     case "PRIVATE_DIR_REMOVE_SRC":
                         hasPermission = this.directoryType === "SELF"
-                            && (this.userInfo.isAdmin || this.curDirAdminUser.filter(item => this.userInfo.email === item.joyeaId).length > 0);
+                            && (this.userInfo.isAdmin || this.curDirAdminUser.filter(item => this.userInfo.email === item.joyeaId).length > 0)
+                            && !fileItem.mime_type.startsWith("word");
                         break;
                     // case "PRIVATE_DIR_DOWNLOAD":
                     //     hasPermission = this.directoryType === "SELF" && fileItem.is_dir
