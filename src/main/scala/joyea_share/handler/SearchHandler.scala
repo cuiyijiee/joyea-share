@@ -41,7 +41,7 @@ class SearchHandler extends IAction {
                     //查询资源是否已经收藏
                     contentJsonArr.forEach(contentValue => {
                         val content = contentValue.asObject()
-                        val srcNeid = content.getLong("neid", -1)
+                        val srcNeid = content.getString("neid","-1").toLong
                         val optionSrc = Await.result(AsyncDB.withPool {
                             implicit tx => {
                                 SrcCollect.findByUserIdAndNeid(userId = sessionUserId, neid = srcNeid)

@@ -24,9 +24,6 @@ export let joyeaMenuPath = [
     {
         name: "泡罩线", path: "/营销素材展示/泡罩线", icon: "menu-icon/15.png"
     },
-    // {
-    //     name: "软双铝线", path: "/营销素材展示/软双铝线", icon: "menu-icon/13.png"
-    // },
     {
         name: "制粒线", path: "/营销素材展示/制粒线", icon: "menu-icon/14.png"
     },
@@ -41,6 +38,12 @@ export let joyeaMenuPath = [
     },
     {
         name: "友商信息", path: "/营销素材展示/友商信息", icon: "menu-icon/17.png"
+    },
+    {
+        name: "一家园素材库", path: "/营销素材展示/一家园素材库", icon: "menu-icon/20.png"
+    },
+    {
+        name: "元一素材库", path: "/营销素材展示/元一素材库", icon: "menu-icon/21.png"
     }
 ]
 
@@ -74,4 +77,23 @@ export function convertItem(item) {
     if (item.srcRev) item.rev = item.srcRev;
     if (item.srcPath) item.path = item.srcPath;
     return item;
+}
+
+export function getQueryParam(key) {
+    if (!key) {
+        return false;
+    }
+
+    var value = '';
+    var paramStr = window.location.search ? window.location.search.substr(1) : '';
+
+    if (paramStr) {
+        paramStr.split('&').forEach(function (param) {
+            var arr = param.split('=');
+            if (arr[0] == key) {
+                value = arr[1];
+            }
+        });
+    }
+    return value;
 }

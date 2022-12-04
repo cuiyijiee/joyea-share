@@ -9,7 +9,7 @@
             </template>
         </van-search>
         <div v-if="directoryType.length === 0">
-<!--            <van-image :src="background" style="position: fixed"/>-->
+            <!--            <van-image :src="background" style="position: fixed"/>-->
             <div id="space-selector">
                 <div style="text-align: center; background-color: #ffffff">
                     <van-image :src="lenovoSpaceBg"
@@ -88,10 +88,15 @@
                                     <van-col span="16">
                                         {{ item.path.substr(item.path.lastIndexOf('/') + 1) }}
                                         <span v-if="item.desc">
-                                        <van-tag v-for="tag in item.desc.split(' ')" mark style="margin-right: 2px">
-                                        {{ tag.replace(markReg, "") }}
-                                    </van-tag>
-                                    </span>
+                                            <van-tag v-for="tag in item.desc.split(' ')" mark style="margin-right: 2px">
+                                            {{ tag.replace(markReg, "") }}
+                                            </van-tag>
+                                        </span>
+                                        <span v-else-if="item.tags">
+                                            <van-tag v-for="tag in item.tags" mark style="margin-right: 2px">
+                                            {{ tag.name.replace(markReg, "") }}
+                                            </van-tag>
+                                        </span>
                                     </van-col>
                                     <van-col span="4">
                                         <van-button v-if="!item['is_dir'] " icon="plus" plain size="small"
@@ -117,6 +122,11 @@
                                     {{ tag.replace(markReg, "") }}
                                 </van-tag>
                                 </span>
+                                    <span v-else-if="item.tags">
+                                            <van-tag v-for="tag in item.tags" mark style="margin-right: 2px">
+                                            {{ tag.name.replace(markReg, "") }}
+                                            </van-tag>
+                                        </span>
                                 </van-col>
                             </van-cell>
                         </van-list>
@@ -146,6 +156,11 @@
                                     {{ tag.replace(markReg, "") }}
                                 </van-tag>
                                 </span>
+                                    <span v-else-if="item.tags">
+                                            <van-tag v-for="tag in item.tags" mark style="margin-right: 2px">
+                                            {{ tag.name.replace(markReg, "") }}
+                                            </van-tag>
+                                        </span>
                                 </div>
                             </van-grid-item>
                         </van-grid>
@@ -168,6 +183,11 @@
                                         {{ tag.replace(markReg, "") }}
                                     </van-tag>
                                     </span>
+                                        <span v-else-if="item.tags">
+                                            <van-tag v-for="tag in item.tags" mark style="margin-right: 2px">
+                                            {{ tag.name.replace(markReg, "") }}
+                                            </van-tag>
+                                        </span>
                                     </van-col>
                                     <van-col span="4">
                                         <van-button v-if="!item['is_dir']" icon="plus" plain size="small"
@@ -197,6 +217,11 @@
                                         {{ tag.replace(markReg, "") }}
                                     </van-tag>
                                     </span>
+                                        <span v-else-if="item.tags">
+                                            <van-tag v-for="tag in item.tags" mark style="margin-right: 2px">
+                                            {{ tag.name.replace(markReg, "") }}
+                                            </van-tag>
+                                        </span>
                                     </van-col>
                                     <van-col span="4">
                                         <van-button v-if="!item['is_dir']" icon="plus" plain size="small"

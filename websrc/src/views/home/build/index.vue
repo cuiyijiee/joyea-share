@@ -31,7 +31,8 @@
                  element-loading-background="rgba(209, 209, 209)"
                  style="padding: 10px 10px 0 10px;height: 100%; ">
                 <el-row :gutter="10" align="middle" justify="center">
-                    <el-col v-for="(menu,index) in menuPath" :key="index" :lg="6" :md="6" :sm="12" :xl="6" :xs="24">
+                    <el-col v-for="(menu,index) in menuPath" :key="index" class="card-panel-col"
+                            :lg="{span: '4-8'}" :md="{span: '4-8'}" :sm="12" :xl="{span: '4-8'}" :xs="12">
                         <div class="menu-content" style="border: #000000 3px" @click="handleListLenovoDir(menu.path)">
                             <img :src="menu.icon" style=""/>
                         </div>
@@ -360,7 +361,7 @@ import api, {
 import genSrcPreviewSrc, {getVideoPreviewUrl} from "../../../utils"
 import Sortable from 'sortablejs';
 import videojs from 'video.js'
-import {getDocumentImage, getFileNameWithoutExtension, joyeaMenuPath} from "@/utils/JoyeaUtil";
+import {getDocumentImage, getFileNameWithoutExtension, getQueryParam, joyeaMenuPath} from "@/utils/JoyeaUtil";
 import {mapGetters} from "vuex";
 import LenovoDirSelector from "@/components/LenovoDirSelector";
 import LenovoDirDrawer from "@/components/LenovoDirDrawer";
@@ -548,6 +549,11 @@ export default {
             if (row.mime_type.startsWith("video")) {
                 this.handlePlayVideo(row);
                 return
+            }else if(row.mime_type.startsWith("word")){
+              let nextPlusToken = localStorage.getItem("nextx_token");
+              let url = "https://m.nextxx.cn/fullscreen/#/main/pc/boardDetail?access_token=" + nextPlusToken + "&id=" + row.neid;
+              window.open(url);
+              return;
             }
             let url = genSrcPreviewSrc(row.neid);
             if (row.mime_type.startsWith("video")) {
@@ -1307,6 +1313,10 @@ export default {
                 _this.handleGoRootPath();
             }
         });
+        let nextPlusToken =  getQueryParam("access_token");
+        if(nextPlusToken){
+          localStorage.setItem("nextx_token",nextPlusToken);
+        }
     },
     destroyed() {
     }
@@ -1393,5 +1403,9 @@ export default {
 
 .el-icon-folder-opened {
     color: #fec04a;
+}
+
+.el-col-lg-4-8 {
+  width: 20%;
 }
 </style>

@@ -30,18 +30,10 @@ export function GenImageListView(context, itemList, sessionId, clickItem) {
             index = tmp;
         }
         tmp++;
-        let isRealImage = store.state.showRealImage;
-        if (isRealImage) {
-            return {
-                url: genSrcOriginSrc(item.path, item.neid, sessionId),
-                joyeaDesc: item.joyeaDesc
-            };
-        } else {
-            return {
-                url: genSrcPreviewSrc(item.neid, item.hash, item.rev, "pic", sessionId), //neid, hash, rev, previewType, sessionId
-                joyeaDesc: item.joyeaDesc
-            }
-        }
+        return {
+            url: genSrcOriginSrc(item.path, item.neid, sessionId),
+            joyeaDesc: item.joyeaDesc
+        };
     });
     if (list.length === 0) {
         context.$notify({
