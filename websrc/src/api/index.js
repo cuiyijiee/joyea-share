@@ -176,9 +176,10 @@ export function getFileMetadata(directoryType, path, parentDirId) {
     })
 }
 
-export function ftsSearch(searchKey, offset, limit) {
+export function ftsSearch(searchKey, offset, limit, searchType, searchOrderType) {
     return service.post("apiv2/lenovo/ftsSearch", {
-        searchKey: searchKey, offset: offset, limit: limit
+        searchKey: searchKey, offset: offset, limit: limit,
+        searchType: searchType, searchOrderType: searchOrderType
     }).then(resp => {
         return resp.data;
     })
