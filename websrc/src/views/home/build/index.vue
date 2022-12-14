@@ -289,7 +289,7 @@
         </div>
       </el-image>
     </el-dialog>
-    <SearchResultDialog
+    <search-result-dialog
         ref="searchDialog"
         :directoryType="directoryType"
         @addSrcToPrivateDir="handleAddSrcToPrivateDir"
@@ -298,7 +298,7 @@
         @handleAdd="handleAdd"
         @handleBatchAdd="handleBatchAdd"
     >
-    </SearchResultDialog>
+    </search-result-dialog>
     <el-dialog :close-on-click-modal="false" :visible.sync="visible.addWordDialogVisible" title="小白板管理"
                @open="handleFilterCurDirWordList">
       <div style="text-align: right">
