@@ -10,43 +10,44 @@
                      tab-position="top" @tab-click="handleFilterSearchResult">
                 <el-tab-pane key="0" label="全部"></el-tab-pane>
                 <el-tab-pane key="1" label="文件夹"></el-tab-pane>
-                <el-tab-pane key="2" label="图片"></el-tab-pane>
-                <el-tab-pane key="3" label="视频"></el-tab-pane>
-                <el-tab-pane key="4" label="文档"></el-tab-pane>
+                <el-tab-pane key="2" label="文档"></el-tab-pane>
+                <el-tab-pane key="3" label="图片"></el-tab-pane>
+                <el-tab-pane key="4" label="视频"></el-tab-pane>
             </el-tabs>
             <!--            <div v-loading="loading.searchMore" class="search-result-content">-->
             <div class="search-result-content">
                 <div class="function-block">
                     <el-button icon="iconfont el-icon-a-icon_addtolist" size="mini" type="primary"
-                               :disabled="directoryType === ''"
                                @click="handleBatchAddToList">加入清单
                     </el-button>
                     <el-button icon="iconfont el-icon-a-icon_addtomarketsegments" :disabled="directoryType!=='SELF'"
                                size="mini" type="primary" @click="handleBatchAddToPrivate">加入细分市场
                     </el-button>
                     <span>
-                        <el-popover
-                            placement="bottom-end"
-                            trigger="click">
-                            <div class="sort-item" @click="handleSortTypeSelected(1)">
-                                <i class="iconfont el-icon-icon_right sort-icon"
-                                   :style="{visibility : sortType === 1 ? 'visible' : 'hidden'}"></i>文件名</div>
-                            <div class="sort-item" @click="handleSortTypeSelected(2)">
-                                <i class="iconfont el-icon-icon_right sort-icon"
-                                   :style="{visibility : sortType === 2 ? 'visible' : 'hidden'}"></i>文件类型</div>
-                            <el-divider></el-divider>
-                            <div class="sort-item" @click="handleSortOrderSelected(1)">
-                                <i class="iconfont el-icon-icon_right sort-icon"
-                                   :style="{visibility : sortOrder === 1 ? 'visible' : 'hidden'}"></i>升序</div>
-                            <div class="sort-item" @click="handleSortOrderSelected(2)">
-                                <i class="iconfont el-icon-icon_right sort-icon"
-                                   :style="{visibility : sortOrder === 2 ? 'visible' : 'hidden'}"></i>降序</div>
-                            <el-button slot="reference" size="mini" class="function-block-sort"
-                                       icon="iconfont el-icon-icon_sort">排序</el-button>
-                        </el-popover>
-                    </span>
+            <el-popover
+                placement="bottom-end"
+                trigger="click">
+              <div class="sort-item" @click="handleSortTypeSelected(0)">
+                <i class="iconfont el-icon-icon_right sort-icon"
+                   :style="{visibility : sortType === 0 ? 'visible' : 'hidden'}"></i>匹配度排序</div>
+              <div class="sort-item" @click="handleSortTypeSelected(1)">
+                <i class="iconfont el-icon-icon_right sort-icon"
+                   :style="{visibility : sortType === 1 ? 'visible' : 'hidden'}"></i>名称排序</div>
+              <div v-if="sortType === 1">
+                <el-divider></el-divider>
+                <div class="sort-item" @click="handleSortOrderSelected(0)">
+                  <i class="iconfont el-icon-icon_right sort-icon"
+                     :style="{visibility : sortOrder === 0 ? 'visible' : 'hidden'}"></i>升序</div>
+                <div class="sort-item" @click="handleSortOrderSelected(1)">
+                  <i class="iconfont el-icon-icon_right sort-icon"
+                     :style="{visibility : sortOrder === 1 ? 'visible' : 'hidden'}"></i>降序</div>
+              </div>
+              <el-button slot="reference" size="mini" class="function-block-sort"
+                         icon="iconfont el-icon-icon_sort">排序</el-button>
+            </el-popover>
+          </span>
                 </div>
-                <el-table v-loading="loading.search" :data="searchShowResult" @selection-change="handleSelectionChange"
+                <el-table v-loading="loading.search" :data="searchResult" @selection-change="handleSelectionChange"
                           empty-text="暂没有搜索数据" height="500" style="width: 100%" ref="multipleTable">
                     <!--多选框，屏蔽文件夹，使其不可选中-->
                     <el-table-column type="selection" width="55"
@@ -55,16 +56,16 @@
                         <template slot-scope="scope">
                             <div>
                                 <div class="file-name-block">
-                                    <span class="file-icon">
-                                        <i v-if="scope.row.is_dir" class="iconfont-color icon-icon_folder"></i>
-                                        <i v-else-if="scope.row.mime_type.startsWith('doc')"
-                                           class="iconfont-color icon-icon_file"></i>
-                                        <i v-else-if="scope.row.mime_type.startsWith('image')"
-                                           class="iconfont-color icon-icon_pic"></i>
-                                        <i v-else-if="scope.row.mime_type.startsWith('video')"
-                                           class="iconfont-color icon-icon_vedio"></i>
-                                        <i v-else class="el-icon-question"></i>
-                                    </span>
+                  <span class="file-icon">
+                    <i v-if="scope.row.is_dir" class="iconfont-color icon-icon_folder"></i>
+                    <i v-else-if="scope.row.mime_type.startsWith('doc')"
+                       class="iconfont-color icon-icon_file"></i>
+                    <i v-else-if="scope.row.mime_type.startsWith('image')"
+                       class="iconfont-color icon-icon_pic"></i>
+                    <i v-else-if="scope.row.mime_type.startsWith('video')"
+                       class="iconfont-color icon-icon_vedio"></i>
+                    <i v-else class="el-icon-question"></i>
+                  </span>
                                     <span class="file-name" @click="handleGoToPreview(scope.row)">
                                         <b>{{ scope.row.path.substr(scope.row.path.lastIndexOf("/") + 1) }}</b>
                                     </span>
@@ -92,39 +93,39 @@
                     <el-table-column label="文件类型" width="220">
                         <template slot-scope="scope">
                             <div>
-                            <span class="file-type-show">
+                <span class="file-type-show">
                                 {{ formatFileShowType(scope.row) }}
-                            </span>
+                </span>
                                 <span class="file-type-hide">
-                                <el-tooltip v-if="scope.row.is_dir" :open-delay="defaultOpenDelay" placement="top">
-                                    <div slot="content">跳转至文件所在位置</div>
-                                    <el-icon
-                                        class="iconfont el-icon-a-icon_jumptothelocation file-type-icon"
-                                        @click.native="handleGotoDir(scope.row)"></el-icon>
-                                </el-tooltip>
-                                <el-tooltip
-                                    v-if="scope.row.is_dir"
-                                    :open-delay="defaultOpenDelay" placement="top">
-                                    <div slot="content">获取短链</div>
-                                    <el-icon class="iconfont el-icon-a-icon_getshortchain file-type-icon"
-                                             @click.native="handleGetCurRedirectPath(scope.row)"></el-icon>
-                                </el-tooltip>
-                                <el-tooltip v-if="directoryType === 'LENOVO' && !scope.row.is_dir"
-                                            :open-delay="defaultOpenDelay"
-                                            placement="top">
-                                    <div slot="content">加入清单</div>
-                                    <el-icon class="iconfont el-icon-a-icon_addtolist file-type-icon"
-                                             @click.native="handleAdd(scope.row)"></el-icon>
-                                </el-tooltip>
+                  <el-tooltip v-if="scope.row.is_dir" :open-delay="defaultOpenDelay" placement="top">
+                    <div slot="content">跳转至文件所在位置</div>
+                    <el-icon
+                        class="iconfont el-icon-a-icon_jumptothelocation file-type-icon"
+                        @click.native="handleGotoDir(scope.row)"></el-icon>
+                  </el-tooltip>
+                  <el-tooltip
+                      v-if="scope.row.is_dir"
+                      :open-delay="defaultOpenDelay" placement="top">
+                    <div slot="content">获取短链</div>
+                    <el-icon class="iconfont el-icon-a-icon_getshortchain file-type-icon"
+                             @click.native="handleGetCurRedirectPath(scope.row)"></el-icon>
+                  </el-tooltip>
+                  <el-tooltip v-if="directoryType === 'LENOVO' && !scope.row.is_dir"
+                              :open-delay="defaultOpenDelay"
+                              placement="top">
+                    <div slot="content">加入清单</div>
+                    <el-icon class="iconfont el-icon-a-icon_addtolist file-type-icon"
+                             @click.native="handleAdd(scope.row)"></el-icon>
+                  </el-tooltip>
 
-                                <el-tooltip v-if="directoryType === 'SELF' && !scope.row.is_dir"
-                                            :open-delay="defaultOpenDelay"
-                                            placement="top">
-                                    <div slot="content">加入细分市场</div>
-                                    <el-icon class="iconfont el-icon-a-icon_addtomarketsegments file-type-icon"
-                                             @click.native="handleAddSrcToPrivateDir(scope.row)"></el-icon>
-                                </el-tooltip>
-                            </span>
+                  <el-tooltip v-if="directoryType === 'SELF' && !scope.row.is_dir"
+                              :open-delay="defaultOpenDelay"
+                              placement="top">
+                    <div slot="content">加入细分市场</div>
+                    <el-icon class="iconfont el-icon-a-icon_addtomarketsegments file-type-icon"
+                             @click.native="handleAddSrcToPrivateDir(scope.row)"></el-icon>
+                  </el-tooltip>
+                </span>
                             </div>
                         </template>
                     </el-table-column>
@@ -185,6 +186,7 @@ export default {
                 keyword: '',
                 hasNext: false,
                 nextOffset: 0,
+                realOrderType: "0",
 
                 currentIndex: 0,
                 defaultLimit: 30,
@@ -200,8 +202,8 @@ export default {
             },
             defaultImg: 'this.src="' + require('@assets/error.png') + '"', //默认图地址
             multipleSelection: [],
-            sortType: 1,
-            sortOrder: 1
+            sortType: 0,
+            sortOrder: 0
         }
     },
     methods: {
@@ -254,7 +256,19 @@ export default {
         },
         handleStartSearch() {
             this.loading.searchMore = true;
-            ftsSearch(this.search.keyword, this.search.nextOffset, this.search.defaultLimit).then(response => {
+
+            if (this.sortType === 0) {
+                this.search.realOrderType = "0"
+            } else if (this.sortType === 1) {
+                if (this.sortOrder === 0) {
+                    this.search.realOrderType = "1"
+                } else if (this.sortOrder === 1) {
+                    this.search.realOrderType = "2"
+                }
+            }
+            //console.log("sort type: " + this.sortType + ", sort order: " + this.sortOrder + ",real sort " + this.search.realOrderType);
+            ftsSearch(this.search.keyword, this.search.nextOffset, this.search.defaultLimit,
+                this.search.resultShowType, this.search.realOrderType).then(response => {
                 if (response.code === "0") {
                     this.search.hasNext = response.obj["has_more"];
                     this.search.nextOffset = response.obj["next_offset"];
@@ -263,11 +277,6 @@ export default {
                         item.isModify = false;
                         this.searchResult.push(item);
                     })
-                    //过滤当前所选标签文件
-                    this.handleFilterSearchResult();
-                    if (this.search.nextOffset <= this.search.defaultLimit) {
-                        this.handleSortShowResult();
-                    }
                 } else {
                     this.$notify.error({
                         title: '搜索出错',
@@ -279,31 +288,9 @@ export default {
             })
         },
         handleFilterSearchResult() {
-            switch (this.search.resultShowType) {
-                case "0" || "":
-                    this.searchShowResult = this.searchResult;
-                    break;
-                case "1":
-                    this.searchShowResult = this.searchResult.filter(temp => {
-                        return temp.is_dir;
-                    });
-                    break;
-                case "2":
-                    this.searchShowResult = this.searchResult.filter(temp => {
-                        return !temp.is_dir && temp.mime_type.startsWith('image');
-                    });
-                    break;
-                case "3":
-                    this.searchShowResult = this.searchResult.filter(temp => {
-                        return !temp.is_dir && temp.mime_type.startsWith('video');
-                    });
-                    break;
-                case "4":
-                    this.searchShowResult = this.searchResult.filter(temp => {
-                        return !temp.is_dir && temp.mime_type.startsWith('doc');
-                    });
-                    break;
-            }
+            this.search.nextOffset = 0;
+            this.searchResult = [];
+            this.handleStartSearch();
         },
         handleSearch(searchKey) {
             this.search.keyword = searchKey;
@@ -318,98 +305,25 @@ export default {
             this.multipleSelection = val;
         },
         handleBatchAddToList() {
-            this.$emit("handleBatchAdd", this.multipleSelection)
+            this.$emit("handleBatchAdd", this.multipleSelection);
         },
         handleBatchAddToPrivate() {
             this.$emit("batchAddSrcToPrivateDir", this.multipleSelection);
         },
         handleSortTypeSelected(val) {
             this.sortType = val;
-            this.handleSortShowResult();
+            this.search.nextOffset = 0;
+            this.searchResult = [];
+            this.handleStartSearch();
         },
         handleSortOrderSelected(val) {
             this.sortOrder = val;
-            this.handleSortShowResult();
+            this.search.nextOffset = 0;
+            this.searchResult = [];
+            this.handleStartSearch();
         },
-        handleSortShowResult() {
-
-            let dirList = [];
-            let picList = [];
-            let videoList = [];
-            let docList = [];
-            let otherList = [];
-
-            this.searchShowResult.forEach(item => {
-                if (item.is_dir) {
-                    dirList.push(item)
-                } else if (item.mime_type && item.mime_type.startsWith("image")) {
-                    picList.push(item)
-                } else if (item.mime_type && item.mime_type.startsWith("video")) {
-                    videoList.push(item)
-                } else if (item.mime_type && item.mime_type.startsWith("doc")) {
-                    docList.push(item)
-                } else {
-                    otherList.push(item)
-                }
-            });
-
-            dirList = dirList.sort((file1, file2) => {
-                let fileNameA = file1.path.substr(file1.path.lastIndexOf("/") + 1);
-                let fileNameB = file2.path.substr(file2.path.lastIndexOf("/") + 1);
-                return fileNameA.localeCompare(fileNameB);
-            });
-            picList = picList.sort((file1, file2) => {
-                let fileNameA = file1.path.substr(file1.path.lastIndexOf("/") + 1);
-                let fileNameB = file2.path.substr(file2.path.lastIndexOf("/") + 1);
-                return fileNameA.localeCompare(fileNameB);
-            });
-            videoList = videoList.sort((file1, file2) => {
-                let fileNameA = file1.path.substr(file1.path.lastIndexOf("/") + 1);
-                let fileNameB = file2.path.substr(file2.path.lastIndexOf("/") + 1);
-                return fileNameA.localeCompare(fileNameB);
-            });
-            docList = docList.sort((file1, file2) => {
-                let fileNameA = file1.path.substr(file1.path.lastIndexOf("/") + 1);
-                let fileNameB = file2.path.substr(file2.path.lastIndexOf("/") + 1);
-                return fileNameA.localeCompare(fileNameB);
-            });
-            otherList = otherList.sort((file1, file2) => {
-                let fileNameA = file1.path.substr(file1.path.lastIndexOf("/") + 1);
-                let fileNameB = file2.path.substr(file2.path.lastIndexOf("/") + 1);
-                return fileNameA.localeCompare(fileNameB);
-            });
-
-            this.searchShowResult = [];
-            if (this.sortType === 1) {
-                //降序
-                if (this.sortOrder === 2) {
-                    dirList = dirList.reverse();
-                    picList = picList.reverse();
-                    videoList = videoList.reverse();
-                    docList = docList.reverse();
-                    otherList = otherList.reverse();
-                }
-                this.searchShowResult = this.searchShowResult.concat(dirList)
-                    .concat(picList)
-                    .concat(videoList)
-                    .concat(docList)
-                    .concat(otherList);
-            } else if (this.sortType === 2) {
-                //降序
-                if (this.sortOrder === 2) {
-                    this.searchShowResult = this.searchShowResult.concat(dirList)
-                        .concat(picList)
-                        .concat(videoList)
-                        .concat(docList)
-                        .concat(otherList);
-                } else if (this.sortOrder === 1) {
-                    this.searchShowResult = this.searchShowResult.concat(otherList)
-                        .concat(docList)
-                        .concat(videoList)
-                        .concat(picList)
-                        .concat(dirList);
-                }
-            }
+        close() {
+            this.visible.searchDialogVisible = false;
         }
     },
     watch: {
@@ -433,7 +347,7 @@ export default {
 :deep(.el-dialog) {
 
     margin-top: 8vh !important;
-    width: 75%;
+    width: 75% !important;
 
     .el-dialog__header {
         background-color: #EAE8EB;

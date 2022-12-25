@@ -13,6 +13,8 @@
                       @click="handleClickTopSearchKey(key)"><u><b>{{ key }}</b></u></span>
             </div>
         </div>
+        <!--        <el-button style="position: absolute" icon="el-icon-menu" @click="menuDrawerVisible = !menuDrawerVisible">目录-->
+        <!--        </el-button>-->
         <el-drawer ref="drawer" :visible.sync="menuDrawerVisible" custom-class="demo-drawer"
                    direction="ltr" title="目录菜单">
             <div class="demo-drawer__content">
@@ -22,8 +24,9 @@
         <div v-if="directoryType.length === 0">
             <space-selector @onDirectoryTypeSelected="handleDirectoryTypeSelected"/>
         </div>
-        <div v-else-if="curDirNeid === '541796009' && toCreateAlbum.list.length === 0"
-             style="height:1080px;padding: 0 80px;background: #d1d1d1;">
+        <div
+            v-else-if="curDirNeid === '541796009' && toCreateAlbum.list.length === 0"
+            style="height:1080px;padding: 0 80px;background: #d1d1d1;">
             <div v-loading="dir.loadingDir || loading.search"
                  element-loading-background="rgba(209, 209, 209)"
                  style="padding: 10px 10px 0 10px;height: 100%; ">
@@ -74,10 +77,10 @@
                 </el-row>
                 <div class="adminContentHead"
                      style="text-align: right">
-                    <AddSrcToPrivateDir v-if="hasBtnShowPermission(null,'NEW_PRIVATE_DIR')" :curDirNeid="curDirNeid"
-                                        @onAddSuccess="handleRefreshDir" @preview="handleClickDirItem"/>
-                    <AddPrivateDirectory v-if="hasBtnShowPermission(null,'NEW_PRIVATE_DIR')"
-                                         :curDirNeid="curDirNeid" @onAddSuccess="handleRefreshDir"/>
+                    <add-src-to-private-dir v-if="hasBtnShowPermission(null,'NEW_PRIVATE_DIR')" :curDirNeid="curDirNeid"
+                                            @onAddSuccess="handleRefreshDir" @preview="handleClickDirItem"/>
+                    <add-private-directory v-if="hasBtnShowPermission(null,'NEW_PRIVATE_DIR')"
+                                           :curDirNeid="curDirNeid" @onAddSuccess="handleRefreshDir"/>
                     <el-button v-if="hasBtnShowPermission(null,'WORD_MANAGER')" class="search-button" size="small"
                                @click="visible.addWordDialogVisible = !visible.addWordDialogVisible">
                         管理小白板
@@ -148,9 +151,9 @@
                                 <el-button circle icon="el-icon-link"
                                            @click.stop="handleAddTranscodeVideo(scope.$index, scope.row)"/>
                             </span>
-                            <rename-private-directory v-if="hasBtnShowPermission(scope.row,'RENAME')"
-                                                      :file-item="scope.row"
-                                                      @onModifySuccess="handleRefreshDir"/>
+                            <RenamePrivateDirectory v-if="hasBtnShowPermission(scope.row,'RENAME')"
+                                                    :file-item="scope.row"
+                                                    @onModifySuccess="handleRefreshDir"/>
                             <span v-if="hasBtnShowPermission(scope.row,'RENAME_SRC')">
                                 <el-button circle icon="el-icon-edit"
                                            @click.stop="handleUpdateAlias(scope.$index, scope.row)">
@@ -583,7 +586,7 @@ export default {
             this.handleSearch(key);
         },
         handleGetDocumentImage(mimeType) {
-            return getDocumentImage(mimeType);
+            return getDocumentImage(mimeType)
         },
         initVideoPlayer() {
             let _this = this;
@@ -662,7 +665,7 @@ export default {
             }).then(response => {
                 if (response.result) {
                 } else {
-                    console.log("引用计数失败：" + response.msg);
+                    console.log("引用计数失败：" + response.msg)
                 }
             });
             this.visible.listDetailDialogVisible = false;
@@ -729,7 +732,7 @@ export default {
                     }
                 }).finally(() => {
                     _this.loading.searchMore = false
-                });
+                })
             }
         },
         handleAddTranscodeVideo(index, row) {
@@ -857,11 +860,15 @@ export default {
             }
         },
         handleBatchAdd(multiRow) {
+            if (this.directoryType === '') {
+                this.$refs.searchDialog.close();
+                this.handleDirectoryTypeSelected("LENOVO");
+            }
             if (multiRow instanceof Array && multiRow.length > 0) {
                 multiRow.forEach(item => {
-                    this.handleAdd(item, false);
+                    this.handleAdd(item, true);
                 });
-                this.$message.success("成功添加【" + multiRow.length + "】条数据到清单！");
+                this.$message.success("成功添加【" + multiRow.length + "】条数据到清单！")
             }
         },
         handleAdd(row, needFilter) {
@@ -1113,7 +1120,6 @@ export default {
                             item.joyeaDesc = "";
                             item.isModify = false;
                             if (item.mime_type && item.mime_type === 'word' && !this.userInfo.isAdmin) {
-
                             } else {
                                 this.dir.tableData.push(item)
                             }
@@ -1273,7 +1279,6 @@ export default {
                     }
                 })
             }).catch(() => {
-
             });
         }
     },
@@ -1325,7 +1330,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
 .px10_divider {
     padding: 10px;
 }
@@ -1352,7 +1356,6 @@ export default {
 
 .bg-purple {
     padding: 5px;
-
 }
 
 .grid-content {
@@ -1379,7 +1382,6 @@ export default {
     margin-top: 5px;
     width: 100%;
 }
-
 
 .adminContentHead {
     font-size: 12px;
