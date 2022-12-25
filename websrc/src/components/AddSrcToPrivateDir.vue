@@ -124,12 +124,6 @@ export default {
                 path: this.dir.currentPath
             });
         },
-        // handleSelectSrc(item) {
-        //     this.$emit('selectSrc', {
-        //         neid: item.neid,
-        //         path: item.path
-        //     });
-        // },
         handleClickClose() {
             this.dir.tableData = [];
             this.visible.addSrcVisible = false;

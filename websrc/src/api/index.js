@@ -271,3 +271,17 @@ export function listPrivateDirectoryAdmin(dirId) {
         return resp.data;
     })
 }
+
+export function getRootDirectory() {
+    return service.post("apiv2/directory/root", {}).then(resp => {
+        return resp.data;
+    })
+}
+
+export function getChildDirectory(directoryType, parentDirId) {
+    return service.post("apiv2/directory/child", {
+        directoryType: directoryType, parentDirId: parentDirId
+    }).then(resp => {
+        return resp.data;
+    })
+}

@@ -13,20 +13,17 @@
                       @click="handleClickTopSearchKey(key)"><u><b>{{ key }}</b></u></span>
             </div>
         </div>
-        <!--        <el-button style="position: absolute" icon="el-icon-menu" @click="menuDrawerVisible = !menuDrawerVisible">目录-->
-        <!--        </el-button>-->
         <el-drawer ref="drawer" :visible.sync="menuDrawerVisible" custom-class="demo-drawer"
                    direction="ltr" title="目录菜单">
             <div class="demo-drawer__content">
-                <LenovoDirDrawer/>
+                <lenovo-dir-drawer/>
             </div>
         </el-drawer>
         <div v-if="directoryType.length === 0">
-            <SpaceSelector @onDirectoryTypeSelected="handleDirectoryTypeSelected"/>
+            <space-selector @onDirectoryTypeSelected="handleDirectoryTypeSelected"/>
         </div>
-        <div
-            v-else-if="curDirNeid === '541796009' && toCreateAlbum.list.length === 0"
-            style="height:1080px;padding: 0 80px;background: #d1d1d1;">
+        <div v-else-if="curDirNeid === '541796009' && toCreateAlbum.list.length === 0"
+             style="height:1080px;padding: 0 80px;background: #d1d1d1;">
             <div v-loading="dir.loadingDir || loading.search"
                  element-loading-background="rgba(209, 209, 209)"
                  style="padding: 10px 10px 0 10px;height: 100%; ">
@@ -41,7 +38,11 @@
             </div>
         </div>
         <el-row v-else :gutter="20" style="margin:0 80px;padding: 10px 0 0 0;height:1080px;">
-            <el-col :span="18" class="bg-purple">
+            <!--左边目录树-->
+            <el-col :span="4" class="bg-purple">
+                <directory-tree @handleClickItem="handleOpenDir"></directory-tree>
+            </el-col>
+            <el-col :span="16" class="bg-purple">
                 <!--文件路径显示-->
                 <el-row class="adminContentHead">
                     <el-col :span="15" style="color:#000000;font-size: 15px;">
@@ -66,7 +67,8 @@
                             共{{ dir.tableData.length }}个资源
                         </span>
                         <span>
-                            <el-button size="small" type="primary" @click="handleGetCurRedirectPath">获取短链</el-button>
+                            <el-button size="small" type="primary"
+                                       @click="handleGetCurRedirectPath">获取短链</el-button>
                         </span>
                     </el-col>
                 </el-row>
@@ -82,18 +84,19 @@
                     </el-button>
                 </div>
                 <el-table ref="fileTable" v-loading="dir.loadingDir || loading.search" :data="dir.tableData"
-                          empty-text="文件夹为空" style="width: 100%;" tooltip-effect="dark" @row-click="handleClickDirItem">
+                          empty-text="文件夹为空" style="width: 100%;" tooltip-effect="dark"
+                          @row-click="handleClickDirItem">
                     <el-table-column label="文件名" show-overflow-tooltip>
                         <template slot-scope="scope">
                             <div style="">
                                 <i v-if="scope.row.is_dir" class="el-icon-folder-opened"></i>
                                 <i v-else-if="scope.row.mime_type.startsWith('video')" class="el-icon-video-camera"></i>
                                 <img v-else-if="scope.row.mime_type.startsWith('image')"
-                                          :onerror="defaultImg"
-                                          :preview-text="scope.row.path"
-                                          :src="genPreviewUrl(scope.row.neid)"
-                                          fit="contain" preview="dir_image_list"
-                                          style="width: 120px; height: 90px; line-height: 30px; background-color:#DCDCDC"/>
+                                     :onerror="defaultImg"
+                                     :preview-text="scope.row.path"
+                                     :src="genPreviewUrl(scope.row.neid)"
+                                     fit="contain" preview="dir_image_list"
+                                     style="width: 120px; height: 90px; line-height: 30px; background-color:#DCDCDC"/>
                                 <i v-else-if="scope.row.mime_type.startsWith('doc')" class="el-icon-tickets"></i>
                                 <i v-else-if="scope.row.mime_type.startsWith('word')" class="el-icon-link"></i>
                                 <i v-else class="el-icon-question"></i>
@@ -145,16 +148,9 @@
                                 <el-button circle icon="el-icon-link"
                                            @click.stop="handleAddTranscodeVideo(scope.$index, scope.row)"/>
                             </span>
-                            <RenamePrivateDirectory v-if="hasBtnShowPermission(scope.row,'RENAME')"
-                                                    :file-item="scope.row"
-                                                    @onModifySuccess="handleRefreshDir"/>
-                            <!--                            <span>-->
-                            <!--                                <el-button-->
-                            <!--                                    v-if="hasBtnShowPermission(scope.row,'PRIVATE_DIR_DOWNLOAD')"-->
-                            <!--                                    @click.stop="handleDownloadPrivateDir(scope.$index, scope.row)"-->
-                            <!--                                    icon="el-icon-download" circle>-->
-                            <!--                                </el-button>-->
-                            <!--                            </span>-->
+                            <rename-private-directory v-if="hasBtnShowPermission(scope.row,'RENAME')"
+                                                      :file-item="scope.row"
+                                                      @onModifySuccess="handleRefreshDir"/>
                             <span v-if="hasBtnShowPermission(scope.row,'RENAME_SRC')">
                                 <el-button circle icon="el-icon-edit"
                                            @click.stop="handleUpdateAlias(scope.$index, scope.row)">
@@ -170,7 +166,7 @@
                 </el-table>
             </el-col>
             <!--右边清单操作-->
-            <el-col :span="6" class="bg-purple">
+            <el-col :span="4" class="bg-purple">
                 <div class="content_div">
                     <div class="center_vertical" style="width: 100%">
                         <h1>清单编辑列表（{{ toCreateAlbum.list.length }}）</h1>
@@ -288,7 +284,7 @@
                 </div>
             </el-image>
         </el-dialog>
-        <SearchResultDialog
+        <search-result-dialog
             ref="searchDialog"
             :directoryType="directoryType"
             @addSrcToPrivateDir="handleAddSrcToPrivateDir"
@@ -297,7 +293,7 @@
             @handleAdd="handleAdd"
             @handleBatchAdd="handleBatchAdd"
         >
-        </SearchResultDialog>
+        </search-result-dialog>
         <el-dialog :close-on-click-modal="false" :visible.sync="visible.addWordDialogVisible" title="小白板管理"
                    @open="handleFilterCurDirWordList">
             <div style="text-align: right">
@@ -371,6 +367,7 @@ import RenamePrivateDirectory from "@/components/RenamePrivateDirectory";
 import PrivateDirectoryAdminManager from "@/components/PrivateDirectoryAdminManager";
 import SpaceSelector from "@/components/SpaceSelector";
 import SearchResultDialog from "@/components/SearchResultDialog"
+import DirectoryTree from "@/components/DirectoryTree.vue";
 
 export default {
     name: "index",
@@ -382,7 +379,8 @@ export default {
         RenamePrivateDirectory,
         PrivateDirectoryAdminManager,
         SpaceSelector,
-        SearchResultDialog
+        SearchResultDialog,
+        DirectoryTree
     },
     data() {
         return {
@@ -549,11 +547,11 @@ export default {
             if (row.mime_type.startsWith("video")) {
                 this.handlePlayVideo(row);
                 return
-            }else if(row.mime_type.startsWith("word")){
-              let nextPlusToken = localStorage.getItem("nextx_token");
-              let url = "https://m.nextxx.cn/fullscreen/#/main/pc/boardDetail?access_token=" + nextPlusToken + "&id=" + row.neid;
-              window.open(url);
-              return;
+            } else if (row.mime_type.startsWith("word")) {
+                let nextPlusToken = localStorage.getItem("nextx_token");
+                let url = "https://m.nextxx.cn/fullscreen/#/main/pc/boardDetail?access_token=" + nextPlusToken + "&id=" + row.neid;
+                window.open(url);
+                return;
             }
             let url = genSrcPreviewSrc(row.neid);
             if (row.mime_type.startsWith("video")) {
@@ -585,7 +583,7 @@ export default {
             this.handleSearch(key);
         },
         handleGetDocumentImage(mimeType) {
-            return getDocumentImage(mimeType)
+            return getDocumentImage(mimeType);
         },
         initVideoPlayer() {
             let _this = this;
@@ -664,7 +662,7 @@ export default {
             }).then(response => {
                 if (response.result) {
                 } else {
-                    console.log("引用计数失败：" + response.msg)
+                    console.log("引用计数失败：" + response.msg);
                 }
             });
             this.visible.listDetailDialogVisible = false;
@@ -731,7 +729,7 @@ export default {
                     }
                 }).finally(() => {
                     _this.loading.searchMore = false
-                })
+                });
             }
         },
         handleAddTranscodeVideo(index, row) {
@@ -861,9 +859,9 @@ export default {
         handleBatchAdd(multiRow) {
             if (multiRow instanceof Array && multiRow.length > 0) {
                 multiRow.forEach(item => {
-                    this.handleAdd(item, false)
+                    this.handleAdd(item, false);
                 });
-                this.$message.success("成功添加【" + multiRow.length + "】条数据到清单！")
+                this.$message.success("成功添加【" + multiRow.length + "】条数据到清单！");
             }
         },
         handleAdd(row, needFilter) {
@@ -902,7 +900,6 @@ export default {
             this.toCreateAlbum.list.push(this.toCreateAlbum.toAddRow);
             this.toCreateAlbum.toAddRow = {};
             this.toCreateAlbum.toSelectDesc = [];
-            //this.$set(this.toCreateAlbum,"descSelectDialogVisible",false);
             this.toCreateAlbum.descSelectDialogVisible = false;
         },
         handleCollect(index, row) {
@@ -980,7 +977,6 @@ export default {
                             message: this.toCreateAlbum.idEditMode ? "重新保存成功" : '保存成功'
                         })
                     } else {
-                        console.log(response.msg);
                         this.$notify.error({
                             title: "保存结果",
                             message: this.toCreateAlbum.idEditMode ? "重新保存失败" : '保存失败'
@@ -1003,6 +999,10 @@ export default {
                     this.toCreateAlbum.list = [];
                 }
             });
+        },
+        handleOpenDir(directoryType, path) {
+            this.directoryType = directoryType;
+            this.handleListLenovoDir(path);
         },
         handleDownloadSrc(isList, row) {
             let _this = this;
@@ -1273,6 +1273,7 @@ export default {
                     }
                 })
             }).catch(() => {
+
             });
         }
     },
@@ -1313,9 +1314,9 @@ export default {
                 _this.handleGoRootPath();
             }
         });
-        let nextPlusToken =  getQueryParam("access_token");
-        if(nextPlusToken){
-          localStorage.setItem("nextx_token",nextPlusToken);
+        let nextPlusToken = getQueryParam("access_token");
+        if (nextPlusToken) {
+            localStorage.setItem("nextx_token", nextPlusToken);
         }
     },
     destroyed() {
@@ -1406,6 +1407,6 @@ export default {
 }
 
 .el-col-lg-4-8 {
-  width: 20%;
+    width: 20%;
 }
 </style>
