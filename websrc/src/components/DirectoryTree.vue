@@ -1,20 +1,16 @@
 <template>
     <div>
-        <div class="directory-head">细分市场素材库</div>
-        <el-tree :data="selfData" :props="defaultProps" lazy
+        <el-tree :data="treeData" :props="defaultProps" lazy
                  :load="handleLoadChild"
                  @node-click="handleNodeClick">
             <template slot-scope="scope">
-                <div class="directory-item"><i class="iconfont-color icon-icon_folder"/>{{ scope.data.dirName }}</div>
-            </template>
-        </el-tree>
-        <el-divider></el-divider>
-        <div class="directory-head">基础素材库</div>
-        <el-tree :data="lenovoData" :props="defaultProps" lazy
-                 :load="handleLoadChild"
-                 @node-click="handleNodeClick">
-            <template slot-scope="scope">
-                <div class="directory-item"><i class="iconfont-color icon-icon_folder"/>{{ scope.data.dirName }}</div>
+                <div v-if="scope.data.parentDirId">
+                    <i class="iconfont-color icon-icon_folder"/>
+                    {{ scope.data.dirName }}
+                </div>
+                <div v-else class="directory-item">
+                    <b>{{ scope.data.dirName }}</b>
+                </div>
             </template>
         </el-tree>
     </div>
@@ -28,11 +24,11 @@ export default {
     name: "DirectoryTree",
     data() {
         return {
-            selfData: [],
-            lenovoData: [],
+            treeData: [],
             defaultProps: {
                 label: 'dirName',
                 children: 'children',
+                isLeaf: 'isLeaf'
             }
         }
     },
@@ -40,6 +36,9 @@ export default {
         handleLoadChild(node, resolve) {
             getChildDirectory(node.data.dirType, node.data.id).then(data => {
                 if (data.code === "0") {
+                    data.list.forEach(item => {
+                        item.isLeaf = !item.hasChild;
+                    })
                     resolve(data.list);
                 }
             }).finally(() => {
@@ -53,8 +52,7 @@ export default {
     mounted() {
         getRootDirectory().then(data => {
             if (data.code === "0") {
-                this.selfData = data.obj.selfDirectory;
-                this.lenovoData = data.obj.lenovoDirectory;
+                this.treeData = data.list;
             }
         }).finally(() => {
 

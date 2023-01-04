@@ -10,12 +10,20 @@ import Share from '../views/home/share'
 import UploadManage from "../views/home/UploadManage";
 import UploadIndex from "../views/home/upload/index";
 import Transcode from  "../views/home/tanscode";
+import Test from "../views/Test"
 
 Vue.use(Router);
 
 export default new Router({
     base: process.env.BASE_URL,
     routes: [
+        {
+            path: '/test',
+            name: 'test',
+            desc: '测试',
+            component: Test,
+            hidden: true
+        },
         {
             path: '/login',
             name: 'login',

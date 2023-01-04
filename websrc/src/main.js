@@ -18,6 +18,9 @@ import "./assets/iconfont-color/iconfont.css"
 Video.addLanguage('zh-CN', video_zhCN);
 Video.addLanguage('en', video_en);
 
+import md5 from 'js-md5';
+Vue.prototype.$md5 = md5;
+
 Vue.config.productionTip = false;
 Vue.use(ElementUI);
 Vue.use(preview);
