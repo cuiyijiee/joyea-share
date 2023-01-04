@@ -372,6 +372,8 @@ import SpaceSelector from "@/components/SpaceSelector";
 import SearchResultDialog from "@/components/SearchResultDialog"
 import DirectoryTree from "@/components/DirectoryTree.vue";
 
+let videoLoading = require("@/assets/video-loading.jpg")
+
 export default {
     name: "index",
     components: {
@@ -599,7 +601,7 @@ export default {
                     language: 'zh-CN', // 设置语言
                     muted: false, // 是否静音
                     inactivityTimeout: false,
-                    poster: 'video-loading.jpg',
+                    poster: videoLoading,
                     controlBar: { // 设置控制条组件
                         children: [
                             {name: 'playToggle'}, // 播放按钮
@@ -618,7 +620,7 @@ export default {
                     _this.player = this;
                 });
             } else {
-                _this.player.poster("video-loading.jpg")
+                _this.player.poster(videoLoading)
             }
         },
         playVideo(videoUrl) {

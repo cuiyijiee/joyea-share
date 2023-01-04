@@ -12,6 +12,8 @@
 import videojs from 'video.js'
 import {getVideoPreviewUrl} from "@/utils";
 
+let videoLoading = require("@/assets/video-loading.jpg")
+
 export default {
   name: "VideoPreviewDialog",
   data() {
@@ -54,7 +56,7 @@ export default {
           language: 'zh-CN', // 设置语言
           muted: false, // 是否静音
           inactivityTimeout: false,
-          poster: 'video-loading.jpg',
+          poster: videoLoading,
           controlBar: { // 设置控制条组件
             children: [
               {name: 'playToggle'}, // 播放按钮
