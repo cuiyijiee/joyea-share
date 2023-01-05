@@ -94,7 +94,7 @@
                         <template slot-scope="scope">
                             <div>
                 <span class="file-type-show">
-                                {{ formatFileShowType(scope.row) }}
+                    {{ formatFileShowType(scope.row) }}
                 </span>
                                 <span class="file-type-hide">
                   <el-tooltip v-if="scope.row.is_dir" :open-delay="defaultOpenDelay" placement="top">

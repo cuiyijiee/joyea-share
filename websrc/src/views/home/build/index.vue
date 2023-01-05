@@ -1,7 +1,7 @@
 <template>
     <section id="build">
         <!--工具条-->
-        <div style="padding: 10px 80px 0 80px;background: #E9E9E9;">
+        <div class="main-tools">
             <el-input v-model="search.key" class="my-input" placeholder="请输入关键字"
                       @keyup.enter.native="handleSearch">
                 <el-button slot="append" class="search-button"
@@ -13,8 +13,6 @@
                       @click="handleClickTopSearchKey(key)"><u><b>{{ key }}</b></u></span>
             </div>
         </div>
-        <!--        <el-button style="position: absolute" icon="el-icon-menu" @click="menuDrawerVisible = !menuDrawerVisible">目录-->
-        <!--        </el-button>-->
         <el-drawer ref="drawer" :visible.sync="menuDrawerVisible" custom-class="demo-drawer"
                    direction="ltr" title="目录菜单">
             <div class="demo-drawer__content">
@@ -24,9 +22,8 @@
         <div v-if="directoryType.length === 0">
             <space-selector @onDirectoryTypeSelected="handleDirectoryTypeSelected"/>
         </div>
-        <div
-            v-else-if="curDirNeid === '541796009' && toCreateAlbum.list.length === 0"
-            style="height:1080px;padding: 0 80px;background: #d1d1d1;">
+        <div v-else-if="curDirNeid === '541796009' && toCreateAlbum.list.length === 0"
+             style="height:1080px;padding: 0 40px;background: #d1d1d1;">
             <div v-loading="dir.loadingDir || loading.search"
                  element-loading-background="rgba(209, 209, 209)"
                  style="padding: 10px 10px 0 10px;height: 100%; ">
@@ -40,12 +37,25 @@
                 </el-row>
             </div>
         </div>
-        <el-row v-else :gutter="20" style="margin:0 80px;padding: 10px 0 0 0;height:1080px;">
-            <!--左边目录树-->
+        <el-row v-else :gutter="20" style="margin:0 40px;padding: 10px 0 0 0;height:1080px;">
             <el-col :span="4" class="bg-purple">
                 <directory-tree @handleClickItem="handleOpenDir"></directory-tree>
             </el-col>
             <el-col :span="16" class="bg-purple">
+                <div class="directory-tools">
+                    <el-button icon="iconfont el-icon-a-icon_getshortchain" size="mini" type="primary"
+                               @click="handleGetCurRedirectPath">获取短链
+                    </el-button>
+                    <el-button v-if="hasBtnShowPermission(null,'WORD_MANAGER')"
+                               size="mini" type="primary"
+                               @click="visible.addWordDialogVisible = !visible.addWordDialogVisible">
+                        管理小白板
+                    </el-button>
+                    <add-src-to-private-dir v-if="hasBtnShowPermission(null,'NEW_PRIVATE_DIR')" :curDirNeid="curDirNeid"
+                                            @onAddSuccess="handleRefreshDir" @preview="handleClickDirItem"/>
+                    <add-private-directory v-if="hasBtnShowPermission(null,'NEW_PRIVATE_DIR')"
+                                           :curDirNeid="curDirNeid" @onAddSuccess="handleRefreshDir"/>
+                </div>
                 <!--文件路径显示-->
                 <el-row class="adminContentHead">
                     <el-col :span="15" style="color:#000000;font-size: 15px;">
@@ -77,14 +87,7 @@
                 </el-row>
                 <div class="adminContentHead"
                      style="text-align: right">
-                    <add-src-to-private-dir v-if="hasBtnShowPermission(null,'NEW_PRIVATE_DIR')" :curDirNeid="curDirNeid"
-                                            @onAddSuccess="handleRefreshDir" @preview="handleClickDirItem"/>
-                    <add-private-directory v-if="hasBtnShowPermission(null,'NEW_PRIVATE_DIR')"
-                                           :curDirNeid="curDirNeid" @onAddSuccess="handleRefreshDir"/>
-                    <el-button v-if="hasBtnShowPermission(null,'WORD_MANAGER')" class="search-button" size="small"
-                               @click="visible.addWordDialogVisible = !visible.addWordDialogVisible">
-                        管理小白板
-                    </el-button>
+
                 </div>
                 <el-table ref="fileTable" v-loading="dir.loadingDir || loading.search" :data="dir.tableData"
                           empty-text="文件夹为空" style="width: 100%;" tooltip-effect="dark"
@@ -1332,6 +1335,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "../../../style/vars";
+
 .px10_divider {
     padding: 10px;
 }
@@ -1412,5 +1417,10 @@ export default {
 
 .el-col-lg-4-8 {
     width: 20%;
+}
+
+.main-tools {
+    padding: 10px $--main-padding 0 $--main-padding;
+    background: #E9E9E9;
 }
 </style>

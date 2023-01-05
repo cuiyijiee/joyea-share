@@ -1,6 +1,6 @@
 <template>
-    <div>
-        <el-tree :data="treeData" :props="defaultProps" lazy
+    <div class="directory-tree">
+        <el-tree :data="treeData" :props="defaultProps" lazy indent="8"
                  :load="handleLoadChild"
                  @node-click="handleNodeClick">
             <template slot-scope="scope">
@@ -9,7 +9,7 @@
                     {{ scope.data.dirName }}
                 </div>
                 <div v-else class="directory-item">
-                    <b>{{ scope.data.dirName }}</b>
+                    <b style="color: #303133">{{ scope.data.dirName }}</b>
                 </div>
             </template>
         </el-tree>
@@ -69,6 +69,10 @@ export default {
 
 .directory-item {
     font-size: 14px;
+}
+
+.directory-tree{
+
 }
 
 </style>

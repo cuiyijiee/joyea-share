@@ -290,7 +290,7 @@ export default {
 
         .main_content {
 
-            padding-left: 80px;
+            padding-left: $--main-padding;
 
             .logo {
                 cursor: pointer;
@@ -312,7 +312,7 @@ export default {
 
         .userinfo {
             text-align: right;
-            padding-right: 80px;
+            padding-right: $--main-padding;
             float: right;
 
             .el-button--mini {
